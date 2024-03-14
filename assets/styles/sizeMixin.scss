@@ -1,0 +1,25 @@
+$maxWidth_FullHD: 1920;
+$maxWidth_HD: 1170;
+$maxWidth_Tablet: 780;
+$maxWidth_Phone: 320;
+
+@mixin adaptive($property, $startSize, $minSize, $typeScreen) {
+  $addSize: $startSize - $minSize;
+  @if $typeScreen==1 {
+    #{$property}: $startSize + px;
+    @media (max-width: #{$maxWidth_HD + px}) {
+      #{$property}: calc(#{$minSize + px} + #{$addSize} * ((100vw -780px) / #{$maxWidth_HD - 780}));
+    }
+  } @else if $typeScreen==2 {
+    #{$property}: $startSize + px;
+    @media (min-width: #{$maxWidth_HD + px}) {
+      #{$property}: calc(
+        #{$minSize + px} + #{$addSize} * ((100vw - 320px) / #{$maxWidth_Tablet - 320})
+      );
+    }
+  } @else {
+    #{$property}: calc(
+      #{$minSize + px} + #{$addSize} * ((100vw - 1200px) / #{$maxWidth_FullHD - 1170})
+    );
+  }
+}

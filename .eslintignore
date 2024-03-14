@@ -1,0 +1,11 @@
+# Commin
+node_modules
+.output
+.nuxt
+.nitro
+coverage
+lib/templates
+dist
+
+*.css
+*.bat

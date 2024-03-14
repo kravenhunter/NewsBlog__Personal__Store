@@ -1,0 +1,22 @@
+{
+  "root": true,
+  "env": {
+    "browser": true,
+    "node": true
+  },
+  "extends": ["@antfu", "prettier"],
+  "ignorePatterns": [".gitignore", ".prettierignore"],
+  "rules": {
+    "no-console": "off",
+    "no-undef": "off",
+    "valid-typeof": "off",
+    //"valid-typeof": ["error", { "requireStringLiterals": true }]
+    "spaced-comment": "off",
+    "sort-imports": "off",
+    "vue/attributes-order": "off",
+    "import/order": 0,
+    "no-debugger": "off",
+    "no-restricted-syntax": "off",
+    "antfu/top-level-function": "off"
+  }
+}

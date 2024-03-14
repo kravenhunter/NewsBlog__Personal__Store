@@ -1,0 +1,50 @@
+{
+  "name": "nuxt-app",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "lint": "eslint .",
+    "lint-fix": "eslint . --fix"
+  },
+  "dependencies": {
+    "@pinia/nuxt": "^0.4.11",
+    "@tiptap/extension-blockquote": "^2.0.4",
+    "@tiptap/extension-character-count": "^2.0.4",
+    "@tiptap/extension-code": "^2.0.4",
+    "@tiptap/extension-document": "^2.0.4",
+    "@tiptap/extension-highlight": "^2.0.4",
+    "@tiptap/extension-image": "^2.0.4",
+    "@tiptap/extension-placeholder": "^2.0.4",
+    "@tiptap/extension-text-align": "^2.0.4",
+    "@tiptap/extension-underline": "^2.0.4",
+    "@tiptap/extension-youtube": "^2.0.4",
+    "@tiptap/pm": "^2.0.4",
+    "@tiptap/starter-kit": "^2.0.4",
+    "@tiptap/vue-3": "^2.0.4",
+    "@vuelidate/core": "^2.0.3",
+    "@vuelidate/validators": "^2.0.3",
+    "@vueup/vue-quill": "^1.2.0",
+    "firebase": "^10.1.0",
+    "firebase-admin": "^11.10.1",
+    "pinia": "^2.1.4",
+    "sass": "^1.64.1",
+    "uuid": "^9.0.0",
+    "vue-uuid": "^3.0.0"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^0.39.8",
+    "@iconify/vue": "^4.1.1",
+    "@nuxt/devtools": "latest",
+    "@types/node": "^18.16.20",
+    "eslint-config-prettier": "^8.8.0",
+    "nuxt": "^3.6.5",
+    "postcss-scss": "^4.0.6"
+  },
+  "overrides": {
+    "vue": "latest"
+  }
+}
