@@ -1,0 +1,5 @@
+-- AddForeignKey
+ALTER TABLE `Post` ADD CONSTRAINT `Post_imageBg_Id_fkey` FOREIGN KEY (`imageBg_Id`) REFERENCES `File`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Post` ADD CONSTRAINT `Post_imagePrev_Id_fkey` FOREIGN KEY (`imagePrev_Id`) REFERENCES `File`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

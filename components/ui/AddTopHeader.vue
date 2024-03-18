@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { useAuthStore } from "@/stores/authStore";
 import formatPath from "@/utils/formatPath";
-import { storeToRefs } from "pinia";
 import type { INavigation } from "types/INavigation";
+
+// import { storeToRefs } from "pinia";
+// import { useAuthStore } from "@/stores/authStore";
 
 defineProps({
   topLinks: {
@@ -19,6 +20,8 @@ defineEmits<{
   searchInput: [value: string];
 }>();
 
+const { data, signOut, status } = useAuth();
+
 const convertPath = (title: string | undefined) => title && `/${title?.toLocaleLowerCase()}/list`;
 
 const searchReqiest = ref("");
@@ -30,8 +33,8 @@ const openLogIn = ref(false);
 const opnenSignIn = ref(false);
 const opemProfile = ref(false);
 
-const { signOutUser } = useAuthStore();
-const { statAuth } = storeToRefs(useAuthStore());
+// const { signOutUser } = useAuthStore();
+// const { statAuth } = storeToRefs(useAuthStore());
 
 const toggleHandler = (event: boolean) => (isShow.value = !event);
 
@@ -44,12 +47,14 @@ const openLogInWindow = (event: boolean) => {
   opnenSignIn.value = !event;
 };
 const logOutHandler = async () => {
-  const status = await signOutUser();
-
-  if (status.statusCode === 200) {
-    opemProfile.value = false;
+  try {
+    const result = await signOut({
+      redirect: false,
+    });
+    console.log(result); //  { url: 'http://localhost:3001/index' }
+  } catch (error) {
+    console.log(error);
   }
-  status.statusCode === 405 && console.log("Error Log out", status.message);
 };
 const searchHandler = (search: string) => {
   search && navigateTo(`/search/${search}`);
@@ -119,9 +124,9 @@ const searchHandler = (search: string) => {
     <ul class="signInLinks flex">
       <li class="links">
         <UiElementsDynamicTransition>
-          <div class="profile_container" v-if="statAuth.authenticated">
+          <div class="profile_container" v-if="status === 'authenticated'">
             <div class="login">
-              <p>{{ statAuth.authUser?.userNameField }}</p>
+              <p>{{ data?.user?.name }}</p>
             </div>
             <div class="user_block">
               <UiElementsAddButton
@@ -220,8 +225,8 @@ const searchHandler = (search: string) => {
           <div class="burger_auth">
             <ul class="burger_auth_links">
               <li class="links">
-                <div class="burger_profile" v-if="statAuth.authenticated">
-                  <p>{{ statAuth.authUser?.userNameField }}</p>
+                <div class="burger_profile" v-if="status === 'authenticated'">
+                  <p>{{ data?.user?.name }}</p>
                   <UiElementsAddButton
                     type="button"
                     class="user_btn"

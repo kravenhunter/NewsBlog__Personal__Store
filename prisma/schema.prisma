@@ -1,0 +1,183 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Account {
+  id            String  @id
+  type          String
+  refresh_token String?
+  access_token  String?
+  expires_at    Int?
+  token_type    String?
+  id_token      String?
+  session_state String?
+  userId        String  @unique
+  User          User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Session {
+  id           String   @id
+  sessionToken String   @unique
+  userId       String   @unique
+  expires      DateTime
+  User         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id               String            @id @default(cuid())
+  name             String?
+  email            String?           @unique
+  emailVerified    DateTime?
+  hashedPassword   String?
+  createdAt        DateTime          @default(now())
+  updateddAt       DateTime          @default(now())
+  Account          Account?
+  Session          Session?
+  Comment          Comment?
+  User_Credentials User_Credentials?
+}
+
+model User_Credentials {
+  id             String    @id @default(cuid())
+  date           DateTime  @default(now())
+  accessPanel    Boolean
+  userNameField  String
+  adressField    String?
+  emailField     String
+  avatarId       String?   @unique
+  avatar         File?     @relation(fields: [avatarId], references: [id], onDelete: SetNull)
+  birthdayField  DateTime?
+  firstNameField String?
+  lastNameField  String?
+  phoneField     String?
+  genderField    Gender
+  userId         String    @unique
+  User           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum Gender {
+  Male
+  Female
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model File {
+  id               String            @id @default(cuid())
+  create_at        DateTime          @default(now())
+  update_at        DateTime?
+  title            String
+  file_type        FileType
+  file_binary      String            @db.MediumText
+  description      String?
+  User_Credentials User_Credentials?
+  Advertise        Advertise?
+  ImageBg          Post?             @relation(name: "imageBg")
+  ImagePrev        Post?             @relation(name: "imagePrev")
+  tagId            String?
+  tag              Tag?              @relation(fields: [tagId], references: [id])
+}
+
+enum FileType {
+  Image
+  Audio
+}
+
+model Post {
+  id           String   @id @default(cuid())
+  date         DateTime @default(now())
+  title        String
+  author       String
+  body         String
+  imageBg_Id   String   @unique
+  imagePrev_Id String   @unique
+  imageBg      File?    @relation(fields: [imageBg_Id], references: [id], name: "imageBg")
+  imagePrev    File?    @relation(fields: [imagePrev_Id], references: [id], name: "imagePrev")
+  shortBody    String
+  tags         Tag[]
+
+  Comment   Comment[]
+  CommentId String?
+}
+
+model Tag {
+  id    String   @id @default(cuid())
+  date  DateTime @default(now())
+  title String
+  Posts Post[]
+  File  File[]
+}
+
+model Comment {
+  id     String   @id @default(cuid())
+  date   DateTime @default(now())
+  title  String
+  body   String
+  postId String   @unique
+  Posts  Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId String   @unique
+  Author User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model About {
+  id          String   @id @default(cuid())
+  date        DateTime @default(now())
+  title       String
+  description String
+}
+
+model Advertise {
+  id       String   @id @default(cuid())
+  date     DateTime @default(now())
+  name     String
+  sourceId String   @unique
+  source   File     @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+}
+
+model Contacts {
+  id        String   @id @default(cuid())
+  date      DateTime @default(now())
+  adress    String
+  copyright String
+  email     String
+  Socials   Social[]
+  // facebookLink String
+  // instagram    String
+  // twetter      String
+  // vkontakte    String
+  // youtube      String
+}
+
+model Social {
+  id        String    @id @default(cuid())
+  date      DateTime  @default(now())
+  title     String
+  link      String
+  contactId String?   @unique
+  Contacts  Contacts? @relation(fields: [contactId], references: [id], onDelete: Cascade)
+}
+
+model FooterLink {
+  id    String   @id @default(cuid())
+  date  DateTime @default(now())
+  title String
+  path  String?
+}
+
+model Navigation {
+  id    String   @id @default(cuid())
+  date  DateTime @default(now())
+  title String
+  path  String?
+}
