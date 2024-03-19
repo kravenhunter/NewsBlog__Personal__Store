@@ -1,92 +1,74 @@
 <script setup lang="ts">
+import type {
+  About,
+  Advertise,
+  Contacts,
+  File as FileData,
+  FooterLink,
+  Navigation,
+  Post,
+  Tag,
+} from "@prisma/client";
 import { storeToRefs } from "pinia";
 
 //Get  Authorized user
-const { isAuthorized } = useAuthStore();
+// const { isAuthorized } = useAuthStore();
+// const { data, signOut, status } = useAuth();
 
+const { loadDataList } = useUnionStore();
 //Fetch AboutUs  data
-const { aboutUs } = storeToRefs(useAboutUsStore());
-const { getAboutUs } = useAboutUsStore();
+const {
+  postlist,
+  categoryList,
+  advertiseList,
+  aboutUs,
+  contactList,
+  navLiks,
+  footerLinks,
+  imageList,
+  podCastList,
+} = storeToRefs(useUnionStore());
 
-//Fetch Contactsr links data
-const { stateData } = storeToRefs(useContactStore());
-const { getContacts } = useContactStore();
-
-//Fetch Nav and Footer links data
-const { navLinks, footerLinks } = storeToRefs(useNavStorage());
-const { getList, getFooterList } = useNavStorage();
-
-//Fetch Articles data
-const { postsState } = storeToRefs(useArticleStore());
-const { getPostList } = useArticleStore();
-
-const { imageList } = storeToRefs(useGalaryStore());
-const { getGalaryDBList } = useGalaryStore();
-//CategoryLinks
-
-const { categoryState } = storeToRefs(useCategoryStorage());
-const { getGategoryList } = useCategoryStorage();
-
-//Fetch Podcast List
-const { podcastsState } = storeToRefs(usePodcastsStore());
-const { getPodCastList } = usePodcastsStore();
-
-//Fetch Advertisement List
-const { advertiseList } = storeToRefs(useAdvertiseStore());
-const { getAdvertiseList } = useAdvertiseStore();
-/* 
-const { geUsersList } = useUserStore();
-const { authorizedUserCredentials } = storeToRefs(useUserStore()); */
-/* 
-const loadStores2 = async () => {
-  !authorizedUserCredentials.value?.id && (await isAuthorized());
-
-  await geUsersList();
-  await getPostList();
-  await getGategoryList();
-  await getPodCastList();
-  await getAboutUs();
-  await getContacts();
-  await getGalaryDBList();
-  await getAdvertiseList();
-  await getList();
-  await getFooterList();
-};
- */
 const loadStores = async () => {
-  if (!postsState.value.postList.length) {
-    await getPostList();
+  if (!postlist.value?.length) {
+    await loadDataList<Post[]>("/api/post/list", "post");
   }
-  if (!categoryState.value?.length) {
-    await getGategoryList();
+  if (!categoryList.value?.length) {
+    await loadDataList<Tag[]>("/api/tag/list", "tag");
   }
-  if (!podcastsState.value?.podcastList.length) {
-    await getPodCastList();
+  if (!podCastList.value?.length) {
+    await loadDataList<FileData[]>("/api/file/list-by-type/audio", "podcasts");
+  }
+  if (!contactList.value) {
+    await loadDataList<Contacts[]>("/api/contacts/list", "contacts");
   }
   if (!aboutUs.value) {
-    await getAboutUs();
-  }
-  if (!stateData.value) {
-    await getContacts();
-  }
-  if (!imageList.value.databaseList.length) {
-    await getGalaryDBList();
-  }
-  if (!advertiseList.value.databaseList.length) {
-    await getAdvertiseList();
+    await loadDataList<About[]>("/api/about/list", "about");
   }
 
-  if (!navLinks.value?.length) {
-    await getList();
+  if (!imageList.value) {
+    await loadDataList<FileData[]>("/api/file/list-by-type/images", "images");
   }
-  if (!footerLinks.value?.length) {
-    await getFooterList();
+  if (!advertiseList.value) {
+    await loadDataList<Advertise[]>("/api/advertise/list", "advertise");
+  }
+
+  if (!navLiks.value) {
+    await loadDataList<Navigation[]>("/api/nav-link/list", "nav-link");
+  }
+  if (!footerLinks.value) {
+    await loadDataList<FooterLink[]>("/api/footer-link/list", "footer-link");
   }
 };
 //Load all stores
 await loadStores();
+
 //CHeck Auth a
-onMounted(async () => await isAuthorized());
+// onMounted(async () => await isAuthorized());
+definePageMeta({
+  layout: "admin",
+  middleware: "auth", //from nuxt-config
+});
 </script>
 
 <template>

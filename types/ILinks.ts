@@ -1,4 +1,4 @@
-export interface ILinks {
+export default interface ILinks {
   name: string;
   path: string;
 }

@@ -1,4 +1,4 @@
-export interface IContact {
+export default interface IContact {
   id?: string;
   copyright?: string;
   telephone?: string;

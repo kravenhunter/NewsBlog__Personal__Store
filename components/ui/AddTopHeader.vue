@@ -1,26 +1,20 @@
 <script setup lang="ts">
 import formatPath from "@/utils/formatPath";
-import type { INavigation } from "types/INavigation";
+import type { Navigation } from "@prisma/client";
 
 // import { storeToRefs } from "pinia";
 // import { useAuthStore } from "@/stores/authStore";
-
-defineProps({
-  topLinks: {
-    type: Array as PropType<INavigation[]>,
-    default: null,
-  },
-  categoryLinks: {
-    type: Array as PropType<INavigation[]>,
-    default: null,
-  },
-});
+interface IProps {
+  topLinks?: Navigation[] | null;
+  categoryLinks?: Navigation[] | null;
+}
+defineProps<IProps>();
 
 defineEmits<{
   searchInput: [value: string];
 }>();
 
-const { data, signOut, status } = useAuth();
+const { data, signIn, signOut, status } = useAuth();
 
 const convertPath = (title: string | undefined) => title && `/${title?.toLocaleLowerCase()}/list`;
 

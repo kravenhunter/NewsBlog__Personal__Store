@@ -1,67 +1,44 @@
 <script setup lang="ts">
-import type { IArticle } from "types/IArticle";
+import type { IPost } from "~/types";
 
-defineProps({
-  singlePost: {
-    type: Object as PropType<IArticle>,
-    default: null,
-  },
-  fontSize: {
-    type: String,
-    default: "18px",
-  },
-  fontWeight: {
-    type: Number,
-    default: 600,
-  },
-  rowSize: {
-    type: String,
-    default: "auto",
-  },
-  showContent: {
-    type: Boolean,
-    default: false,
-  },
-  showShortBody: {
-    type: Boolean,
-    default: false,
-  },
-  showCategory: {
-    type: Boolean,
-    default: false,
-  },
-  showTitle: {
-    type: Boolean,
-    default: false,
-  },
-  showImage: {
-    type: Boolean,
-    default: false,
-  },
-  showDate: {
-    type: Boolean,
-    default: false,
-  },
-  classType: {
-    type: String,
-    default: "",
-  },
+interface IProps {
+  singlePost: IPost;
+  fontSize: string;
+  fontWeight: number;
+  rowSize: string;
+  showContent?: boolean;
+  showShortBody?: boolean;
+  showCategory?: boolean;
+  showTitle?: boolean;
+  showImage?: boolean;
+  showDate?: boolean;
+  classType?: string;
+}
+
+withDefaults(defineProps<IProps>(), {
+  fontSize: "18px",
+  fontWeight: 600,
+  rowSize: "auto",
 });
 </script>
 
 <template>
   <article class="single_post" :class="classType">
     <div class="tag" v-if="showCategory">
-      <h5>{{ singlePost?.category?.toLocaleUpperCase() }}</h5>
+      <h5>{{ singlePost?.tags.join(" ")?.toLocaleUpperCase() }}</h5>
     </div>
     <div class="title_post" v-if="showTitle">
-      <NuxtLink :to="{ path: `/${singlePost?.category}/${singlePost?.id}` }">
+      <NuxtLink :to="{ path: `/post/${singlePost?.id}` }">
         <p>{{ singlePost?.title }}</p>
       </NuxtLink>
     </div>
 
     <div class="preview_image" v-if="showImage">
-      <img class="image" :src="singlePost?.image" alt="postPriview" />
+      <!-- <img class="image" :src="singlePost?.image" alt="postPriview" /> -->
+      <NuxtImg
+        v-if="singlePost.imagePrev"
+        :src="`data:image/webp;base64,${singlePost.imagePrev.file_binary}`"
+        alt="Image" />
     </div>
 
     <div v-if="showShortBody" class="shortn_block">
@@ -70,7 +47,7 @@ defineProps({
     <div class="post_created" v-if="showDate">
       <span>
         By <b class="author">{{ singlePost?.author }}</b>
-        {{ singlePost?.date && formatDate(singlePost?.date) }}
+        {{ singlePost?.date && formatDate(singlePost.date) }}
       </span>
     </div>
 

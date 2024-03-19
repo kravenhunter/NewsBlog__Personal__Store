@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import type { INavigation } from "types/INavigation";
+import type { Navigation } from "@prisma/client";
 
-defineProps({
-  navLinks: {
-    type: Array as PropType<INavigation[]>,
-    default: null,
-  },
-});
+interface IProps {
+  navLinks?: Navigation[] | null;
+}
+
+defineProps<IProps>();
 
 const selectedTab = ref("");
 

@@ -1,12 +1,10 @@
 <script setup lang="ts">
-import type { IPodcast } from "types/IPodcast";
+import type { IFileData } from "~/types";
 
-defineProps({
-  podcastList: {
-    type: Array as PropType<IPodcast[]>,
-    default: null,
-  },
-});
+interface IProps {
+  podcastList?: IFileData[] | null;
+}
+defineProps<IProps>();
 </script>
 
 <template>
@@ -16,7 +14,7 @@ defineProps({
         <h2>Podcasts</h2>
         <span> Lesten our podcast news. Daily, global problem adn funny things. </span>
       </div>
-      <UiElementsMusicAqualizer :list="podcastList" :show-list="false" />
+      <UiElementsMusicAqualizer v-if="podcastList" :list="podcastList" :show-list="false" />
     </div>
     <div class="media_sub">
       <MediaSubcsribe />

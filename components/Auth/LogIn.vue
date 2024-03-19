@@ -7,20 +7,39 @@ const formData = reactive({
   passwordField: "p@ssw0rd",
 });
 const { logInInUser } = useAuthStore();
-
+const { signIn } = useAuth();
+const isLoading = ref(false);
 const v$ = validateLoginHelper(formData);
 async function submitForm() {
   v$.value.$validate();
   if (!v$.value.$error) {
-    // console.log('password', v$.value.passwordField.$model);
-    const reseulAuth = await logInInUser(v$.value.emailField.$model, v$.value.passwordField.$model);
-    if (reseulAuth.statusCode === 200) {
-      // userState.value = true;
-
-      closeHandler();
+    try {
+      isLoading.value = true;
+      setTimeout(async () => {
+        const result = await signIn("credentials", {
+          email: v$.value.emailField.$model,
+          password: v$.value.passwordField.$model,
+          redirect: false,
+        });
+        isLoading.value = false;
+        closeHandler();
+      }, 1000);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setTimeout(() => {
+        isLoading.value = false;
+      }, 1000);
     }
+    // // console.log('password', v$.value.passwordField.$model);
+    // const reseulAuth = await logInInUser(v$.value.emailField.$model, v$.value.passwordField.$model);
+    // if (reseulAuth.statusCode === 200) {
+    //   // userState.value = true;
 
-    reseulAuth.statusCode === 405 && console.log("submit! isAutState", reseulAuth.statusCode);
+    //   closeHandler();
+    // }
+
+    // reseulAuth.statusCode === 405 && console.log("submit! isAutState", reseulAuth.statusCode);
   } else {
     // console.log(v$.value.$errors[0]);
     console.log("password", v$.value.passwordField.$model);

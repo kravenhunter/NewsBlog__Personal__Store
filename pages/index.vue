@@ -2,26 +2,32 @@
 import { storeToRefs } from "pinia";
 
 //Fetch Podcast List
-const { podcastsState } = storeToRefs(usePodcastsStore());
+const { postlist, podCastList, advertiseList } = storeToRefs(useUnionStore());
 
-//Fetch Articles data
-const { postsState } = storeToRefs(useArticleStore());
-
-//Fetch Advertisement galary
-const { advertiseList } = storeToRefs(useAdvertiseStore());
-
-/* function getRandomPost(state: IArticle[]) {
-  const min = state.length / state.length;
-  const max = state.length;
-  const rendom = Math.floor(Math.random() * (max - min) + min);
-  return state[rendom - 1];
-} */
-/* function getRandomRang(state: IArticle[], num: number) {
-  const min = state.length / state.length;
-  const max = state.length - num;
-  const rendom = Math.floor(Math.random() * (max - min) + min);
-  return state.slice(rendom, rendom + num);
-} */
+const worldList = postlist.value.filter((item) => {
+  return item.tags.some((el) => el.title?.includes("World"));
+});
+const businessList = postlist.value.filter((item) => {
+  return item.tags.some((el) => el.title?.includes("World"));
+});
+const policyList = postlist.value.filter((item) => {
+  return item.tags.some((el) => el.title?.includes("World"));
+});
+const artList = postlist.value.filter((item) => {
+  return item.tags.some((el) => el.title?.includes("World"));
+});
+const culture = postlist.value.filter((item) => {
+  return item.tags.some((el) => el.title?.includes("World"));
+});
+const styleList = postlist.value.filter((item) => {
+  return item.tags.some((el) => el.title?.includes("World"));
+});
+const sportList = postlist.value.filter((item) => {
+  return item.tags.some((el) => el.title?.includes("World"));
+});
+const travelList = postlist.value.filter((item) => {
+  return item.tags.some((el) => el.title?.includes("World"));
+});
 
 useSeoMeta({
   title: "MAIN NEWS",
@@ -31,11 +37,11 @@ useSeoMeta({
 
 <template>
   <section class="main_wrapper">
-    <section v-if="postsState.postList.length" class="main">
+    <section v-if="postlist.length" class="main">
       <section class="section_preview">
         <ArticleSingleArticle
           class-type="image_content_middle"
-          :single-post="postsState.favoriteList[0]"
+          :single-post="postlist[0]"
           font-size="30px"
           row-size="700px"
           :show-title="true"
@@ -49,7 +55,7 @@ useSeoMeta({
             :show-title="true"
             :show-image="true"
             :show-date="true"
-            v-for="(el, i) in postsState.worldList.slice(2, 5)"
+            v-for="(el, i) in worldList.slice(2, 5)"
             :key="i"
             :single-post="el" />
         </div>
@@ -59,7 +65,7 @@ useSeoMeta({
 
           <ArticleSingleArticle
             class-type="image_content_rigth"
-            :single-post="postsState.favoriteList[4]"
+            :single-post="postlist[4]"
             :show-title="true"
             :show-image="true"
             :show-date="true" />
@@ -71,19 +77,19 @@ useSeoMeta({
               :show-title="true"
               :show-image="true"
               :show-date="true"
-              v-for="(el, i) in postsState.businessList.slice(2, 5)"
+              v-for="(el, i) in businessList.slice(2, 5)"
               :key="i"
               :single-post="el" />
           </div>
           <LazyUiElementsAdvertise
-            v-if="advertiseList.databaseList.length"
+            v-if="advertiseList"
             label="Advertisement"
-            :link="advertiseList.databaseList[0]" />
+            :link="advertiseList[0]" />
         </div>
       </section>
 
       <section class="section_media">
-        <LazyAddMedia :podcast-list="podcastsState.podcastList" />
+        <LazyAddMedia :podcast-list="podCastList" />
       </section>
 
       <section class="section_policy">
@@ -93,7 +99,7 @@ useSeoMeta({
             class-type="title_content"
             :show-title="true"
             :show-date="true"
-            v-for="(el, i) in postsState.worldList.slice(3, 7)"
+            v-for="(el, i) in worldList.slice(3, 7)"
             :key="i"
             :single-post="el" />
         </div>
@@ -106,7 +112,7 @@ useSeoMeta({
             :show-title="true"
             :show-short-body="true"
             :show-date="true"
-            v-for="(el, i) in postsState.policyList.slice(0, 5)"
+            v-for="(el, i) in policyList.slice(0, 5)"
             :key="i"
             :single-post="el" />
         </div>
@@ -118,7 +124,7 @@ useSeoMeta({
             :show-title="true"
             :show-image="true"
             :show-date="true"
-            v-for="(el, i) in postsState.businessList.slice(3, 6)"
+            v-for="(el, i) in businessList.slice(3, 6)"
             :key="i"
             :single-post="el" />
         </div>
@@ -139,7 +145,7 @@ useSeoMeta({
             :show-date="true"
             row-size="700px"
             font-size="30px"
-            :single-post="postsState.favoriteList[1]" />
+            :single-post="postlist[1]" />
         </div>
         <div class="must_read_list bars">
           <ArticleSingleArticle
@@ -147,15 +153,13 @@ useSeoMeta({
             :show-title="true"
             :show-image="true"
             :show-date="true"
-            v-for="(el, i) in postsState.businessList.slice(0, 4)"
+            v-for="(el, i) in businessList.slice(0, 4)"
             :key="i"
             :single-post="el" />
         </div>
       </section>
 
-      <LazyUiElementsAdvertise
-        v-if="advertiseList.databaseList.length"
-        :link="advertiseList.databaseList[1]" />
+      <LazyUiElementsAdvertise v-if="advertiseList" :link="advertiseList[1]" />
 
       <section class="style_container">
         <div class="art bars">
@@ -166,7 +170,7 @@ useSeoMeta({
             :show-title="true"
             :show-image="true"
             :show-date="true"
-            v-for="(el, i) in postsState.artList.slice(0, 3)"
+            v-for="(el, i) in artList.slice(0, 3)"
             :key="i"
             :single-post="el" />
         </div>
@@ -179,7 +183,7 @@ useSeoMeta({
             :show-date="true"
             row-size="700px"
             font-size="40px"
-            :single-post="postsState.culture[1]" />
+            :single-post="culture[1]" />
 
           <div class="culture_list bars">
             <h3>Culture</h3>
@@ -189,7 +193,7 @@ useSeoMeta({
               :show-title="true"
               :show-short-body="true"
               :show-date="true"
-              v-for="(el, i) in postsState.culture.slice(0, 3)"
+              v-for="(el, i) in culture.slice(0, 3)"
               :key="i"
               :single-post="el" />
           </div>
@@ -202,14 +206,14 @@ useSeoMeta({
               :show-title="true"
               :show-image="true"
               :show-date="true"
-              v-for="(el, i) in postsState.styleList.slice(0, 3)"
+              v-for="(el, i) in styleList.slice(0, 3)"
               :key="i"
               :single-post="el" />
           </div>
           <LazyUiElementsAdvertise
             label="Advertisement"
-            v-if="advertiseList.databaseList.length"
-            :link="advertiseList.databaseList[1]" />
+            v-if="advertiseList"
+            :link="advertiseList[1]" />
 
           <div class="bars busines">
             <h3>Latest News</h3>
@@ -218,7 +222,7 @@ useSeoMeta({
               :show-title="true"
               :show-image="true"
               :show-date="true"
-              v-for="(el, i) in postsState.policyList.slice(0, 3)"
+              v-for="(el, i) in policyList.slice(0, 3)"
               :key="i"
               :single-post="el" />
           </div>

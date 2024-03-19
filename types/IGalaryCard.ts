@@ -1,4 +1,4 @@
-export interface IGalaryCard {
+export default interface IGalaryCard {
   id?: string;
   source?: string;
   name?: string;

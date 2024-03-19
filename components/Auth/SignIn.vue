@@ -10,18 +10,38 @@ const formData = reactive({
 });
 const { createUser } = useAuthStore();
 
+const isLoading = ref(false);
+
 const v$ = validateSignInHelper(formData);
 async function submitForm() {
   v$.value.$validate();
   if (!v$.value.$error) {
-    const result = await createUser(
-      v$.value.userNameField.$model,
-      v$.value.emailField.$model,
-      v$.value.passwordField.$model,
-    );
+    try {
+      isLoading.value = true;
+      const { data, error } = await useFetch("/api/auth/register", {
+        method: "POST",
+        body: {
+          email: v$.value.emailField.$model,
+          userName: v$.value.userNameField.$model,
+          password: v$.value.passwordField.$model,
+        },
+      });
+      if (error.value) {
+        throw error.value;
+      }
+      console.log(data.value);
 
-    console.log(`StatusCode ${result.statusCode}`, result.message);
-    closeHandler();
+      setTimeout(() => {
+        isLoading.value = false;
+        closeHandler();
+      }, 1000);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setTimeout(() => {
+        isLoading.value = false;
+      }, 1000);
+    }
   } else {
     console.log("password", v$.value.passwordField.$model);
     console.log("confirm", v$.value.confirmPasswordField.$model);

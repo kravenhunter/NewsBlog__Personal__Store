@@ -51,7 +51,10 @@ export default defineEventHandler(async (event) => {
         },
       },
     });
-    return postCreate;
+    return {
+      statusCode: 200,
+      statusMessage: "Success",
+    };
   } catch (error) {
     console.log(error);
     return error;

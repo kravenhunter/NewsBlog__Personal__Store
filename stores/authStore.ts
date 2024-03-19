@@ -7,8 +7,7 @@ import {
   type User,
 } from "firebase/auth";
 import { acceptHMRUpdate, defineStore, storeToRefs } from "pinia";
-import type { IError } from "types/IError";
-import type { IUserCredentials } from "types/IUserCredentials";
+import type { IError, IUserCredentials } from "~/types";
 
 export const useAuthStore = defineStore("auth-store", () => {
   const statAuth = reactive({

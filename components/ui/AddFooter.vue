@@ -1,39 +1,26 @@
 <script setup lang="ts">
-import type { IArticle } from "types/IArticle";
-import type { ICategory } from "types/ICategory";
-import type { IContact } from "types/IContacts";
-import type { INavigation } from "types/INavigation";
+import type { Contacts, Navigation, Post, Tag } from "@prisma/client";
 
-defineProps({
-  categories: {
-    type: Array as PropType<ICategory[]>,
-    default: null,
-  },
-  contacts: {
-    type: Object as PropType<IContact>,
-    default: null,
-  },
-  aboutUsLinks: {
-    type: Array as PropType<INavigation[]>,
-    default: null,
-  },
-  favorites: {
-    type: Array as PropType<IArticle[]>,
-    default: null,
-  },
-});
-function getRandomPost(state: IArticle[]) {
-  const min = state.length / state.length;
-  const max = state.length;
-  const rendom = Math.floor(Math.random() * (max - min) + min);
-  return state[rendom - 1];
+interface IProps {
+  categories?: Tag[] | null;
+  contacts?: Contacts[] | null;
+  aboutUsLinks?: Navigation[] | null;
+  favorites?: Post[] | null;
 }
-function getRandomRang(state: IArticle[], num: number) {
-  const min = state.length / state.length;
-  const max = state.length - num;
-  const rendom = Math.floor(Math.random() * (max - min) + min);
-  return state.slice(rendom, rendom + num);
-}
+defineProps<IProps>();
+
+// function getRandomPost(state: IArticle[]) {
+//   const min = state.length / state.length;
+//   const max = state.length;
+//   const rendom = Math.floor(Math.random() * (max - min) + min);
+//   return state[rendom - 1];
+// }
+// function getRandomRang(state: IArticle[], num: number) {
+//   const min = state.length / state.length;
+//   const max = state.length - num;
+//   const rendom = Math.floor(Math.random() * (max - min) + min);
+//   return state.slice(rendom, rendom + num);
+// }
 </script>
 
 <template>
@@ -42,7 +29,7 @@ function getRandomRang(state: IArticle[], num: number) {
     <div class="content">
       <div class="media_block grid_block">
         <h2 class="media_block_title">WORLD IMPELSE</h2>
-        <p>{{ contacts.copyright }}</p>
+        <p>{{ contacts?.length && contacts[0].copyright }}</p>
         <UiAddSocialMediaList :is-inline-block="true" />
       </div>
       <div class="about_block grid_block">
@@ -59,7 +46,7 @@ function getRandomRang(state: IArticle[], num: number) {
           v-if="categories?.length"
           direction="grid"
           gaps="20px"
-          :categorylinks="categories?.slice(1, 8)" />
+          :categorylinks="categories?.slice(1)" />
       </div>
       <div class="editor_picks grid_block">
         <h2 class="title_block">Editor Piks</h2>
@@ -70,9 +57,9 @@ function getRandomRang(state: IArticle[], num: number) {
           :show-image="true"
           font-size="16px"
           :font-weight="400"
-          v-for="(el, i) in favorites.slice(0, 2)"
-          :key="i"
-          :single-post="el" />
+          v-for="fav in favorites"
+          :key="fav.id"
+          :single-post="fav" />
       </div>
     </div>
   </div>

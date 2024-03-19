@@ -1,4 +1,4 @@
-export interface IPodcast {
+export default interface IPodcast {
   id?: string;
   author?: string;
   title?: string;

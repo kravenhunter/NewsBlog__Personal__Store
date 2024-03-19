@@ -1,26 +1,23 @@
 <script setup lang="ts">
-import type { IPodcast } from "types/IPodcast";
+import type { IFileData } from "~/types";
 
-const props = defineProps({
-  list: {
-    type: Array as PropType<IPodcast[]>,
-    default: null,
-  },
-  showList: {
-    type: Boolean,
-    default: false,
-  },
-});
+interface IProps {
+  list: IFileData[];
+  showList?: boolean;
+}
+const props = defineProps<IProps>();
 
 interface IDurationObject {
   id?: string;
   durationTime?: string;
 }
 
-const currentSongObject = ref<IPodcast | null>(null);
-const durationList = ref<IDurationObject[]>([]);
-const previosSong = ref<IPodcast | null>(null);
+const currentSongObject = ref<IFileData | null>(null);
 const currentIndex = ref(0);
+
+const durationList = ref<IDurationObject[]>([]);
+const previosSong = ref<IFileData | null>(null);
+
 const isPlay = ref(false);
 const audioPlayer = ref<HTMLAudioElement>();
 
@@ -35,7 +32,8 @@ const isPlaying = ref(false);
 const propgresBar = ref("0%");
 
 const prevExisted = computed(() => !!props.list[currentIndex.value - 1]);
-const nextExisted = computed(() => !!props.list[currentIndex.value + 1]);
+
+const nextExisted = computed(() => !!props.list[currentIndex.value - 1]);
 
 const timeConvert = (timeNum: number) => {
   const totalMin = Math.floor(timeNum / 60);
@@ -48,6 +46,7 @@ const timeConvert = (timeNum: number) => {
   return `${totalMin}:${totalSec}`;
 };
 const convertDataBar = (time: number) => Math.floor(time);
+
 const onPlaying = (e: Event) => {
   const audioEvent = e.target as HTMLAudioElement;
   audioEvent?.duration &&
@@ -63,18 +62,33 @@ const resetData = () => {
   duration.value = "0:00";
   isPlay.value = true;
 };
+
 const initializeSong = async () => {
   resetData();
   currentSongObject.value = props.list[currentIndex.value];
-  duration.value = await getDuration(currentSongObject.value);
+  // currentSongObject.value.file_binary = `data:audio/mpeg;base64,${props.list[currentIndex.value].file_binary}`;
+
+  duration.value = await getDuration(
+    `data:audio/mpeg;base64,${currentSongObject.value.file_binary}`,
+  );
 
   audioPlayer.value?.src &&
-    currentSongObject.value?.audioLink &&
-    (audioPlayer.value.src = currentSongObject.value?.audioLink);
+    currentSongObject.value &&
+    (audioPlayer.value.src = `data:audio/mpeg;base64,${currentSongObject.value.file_binary}`);
 
   setTimeout(() => (previosSong.value = currentSongObject.value), 500);
 };
 
+function getDuration(song: string) {
+  return new Promise<string>((resolve) => {
+    const musicPlayer = new Audio();
+    musicPlayer.src = song;
+    musicPlayer.src &&
+      (musicPlayer.onloadeddata = () => {
+        resolve(timeConvert(musicPlayer.duration));
+      });
+  });
+}
 const play = (val: boolean) => {
   isPlaying.value = val;
 
@@ -118,19 +132,9 @@ const selectHandler = async (id: string | undefined) => {
   setTimeout(() => (isSpinNext.value = false), 1500);
 };
 
-function getDuration(song: IPodcast) {
-  return new Promise<string>((resolve) => {
-    const musicPlayer = new Audio();
-    song?.audioLink && (musicPlayer.src = song.audioLink);
-    musicPlayer.src &&
-      (musicPlayer.onloadeddata = () => {
-        resolve(timeConvert(musicPlayer.duration));
-      });
-  });
-}
 const loadDurationList = async () => {
   props.list.forEach(async (el) => {
-    const promisResulte = await getDuration(el);
+    const promisResulte = await getDuration(`data:audio/mpeg;base64,${el.file_binary}`);
 
     durationList.value?.push({ id: el.id, durationTime: promisResulte });
   });
@@ -150,11 +154,11 @@ onMounted(async () => await loadData());
         preload="none"
         ref="audioPlayer"
         @timeupdate="onPlaying"
-        :src="currentSongObject?.audioLink"></audio>
+        :src="`data:audio/mpeg;base64,${currentSongObject.file_binary}`"></audio>
       <div class="album_block">
         <img
           :class="{ spin_next: isSpinNext, spin_back: isSpinBack }"
-          :src="previosSong?.imageLink"
+          :src="`data:image/webp;base64,${previosSong?.adition_binary}`"
           :alt="previosSong?.title" />
         <span></span>
       </div>
@@ -164,8 +168,8 @@ onMounted(async () => await loadData());
             <ul class="title_song" v-for="(el, i) in props.list" :key="i">
               <Transition name="slide-up">
                 <li v-if="el.id === currentSongObject.id">
-                  <h4>{{ el.author }}</h4>
-                  <span>{{ el.title }}</span>
+                  <h4>{{ el.title }}</h4>
+                  <span>{{ el.description }}</span>
                 </li>
               </Transition>
             </ul>
@@ -233,8 +237,8 @@ onMounted(async () => await loadData());
           @click="selectHandler(el?.id)"
           :class="{ active_item: el.id === currentSongObject?.id }">
           <div class="item_title">
-            <h4>{{ el.author }}</h4>
-            <span>{{ el.title }}</span>
+            <h4>{{ el.title }}</h4>
+            <span>{{ el.description }}</span>
           </div>
           <div class="time">
             <p>{{ durationList?.find((duration) => duration.id === el.id)?.durationTime }}</p>

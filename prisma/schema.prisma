@@ -80,6 +80,7 @@ model File {
   title            String
   file_type        FileType
   file_binary      String            @db.MediumText
+  adition_binary   String?            @db.MediumText
   description      String?
   User_Credentials User_Credentials?
   Advertise        Advertise?

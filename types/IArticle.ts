@@ -1,4 +1,4 @@
-export interface IArticle {
+export default interface IArticle {
   id?: string;
   title?: string;
   shortBody?: string;

@@ -1,4 +1,4 @@
-export interface IUserCredentials {
+export default interface IUserCredentials {
   id?: string;
   emailField?: string;
   userNameField?: string;
