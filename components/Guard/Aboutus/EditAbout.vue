@@ -1,32 +1,33 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
+import type { IAbout } from "~/types";
+
+const { aboutUs } = storeToRefs(useUnionStore());
 
 const state = reactive({
-  id: "",
-  title: "",
-  aboutContent: "",
+  title: aboutUs.value?.length ? aboutUs.value[0].title : "",
+  description: aboutUs.value?.length ? aboutUs.value[0].description : "",
 });
-
-const { aboutUs } = storeToRefs(useAboutUsStore());
-const { updateAboutUs, addAbout } = useAboutUsStore();
-
+// const { updateAboutUs, addAbout } = useAboutUsStore();
+const { createOrUpdateData } = useUnionStore();
 const submitForm = async () => {
-  await updateAboutUs(state);
-};
-const fillState = () => {
-  aboutUs?.value?.id && (state.id = aboutUs?.value?.id);
-  aboutUs?.value?.title && (state.title = aboutUs?.value?.title);
-  aboutUs?.value?.aboutContent && (state.aboutContent = aboutUs?.value?.aboutContent);
+  await createOrUpdateData<IAbout>("about/create", state);
 };
 
-onMounted(() => {
-  fillState();
-});
+// const fillState = () => {
+//   aboutUs?.value?.id && (state.id = aboutUs?.value?.id);
+//   aboutUs?.value?.title && (state.title = aboutUs?.value?.title);
+//   aboutUs?.value?.aboutContent && (state.aboutContent = aboutUs?.value?.aboutContent);
+// };
+
+// onMounted(() => {
+//   fillState();
+// });
 </script>
 
 <template>
-  <div class="edit_block" v-if="aboutUs">
-    <input type="hidden" :id="state.id" />
+  <div class="edit_block">
+    <!-- <input type="hidden"  :id="aboutUs.id" /> -->
     <LazyUiElementsAddPostInput
       label="Title"
       width-form="100%"
@@ -36,7 +37,7 @@ onMounted(() => {
       v-model:value.trim="state.title" />
     <div class="edit_content">
       <label for="aboutContent">Content</label>
-      <LazyUiElementsAddEditor v-model:value="state.aboutContent" />
+      <LazyUiElementsAddEditor v-model:value="state.description" />
     </div>
     <div class="btn_block">
       <LazyUiElementsAddButton

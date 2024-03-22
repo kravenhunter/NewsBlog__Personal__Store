@@ -1,5 +1,4 @@
 <script setup lang="ts">
-const emit = defineEmits(["closeModalEmit", "gotoSignIn"]);
 const formData = reactive({
   emailField: "admin@ya.ru",
   passwordField: "p@ssw0rd",
@@ -9,6 +8,7 @@ const { signIn } = useAuth();
 
 const isLoading = ref(false);
 const v$ = validateLoginHelper(formData);
+
 async function submitForm() {
   v$.value.$validate();
   if (!v$.value.$error) {
@@ -21,7 +21,6 @@ async function submitForm() {
           redirect: false,
         });
         isLoading.value = false;
-        closeHandler();
       }, 1000);
     } catch (error) {
       console.log(error);
@@ -46,21 +45,12 @@ async function submitForm() {
     alert("not  submit!");
   }
 }
-
-function closeHandler() {
-  emit("closeModalEmit", true);
-}
 </script>
 
 <template>
   <div class="login_container image grid_center">
     <div class="btn_close">
-      <UiElementsAddButton
-        title="close"
-        data-close-button
-        font-size="2.5rem"
-        paddings="0px"
-        @click="closeHandler"
+      <UiElementsAddButton title="close" data-close-button font-size="2.5rem" paddings="0px"
         >&times;</UiElementsAddButton
       >
     </div>
@@ -89,14 +79,6 @@ function closeHandler() {
         >Log In</UiElementsAddButton
       >
     </form>
-    <div class="goto grid_center">
-      <UiElementsAddButton
-        title="Go to SignIn IN"
-        font-size="1rem"
-        @click="$emit('gotoSignIn', true)"
-        >&#8669; Go to SignIn IN</UiElementsAddButton
-      >
-    </div>
   </div>
 </template>
 

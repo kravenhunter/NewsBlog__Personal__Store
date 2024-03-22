@@ -1,53 +1,57 @@
 <script setup lang="ts">
-import { storeToRefs } from "pinia";
+import fileFromEvent from "~/utils/extractFileFromEvent";
+
+interface IFileData {
+  id?: string;
+  update_at?: number;
+  title?: string;
+  file_type?: string;
+  file_binary: string;
+  adition_binary?: string;
+  description: string;
+}
 
 const state = reactive({
   title: "",
-  author: "",
   description: "",
-  userName: "Carlos",
-  category: "",
-  date: 0,
-  audioFile: {} as FileList,
-  ImageFile: {} as FileList,
 });
 
-const { categoryState } = storeToRefs(useCategoryStorage());
+const file_binary = ref<File | null>();
+const adition_binary = ref<File | null>();
 
-const { addPodcast } = usePodcastsStore();
+const { createOrUpdateData } = useUnionStore();
 
 const onImageSelected = async (event: Event) => {
-  const files = (event.target as HTMLInputElement).files;
-  files?.length && (state.ImageFile = files);
+  file_binary.value = fileFromEvent(event);
 };
 const onAudioSelected = async (event: Event) => {
-  const files = (event.target as HTMLInputElement).files;
-  files?.length && (state.audioFile = files);
+  adition_binary.value = fileFromEvent(event);
 };
 const v$ = validatePodcastHelper(state);
 const resetForm = () => {
   state.title = "";
-  state.author = "";
-  state.category = "";
+
   state.description = "";
-  state.userName = "";
-  state.date = 0;
-  state.audioFile = {} as FileList;
-  state.ImageFile = {} as FileList;
+
+  file_binary.value = null;
+  adition_binary.value = null;
 };
 
 const submitForm = async () => {
   v$.value.$validate();
   if (!v$.value.$error) {
-    if (state.ImageFile?.length && state.audioFile?.length) {
-      const result = await addPodcast(state.ImageFile, state.audioFile, state);
-      if (result.statusCode === 200) {
-        // navigateTo('/guard/posts');
-        resetForm();
-        console.log("Podcast Created");
-      } else if (result.statusCode === 405) {
-        console.log("error of adding Podcast");
+    if (file_binary.value && adition_binary.value) {
+      const body = new FormData();
+
+      body.append("file_binary", file_binary.value, file_binary.value.name);
+      body.append("adition_binary", adition_binary.value, adition_binary.value.name);
+
+      for (const item in state) {
+        body.append(item, `${state[item as keyof typeof state]}`);
       }
+      const result = await createOrUpdateData("file/upload", body);
+
+      result && result.statusCode === 200 && resetForm();
     }
   } else {
     // eslint-disable-next-line no-alert
@@ -79,14 +83,6 @@ const submitForm = async () => {
             v-model:value.trim="v$.author.$model"
             :error="v$.author.$errors" />
 
-          <div class="select_block">
-            <label for="category">Category</label>
-            <select name="category" v-model.trim="state.category">
-              <option v-for="option in categoryState" :key="option.id" :value="option.title">
-                {{ option.title }}
-              </option>
-            </select>
-          </div>
           <div class="upload">
             <label for="upload">Upload title image </label>
             <input type="file" name="upload" @change="onImageSelected" />

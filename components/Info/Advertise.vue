@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { useAdvertiseStore } from "@/stores/advertiseStore";
 import { storeToRefs } from "pinia";
 
-const { advertiseList } = storeToRefs(useAdvertiseStore());
+const { advertiseList } = storeToRefs(useUnionStore());
 const errorResponse = createError({ statusCode: 201, statusMessage: "Content not added" });
 </script>
 
@@ -12,14 +11,14 @@ const errorResponse = createError({ statusCode: 201, statusMessage: "Content not
     <p>
       You can cooporate with us and invest our digital paper and we will advertise your services
     </p>
-    <div class="wrapp-body" v-if="advertiseList.databaseList.length">
+    <div class="wrapp-body" v-if="advertiseList?.length">
       <div class="wrapp-content">
         <LazyGuardGalaryImageCard
-          v-for="element in advertiseList.databaseList"
+          v-for="element in advertiseList"
           :key="element.id"
-          :source="element.source"
+          :source="element.source?.file_binary"
           :name="element.name"
-          :description="element.description" />
+          :description="element.source?.description" />
       </div>
     </div>
     <div v-else class="no_content">

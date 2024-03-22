@@ -1,53 +1,73 @@
 <script setup lang="ts">
-import type { IPodcast } from "types/IPodcast";
+import type { IFileData } from "~/types";
 
-defineProps({
-  list: {
-    type: Array as PropType<IPodcast[]>,
-    default: null,
-  },
-  singlePost: {
-    type: Object as PropType<IPodcast>,
-    default: null,
-  },
-  label: {
-    type: String,
-    default: "",
-  },
-  directionCard: {
-    type: String,
-    reqired: false,
-  },
-  directionContainer: {
-    type: String,
-    reqired: "1fr",
-  },
-  row: {
-    type: String,
-    reqired: "auto",
-  },
-  showBody: {
-    type: Boolean,
-    reqired: false,
-  },
+interface IProps {
+  list?: IFileData[] | null;
+  singlePost?: IFileData[] | null;
+  label?: string;
+  directionCard?: string;
+  directionContainer: string;
+  row: string;
+  showBody: boolean;
+}
+
+withDefaults(defineProps<IProps>(), {
+  directionContainer: "1fr",
+  row: "auto",
 });
 
-const { deletePodcast } = usePodcastsStore();
+// defineProps({
+//   list: {
+//     type: Array as PropType<IPodcast[]>,
+//     default: null,
+//   },
+//   singlePost: {
+//     type: Object as PropType<IPodcast>,
+//     default: null,
+//   },
+//   label: {
+//     type: String,
+//     default: "",
+//   },
+//   directionCard: {
+//     type: String,
+//     reqired: false,
+//   },
+//   directionContainer: {
+//     type: String,
+//     reqired: "1fr",
+//   },
+//   row: {
+//     type: String,
+//     reqired: "auto",
+//   },
+//   showBody: {
+//     type: Boolean,
+//     reqired: false,
+//   },
+// });
+
+const { deleteDataById } = useUnionStore();
+const deleteHandler = async (audioId?: string) => {
+  audioId && (await deleteDataById(`file/delete-by-id/${audioId}`));
+};
 </script>
 
 <template>
   <div class="podcast_block" v-if="list">
-    <div class="postListPreview" v-for="(el, i) in list" :key="i">
+    <div class="postListPreview" v-for="el in list" :key="el.id">
       <div class="img_block">
-        <img :src="el.imageLink" alt="randomGirl" />
+        <NuxtImg :src="`data:image/webp;base64,${el.file_binary}`" :alt="el.title" />
       </div>
 
       <div class="description">
-        <NuxtLink :to="{ path: `/${el.category}/${el.id}` }">
+        <!-- <NuxtLink :to="{ path: `/${el.category}/${el.id}` }">
           <h2 class="title">{{ el.title }}</h2>
-        </NuxtLink>
+        </NuxtLink> -->
 
-        <p class="created">By {{ el.userName }} {{ el.date && formatDate(el.date) }}</p>
+        <p class="created">
+          By {{ el.User?.userNameField }} {{ el.update_at && formatDate(el.update_at) }}
+        </p>
         <p class="post_body" v-if="showBody">
           {{ el.description }}
         </p>
@@ -59,7 +79,7 @@ const { deletePodcast } = usePodcastsStore();
           size-width="24"
           size-heigth="24" />
 
-        <button class="delete" @click="deletePodcast(el.id)">&times;</button>
+        <button class="delete" @click="deleteHandler(el.id)">&times;</button>
       </div>
     </div>
   </div>

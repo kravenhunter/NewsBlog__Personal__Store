@@ -4,30 +4,37 @@ import { storeToRefs } from "pinia";
 // import { uuid } from 'vue-uuid';
 
 const state = reactive({
-  source: "",
-  name: "",
+  title: "",
   description: "",
-  date: 0,
 });
 const isUpload = ref(false);
-const fileList = ref<FileList>();
+const fileData = ref<File>();
 
-const { imageList } = storeToRefs(useGalaryStore());
-const { uploadToStorage } = useGalaryStore();
+const { imageList } = storeToRefs(useUnionStore());
+const { createOrUpdateData } = useUnionStore();
 
 const onFileSelected = async (event: Event) => {
   const fileEvent = event.target as HTMLInputElement;
-  fileEvent.files?.length && (fileList.value = fileEvent.files);
+  fileEvent.files?.length && (fileData.value = fileEvent.files[0]);
 };
 function resetForm() {
-  state.date = 0;
-  state.name = "";
+  state.title = "";
   state.description = "";
-  state.source = "";
 }
+
 const submitForm = async () => {
-  fileList.value?.length && (isUpload.value = await uploadToStorage(fileList.value, state));
-  isUpload.value && resetForm();
+  if (fileData.value) {
+    const body = new FormData();
+
+    body.append("file", fileData.value, fileData.value.name);
+
+    for (const item in state) {
+      body.append(item, `${state[item as keyof typeof state]}`);
+    }
+    const result = await createOrUpdateData("file/upload", body);
+
+    result && result.statusCode === 200 && resetForm();
+  }
 };
 </script>
 
@@ -41,7 +48,7 @@ const submitForm = async () => {
         font-size="2rem"
         name="Name"
         placeholder="Input Image name"
-        v-model:value.trim="state.name" />
+        v-model:value.trim="state.title" />
 
       <UiElementsAddPostInput
         :is-input="false"
@@ -69,13 +76,15 @@ const submitForm = async () => {
       </div>
     </div>
     <div class="wrapp-body">
-      <div class="wrapp-content">
+      <div class="wrapp-content" v-if="imageList?.length">
         <GuardGalaryImageCard
-          v-for="element in imageList.databaseList"
+          v-for="element in imageList"
           :key="element.id"
-          :source="element.source"
-          :name="element.name"
-          :description="element.description" />
+          :image="{
+            source: element.file_binary,
+            title: element.title!,
+            description: element.description,
+          }" />
       </div>
     </div>
   </div>

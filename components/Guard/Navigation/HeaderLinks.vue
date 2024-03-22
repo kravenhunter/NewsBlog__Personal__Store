@@ -1,12 +1,10 @@
 <script setup lang="ts">
-import type { INavigation } from "types/INavigation";
+import type { INavigation } from "~/types";
 
-defineProps({
-  links: {
-    type: Array as PropType<INavigation[]>,
-  },
-  default: null,
-});
+interface IProps {
+  links?: INavigation[] | null;
+}
+defineProps<IProps>();
 
 const emit = defineEmits(["navEmit", "deleteNavLink"]);
 

@@ -11,10 +11,16 @@ export default defineEventHandler(async (event) => {
     }
 
     const body = await readBody(event);
-    const createResult = await event.context.prisma.navigation.create({
+    const item = await event.context.prisma.navigation.create({
       data: body,
     });
-    return createResult;
+    return {
+      statusCode: 200,
+      statusMessage: "Success",
+      table: "nav-link",
+      method: "create",
+      objectResult: item,
+    };
   } catch (error) {
     throw createError({
       statusCode: 500,

@@ -2,56 +2,71 @@
 <script setup lang="ts">
 import type { NuxtError } from "nuxt/app";
 import { storeToRefs } from "pinia";
+import type { ICategory, IFileData } from "~/types";
+import fileFromEvent from "~/utils/extractFileFromEvent";
 
+interface Post {
+  title: string;
+  author: string;
+  body: string;
+  imageBg: IFileData;
+  imagePrev: IFileData;
+  shortBody: string;
+  tags: ICategory[];
+  // Comment  : string;
+}
+
+const { data } = useAuth();
 const route = useRoute();
 
-const state = reactive({
-  id: "",
-  title: "",
-  author: "",
-  category: "",
-  image: "",
-  imageMeta: "",
-  shortBody: "",
-  body: "",
-  date: 0,
-});
 const isCreated = ref("");
 const createResponse = ref<NuxtError>();
-const fileList = ref<FileList>();
 
-const { categoryState } = storeToRefs(useCategoryStorage());
-const { addPost, updatePost, getArticleById } = useArticleStore();
+const file_binary = ref<File | null>();
+
+const { categoryList } = storeToRefs(useUnionStore());
+const { createOrUpdateData, getPostById } = useUnionStore();
+
+const getPost = getPostById(String(route.params.id));
+
+const state = reactive({
+  title: getPost?.id ?? "",
+  author: data.value?.user?.name ?? "",
+  shortBody: getPost?.shortBody ?? "",
+  body: getPost?.body ?? "",
+  tags: getPost?.tags.length ? getPost.tags : ([] as ICategory[]),
+});
+const selectedTags = ref<string>();
+
+watch(selectedTags, () => {
+  const getTag = categoryList.value.find((el) => el.title === selectedTags.value);
+  getTag && state.tags.push(getTag);
+});
 
 const onFileSelected = async (event: Event) => {
-  const fileEvent = event.target as HTMLInputElement;
-  fileEvent.files?.length && (fileList.value = fileEvent.files);
+  file_binary.value = fileFromEvent(event);
 };
 
 const resetForm = () => {
   state.title = "";
   state.author = "";
-  state.category = "";
-  state.image = "";
   state.shortBody = "";
-  fileList.value = {} as FileList;
   state.body = "";
-  state.date = 0;
 };
 const v$ = validatePostHelper(state);
 
-const fillState = (id: string) => {
-  const getArticle = getArticleById(id);
-  getArticle?.id && (state.id = getArticle.id);
-  getArticle?.title && (state.title = getArticle.title);
-  getArticle?.author && (state.author = getArticle.author);
-  getArticle?.category && (state.category = getArticle.category);
-  getArticle?.image && (state.image = getArticle.image);
-  getArticle?.imageMeta && (state.imageMeta = getArticle.imageMeta);
-  getArticle?.shortBody && (state.shortBody = getArticle.shortBody);
-  getArticle?.body && (state.body = getArticle.body);
-  state.date = 0;
-};
+// const fillState = (id: string) => {
+//   const getArticle = getArticleById(id);
+//   getArticle?.id && (state.id = getArticle.id);
+//   getArticle?.title && (state.title = getArticle.title);
+//   getArticle?.author && (state.author = getArticle.author);
+//   getArticle?.category && (state.category = getArticle.category);
+//   getArticle?.image && (state.image = getArticle.image);
+//   getArticle?.imageMeta && (state.imageMeta = getArticle.imageMeta);
+//   getArticle?.shortBody && (state.shortBody = getArticle.shortBody);
+//   getArticle?.body && (state.body = getArticle.body);
+//   state.date = 0;
+// };
 const responseHandler = async (path: string | undefined) => {
   path && setTimeout(async () => await clearError({ redirect: path }), 1000);
   !path && (await clearError());
@@ -69,24 +84,34 @@ const creatingResult = (statusCode: number, message: string) => {
 };
 const submitForm = async () => {
   v$.value.$validate();
+
   if (!v$.value.$error) {
-    if (state.id) {
-      const result = await updatePost(fileList.value, state);
-      creatingResult(result.statusCode, result.message);
-    } else {
-      if (fileList.value) {
-        const result = await addPost(fileList.value, state);
-        creatingResult(result.statusCode, result.message);
+    const body = new FormData();
+    file_binary.value && body.append("file_binary", file_binary.value, file_binary.value.name);
+
+    if (getPost?.id) {
+      for (const item in state) {
+        body.append(item, `${state[item as keyof typeof state]}`);
       }
+      const result = await createOrUpdateData(`post/update/${getPost?.id}`, body);
+
+      result && creatingResult(result.statusCode, result.statusMessage);
+      //  result &&  resetForm();
+    } else {
+      for (const item in state) {
+        body.append(item, `${state[item as keyof typeof state]}`);
+      }
+      const result = await createOrUpdateData("post/create", body);
+      result && creatingResult(result.statusCode, result.statusMessage);
     }
   } else {
     creatingResult(405, "Form not submit. Try again.");
   }
 };
 
-onMounted(() => {
-  route.params.id && fillState(String(route.params.id));
-});
+// onMounted(() => {
+//   route.params.id && fillState(String(route.params.id));
+// });
 </script>
 
 <template>
@@ -111,10 +136,10 @@ onMounted(() => {
             v-model:value.trim="v$.author.$model"
             :error="v$.author.$errors" />
 
-          <div class="select_block" v-if="categoryState">
+          <div class="select_block" v-if="categoryList">
             <label for="category">Category</label>
-            <select name="category" v-model.trim="state.category">
-              <option v-for="option in categoryState" :key="option.id" :value="option.title">
+            <select name="category" v-model.trim="selectedTags">
+              <option v-for="option in categoryList" :key="option.id" :value="option.title">
                 {{ option.title }}
               </option>
             </select>

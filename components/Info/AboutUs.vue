@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 
-const { aboutUs } = storeToRefs(useAboutUsStore());
+const { aboutUs } = storeToRefs(useUnionStore());
 const errorResponse = createError({ statusCode: 201, statusMessage: "Content not added" });
 </script>
 
@@ -9,12 +9,12 @@ const errorResponse = createError({ statusCode: 201, statusMessage: "Content not
   <div class="about_block">
     <h1 class="about_title">About Us</h1>
 
-    <div class="about_content" v-if="aboutUs?.id">
+    <div class="about_content" v-if="aboutUs?.length">
       <div class="about_title">
-        <h2>{{ aboutUs.title }}</h2>
+        <h2>{{ aboutUs[0].title }}</h2>
       </div>
 
-      <div v-if="aboutUs?.aboutContent" class="about_text" v-html="aboutUs?.aboutContent"></div>
+      <div class="about_text" v-html="aboutUs[0].description"></div>
     </div>
     <div v-else class="no_content">
       <LazyErrorResponse :error-event="errorResponse" />
@@ -29,7 +29,7 @@ const errorResponse = createError({ statusCode: 201, statusMessage: "Content not
 }
 .about_block {
   display: grid;
-  max-width: 800px;
+  width: min(100%, 800px);
   row-gap: 20px;
 
   & .about_title {

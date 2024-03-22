@@ -1,47 +1,71 @@
 <!-- eslint-disable no-alert -->
 <script setup lang="ts">
-import { storeToRefs } from "pinia";
+import type { IUserCredentials } from "~/types";
 
 const isEnable = ref(false);
-const fileList = ref<FileList>();
+const fileAvatar = ref<File>();
 
-const { statAuth } = storeToRefs(useAuthStore());
-const { signOutUser } = useAuthStore();
+//const { statAuth } = storeToRefs();
+const { createOrUpdateData } = useUnionStore();
 
-const { authorizedUserCredentials } = storeToRefs(useUserStore());
-const { updateUserCredentials } = useUserStore();
+const { data } = useAuth();
 
+const { getAuthUserByName } = useUnionStore();
+const userCredentials = ref<IUserCredentials>();
+
+data?.value?.user && (userCredentials.value = getAuthUserByName(data.value.user.name!));
+
+const state = reactive({
+  emailField: userCredentials.value?.emailField ?? "",
+  userNameField: userCredentials.value?.userNameField ?? "",
+  firstNameField: userCredentials.value?.firstNameField ?? "",
+  lastNameField: userCredentials.value?.lastNameField ?? "",
+  phoneField: userCredentials.value?.phoneField ?? "",
+  genderField: userCredentials.value?.genderField ?? "",
+  birthdayField: userCredentials.value?.birthdayField ?? "",
+  adressField: userCredentials.value?.adressField ?? "",
+  accessPanel: userCredentials.value?.accessPanel ?? false,
+  date: userCredentials.value?.date ?? Date.now(),
+});
 const onFileSelected = async (event: Event) => {
   const fileEvent = event.target as HTMLInputElement;
-  fileEvent.files?.length && (fileList.value = fileEvent.files);
+  fileEvent.files?.length && (fileAvatar.value = fileEvent.files[0]);
 };
-const submitForm = async () => {
-  if (authorizedUserCredentials.value?.id) {
-    const result = await updateUserCredentials(fileList.value, authorizedUserCredentials.value);
 
-    alert(result.message);
+const submitForm = async () => {
+  if (userCredentials.value?.id) {
+    const body = new FormData();
+
+    fileAvatar.value && body.append("file", fileAvatar.value, fileAvatar.value.name);
+
+    for (const item in state) {
+      body.append(item, `${state[item as keyof typeof state]}`);
+    }
+    const result = await createOrUpdateData("auth/update-credentials", body);
+
+    result && result.statusCode === 200 && alert(result.statusMessage);
   } else {
     alert("Profile data is empty");
   }
 };
 
-onMounted(() => console.log("Setting Block ", authorizedUserCredentials.value));
+// onMounted(() => console.log("Setting Block ", authorizedUserCredentials.value));
 </script>
 
 <template>
   <div class="wrapper_block">
-    <div class="list_block" v-if="authorizedUserCredentials">
+    <div class="list_block">
       <h2>My Prodile</h2>
       <ul>
-        <li>Email: {{ authorizedUserCredentials.emailField }}</li>
-        <li>User name: {{ authorizedUserCredentials.userNameField }}</li>
-        <li>First Name : {{ authorizedUserCredentials.firstNameField }}</li>
-        <li>Last Name: {{ authorizedUserCredentials.lastNameField }}</li>
-        <li>Phone: {{ authorizedUserCredentials.phoneField }}</li>
-        <li>Gender: {{ authorizedUserCredentials.genderField }}</li>
-        <li>Birthday: {{ authorizedUserCredentials.birthdayField }}</li>
-        <li>Adress: {{ authorizedUserCredentials.adressField }}</li>
-        <li>Access Panel: {{ authorizedUserCredentials.accessPanel }}</li>
+        <li>Email: {{ state.emailField }}</li>
+        <li>User name: {{ state.userNameField }}</li>
+        <li>First Name : {{ state.firstNameField }}</li>
+        <li>Last Name: {{ state.lastNameField }}</li>
+        <li>Phone: {{ state.phoneField }}</li>
+        <li>Gender: {{ state.genderField }}</li>
+        <li>Birthday: {{ state.birthdayField }}</li>
+        <li>Adress: {{ state.adressField }}</li>
+        <li>Access Panel: {{ state.accessPanel }}</li>
       </ul>
       <div class="btn_block">
         <LazyUiElementsAddButton
@@ -55,63 +79,63 @@ onMounted(() => console.log("Setting Block ", authorizedUserCredentials.value));
         >
       </div>
     </div>
-    <div class="form_block" v-if="isEnable && authorizedUserCredentials">
+    <div class="form_block" v-if="isEnable">
       <LazyUiElementsAddPostInput
         label="Email"
         width-form="100%"
         font-size="2rem"
         name="emailField"
         placeholder="Input copyright"
-        v-model:value.trim="authorizedUserCredentials.emailField" />
+        v-model:value.trim="state.emailField" />
       <LazyUiElementsAddPostInput
         label="User name"
         width-form="100%"
         font-size="2rem"
         name="userNameField"
         placeholder="Input telephone"
-        v-model:value.trim="authorizedUserCredentials.userNameField" />
+        v-model:value.trim="state.userNameField" />
       <LazyUiElementsAddPostInput
         label="First Name"
         width-form="100%"
         font-size="2rem"
         name="firstNameField"
         placeholder="Input email"
-        v-model:value.trim="authorizedUserCredentials.firstNameField" />
+        v-model:value.trim="state.firstNameField" />
       <LazyUiElementsAddPostInput
         label="Last Name"
         width-form="100%"
         font-size="2rem"
         name="lastNameField"
         placeholder="Input adreess"
-        v-model:value.trim="authorizedUserCredentials.lastNameField" />
+        v-model:value.trim="state.lastNameField" />
       <LazyUiElementsAddPostInput
         label="Phone"
         width-form="100%"
         font-size="2rem"
         name="genderField"
         placeholder="Input fasbook link"
-        v-model:value.trim="authorizedUserCredentials.phoneField" />
+        v-model:value.trim="state.phoneField" />
       <LazyUiElementsAddPostInput
         label="Gender"
         width-form="100%"
         font-size="2rem"
         name="genderField"
         placeholder="Input twetter link"
-        v-model:value.trim="authorizedUserCredentials.genderField" />
+        v-model:value.trim="state.genderField" />
       <LazyUiElementsAddPostInput
         label="Birthday"
         width-form="100%"
         font-size="2rem"
         name="birthdayField"
         placeholder="Input youtube link"
-        v-model:value.trim="authorizedUserCredentials.birthdayField" />
+        v-model:value.trim="state.birthdayField" />
       <LazyUiElementsAddPostInput
         label="Adress"
         width-form="100%"
         font-size="2rem"
         name="adressField"
         placeholder="Input instagramm link"
-        v-model:value.trim="authorizedUserCredentials.adressField" />
+        v-model:value.trim="state.adressField" />
 
       <div class="upload">
         <label for="upload">Avatar image upload</label>

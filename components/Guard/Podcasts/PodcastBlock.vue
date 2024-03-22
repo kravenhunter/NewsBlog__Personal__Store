@@ -1,25 +1,30 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 
+const { podCastList, categoryList } = storeToRefs(useUnionStore());
+
 const search = ref("");
-
-const { categoryState } = storeToRefs(useCategoryStorage());
-
-const { podcastsState } = storeToRefs(usePodcastsStore());
-
 const selected = ref("All");
-
-const searchHandler = () => {
-  if (search && selected.value !== "All") {
-    return [
-      ...podcastsState.value.podcastList.filter((el) => el.title?.includes(search.value)),
-    ].filter((post) => post.category === selected.value);
-  } else if (search && selected.value === "All") {
-    return [...podcastsState.value.podcastList.filter((el) => el.title?.includes(search.value))];
-  } else if (!search && selected.value !== "All") {
-    return [...podcastsState.value.podcastList.filter((post) => post.category === selected.value)];
+const searchHandler = computed(() => {
+  if (search.value) {
+    return [...podCastList.value.filter((el) => el.title?.includes(search.value))].filter(
+      (post) => post.category === selected.value,
+    );
+  } else {
+    return podCastList.value.filter((post) => post.category === selected.value);
   }
-};
+});
+// const searchHandler = () => {
+//   if (search && selected.value !== "All") {
+//     return [
+//       ...podCastList.value.filter((el) => el.title?.includes(search.value)),
+//     ].filter((post) => post.category === selected.value);
+//   } else if (search && selected.value === "All") {
+//     return [...podcastsState.value.podcastList.filter((el) => el.title?.includes(search.value))];
+//   } else if (!search && selected.value !== "All") {
+//     return [...podcastsState.value.podcastList.filter((post) => post.category === selected.value)];
+//   }
+// };
 </script>
 
 <template>
@@ -34,8 +39,8 @@ const searchHandler = () => {
 
         <div class="aqualizer_container">
           <UiElementsMusicAqualizer
-            v-if="podcastsState.podcastList"
-            :list="podcastsState.podcastList"
+            v-if="podCastList.length"
+            :list="podCastList"
             :show-list="true" />
         </div>
       </div>
@@ -62,7 +67,7 @@ const searchHandler = () => {
         <div class="select_block">
           <select v-model="selected">
             <option value="All">All</option>
-            <option v-for="option in categoryState" :key="option.id" :value="option.title">
+            <option v-for="option in categoryList" :key="option.id" :value="option.title">
               {{ option.title }}
             </option>
           </select>
@@ -72,7 +77,7 @@ const searchHandler = () => {
       <div class="list">
         <GuardPodcastsList
           :label="selected"
-          :list="searchHandler()"
+          :list="searchHandler"
           direction-card="250px 2fr 0.5fr"
           row="250px"
           :show-body="true" />

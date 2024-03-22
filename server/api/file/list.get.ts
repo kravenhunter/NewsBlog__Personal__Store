@@ -1,14 +1,15 @@
-import { getServerSession } from "#auth";
+// import { getServerSession } from "#auth";
+import type { H3Error } from "h3";
 
 export default defineEventHandler(async (event) => {
   try {
-    const session = await getServerSession(event);
-    if (!session) {
-      throw createError({
-        statusCode: 401,
-        statusMessage: "Unauthorized",
-      });
-    }
+    // const session = await getServerSession(event);
+    // if (!session) {
+    //   throw createError({
+    //     statusCode: 401,
+    //     statusMessage: "Unauthorized",
+    //   });
+    // }
 
     const getPostList = await event.context.prisma.file.findMany({
       orderBy: { create_at: "desc" },
@@ -16,16 +17,17 @@ export default defineEventHandler(async (event) => {
 
     if (!getPostList.length) {
       throw createError({
-        statusCode: 405,
+        statusCode: 404,
         statusMessage: "No records in database ",
       });
     }
 
     return getPostList;
   } catch (error) {
+    const getError = error as H3Error;
     throw createError({
-      statusCode: 500,
-      statusMessage: (error as Error).message,
+      statusCode: getError.statusCode,
+      statusMessage: getError.statusMessage,
     });
   }
 });

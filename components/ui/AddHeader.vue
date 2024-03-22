@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { Navigation } from "@prisma/client";
+import type { INavigation } from "~/types";
 
 interface IProps {
-  navLinks?: Navigation[] | null;
+  navLinks?: INavigation[] | null;
 }
 
 defineProps<IProps>();

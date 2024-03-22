@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import type {
-  About,
-  Advertise,
-  Contacts,
-  File as FileData,
-  FooterLink,
-  Navigation,
-  Post,
-  Tag,
-} from "@prisma/client";
 import { storeToRefs } from "pinia";
 
+// import type {
+//   About,
+//   Advertise,
+//   Contacts,
+//   File as FileData,
+//   FooterLink,
+//   Navigation,
+//   Post,
+//   Tag,
+// } from "@prisma/client";
 //Get  Authorized user
 // const { isAuthorized } = useAuthStore();
 // const { data, signOut, status } = useAuth();
@@ -31,35 +31,66 @@ const {
 
 const loadStores = async () => {
   if (!postlist.value?.length) {
-    await loadDataList<Post[]>("/api/post/list", "post");
+    await loadDataList("post/list", "post");
   }
   if (!categoryList.value?.length) {
-    await loadDataList<Tag[]>("/api/tag/list", "tag");
+    await loadDataList("tag/list", "tag");
   }
   if (!podCastList.value?.length) {
-    await loadDataList<FileData[]>("/api/file/list-by-type/audio", "podcasts");
+    await loadDataList("file/list-by-type/audio", "podcasts");
   }
   if (!contactList.value) {
-    await loadDataList<Contacts[]>("/api/contacts/list", "contacts");
+    await loadDataList("contacts/list", "contacts");
   }
   if (!aboutUs.value) {
-    await loadDataList<About[]>("/api/about/list", "about");
+    await loadDataList("about/list", "about");
   }
 
   if (!imageList.value) {
-    await loadDataList<FileData[]>("/api/file/list-by-type/images", "images");
+    await loadDataList("file/list-by-type/images", "images");
   }
   if (!advertiseList.value) {
-    await loadDataList<Advertise[]>("/api/advertise/list", "advertise");
+    await loadDataList("advertise/list", "advertise");
   }
 
   if (!navLiks.value) {
-    await loadDataList<Navigation[]>("/api/nav-link/list", "nav-link");
+    await loadDataList("nav-link/list", "nav-link");
   }
   if (!footerLinks.value) {
-    await loadDataList<FooterLink[]>("/api/footer-link/list", "footer-link");
+    await loadDataList("footer-link/list", "footer-link");
   }
 };
+// const loadStores = async () => {
+//   if (!postlist.value?.length) {
+//     await loadDataList<Post[]>("post/list", "post");
+//   }
+//   if (!categoryList.value?.length) {
+//     await loadDataList<Tag[]>("tag/list", "tag");
+//   }
+//   if (!podCastList.value?.length) {
+//     await loadDataList<FileData[]>("file/list-by-type/audio", "podcasts");
+//   }
+//   if (!contactList.value) {
+//     await loadDataList<Contacts[]>("contacts/list", "contacts");
+//   }
+//   if (!aboutUs.value) {
+//     await loadDataList<About[]>("about/list", "about");
+//   }
+
+//   if (!imageList.value) {
+//     await loadDataList<FileData[]>("file/list-by-type/images", "images");
+//   }
+//   if (!advertiseList.value) {
+//     await loadDataList<Advertise[]>("advertise/list", "advertise");
+//   }
+
+//   if (!navLiks.value) {
+//     await loadDataList<Navigation[]>("nav-link/list", "nav-link");
+//   }
+//   if (!footerLinks.value) {
+//     await loadDataList<FooterLink[]>("footer-link/list", "footer-link");
+//   }
+// };
 //Load all stores
 await loadStores();
 

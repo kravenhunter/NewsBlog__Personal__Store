@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { useAuthStore } from "@/stores/authStore";
-
 const emit = defineEmits(["closeModalEmit", "gotoLogIn"]);
 const formData = reactive({
   userNameField: "",
@@ -8,7 +6,6 @@ const formData = reactive({
   passwordField: "",
   confirmPasswordField: "",
 });
-const { createUser } = useAuthStore();
 
 const isLoading = ref(false);
 

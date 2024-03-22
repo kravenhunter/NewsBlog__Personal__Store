@@ -5,15 +5,22 @@ const state = reactive({
   title: "",
 });
 
-const { categoryState } = storeToRefs(useCategoryStorage());
-const { addCategory, deleteCategory } = useCategoryStorage();
+const { categoryList } = storeToRefs(useUnionStore());
+const { createOrUpdateData, deleteDataById } = useUnionStore();
 
+const isDisabled = computed(() => !state.title);
 const submitForm = async () => {
-  const result = await addCategory(state);
-  result.statusCode === 200 && (state.title = "");
+  if (state.title) {
+    const result = await createOrUpdateData("tag/create", { ...state });
+    result?.statusCode === 200 && (state.title = "");
+  }
 };
 const deleteHandler = async (id: string | undefined) => {
-  id && (await deleteCategory(id));
+  id && (await deleteDataById(`tag/delete-by-id/${id}`));
+  // if(id){
+
+  //   const { data: response, error } = await useFetch(`/api/tag/delete-by-id/${id}`);
+  // }
 };
 </script>
 
@@ -30,6 +37,7 @@ const deleteHandler = async (id: string | undefined) => {
         v-model:value.trim="state.title" />
       <div class="btn_block">
         <LazyUiElementsAddButton
+          :disabled="isDisabled"
           title="Save"
           font-size="16px"
           paddings="0.4em"
@@ -40,9 +48,9 @@ const deleteHandler = async (id: string | undefined) => {
         >
       </div>
     </div>
-    <div class="list_block" v-if="categoryState?.length">
-      <ul>
-        <li v-for="(cat, i) in categoryState" :key="i" :id="cat.id">
+    <div class="list_block">
+      <ul v-if="categoryList?.length">
+        <li v-for="cat in categoryList" :key="cat.id">
           <h4>{{ cat.title }}</h4>
           <LazyUiElementsAddButton
             title="Delete"

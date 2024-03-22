@@ -1,9 +1,12 @@
 import { getServerSession } from "#auth";
-import { convertFileTOBase64, extractFormData } from "~/server/utils";
+import type { H3Error } from "h3";
+
+//import { extractFormData } from "~/server/utils";
 
 interface IAdvertise {
   name: string;
-  source: File;
+  description: string;
+  file: File;
 }
 export default defineEventHandler(async (event) => {
   try {
@@ -16,28 +19,44 @@ export default defineEventHandler(async (event) => {
     }
 
     const formData = await readFormData(event);
-
+    // const title = formData.get("name");
+    // const description = formData.get("description");
+    // const file = formData.get("file");
     const getConverted = extractFormData<IAdvertise>(formData);
 
-    const getBufferObject = await convertFileTOBase64(getConverted.source);
+    const getBufferObject = await convertFileTOBase64(getConverted.file);
+    console.log("getBufferObject========");
 
-    const postCreate = await event.context.prisma.advertise.create({
+    const getItem = await event.context.prisma.advertise.create({
       data: {
-        ...getConverted,
-
+        name: getConverted.name,
         source: {
           create: {
-            title: getConverted.source.name,
+            title: getConverted.file.name,
+            description: getConverted.description,
             file_type: "Image",
             file_binary: getBufferObject,
           },
         },
       },
+      select: {
+        source: true,
+      },
     });
-    return postCreate;
+    return {
+      statusCode: 200,
+      statusMessage: "Success",
+      table: "advertise",
+      method: "create",
+      objectResult: getItem,
+    };
   } catch (error) {
     console.log(error);
-    return error;
+    const getError = error as H3Error;
+    throw createError({
+      statusCode: getError.statusCode,
+      statusMessage: getError.message,
+    });
   }
   /*  body.array.forEach(async prod => {
       await prismaCLient.orderItem.create({

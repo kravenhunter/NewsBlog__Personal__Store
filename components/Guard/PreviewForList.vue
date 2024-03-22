@@ -1,35 +1,46 @@
 <script setup lang="ts">
-import type { IArticle } from "types/IArticle";
+import type { IPost } from "~/types";
 
-defineProps({
-  post: {
-    type: Object as PropType<IArticle>,
-    default: () => {},
-  },
-  gridDirection: {
-    type: String,
-    default: "1fr",
-  },
-  isShowBody: {
-    type: Boolean,
-    default: false,
-  },
-  isShowShort: {
-    type: Boolean,
-    default: false,
-  },
+interface IProps {
+  post?: IPost | null;
+  gridDirection: string;
+  isShowBody?: boolean | null;
+  isShowShort?: boolean | null;
+}
+
+withDefaults(defineProps<IProps>(), {
+  gridDirection: "1fr",
 });
 
-const articleStore = useArticleStore();
-const { deletePost, isExistPost } = articleStore;
+// defineProps({
+//   post: {
+//     type: Object as PropType<IPost>,
+//     default: () => {},
+//   },
+//   gridDirection: {
+//     type: String,
+//     default: "1fr",
+//   },
+//   isShowBody: {
+//     type: Boolean,
+//     default: false,
+//   },
+//   isShowShort: {
+//     type: Boolean,
+//     default: false,
+//   },
+// });
+
+const { deleteDataById, isPostExist } = useUnionStore();
+
 const goNext = (routeName: string, id: string | undefined) => {
-  id && isExistPost(id) && navigateTo(`/guard/${routeName}/${id}`);
+  id && isPostExist(id) && navigateTo(`/guard/${routeName}/${id}`);
 };
 </script>
 
 <template>
-  <div class="postListPreview" v-if="post.id">
-    <img :src="post.image" :alt="post.title" />
+  <div class="postListPreview" v-if="post?.id">
+    <NuxtImg :src="`data:image/webp;base64,${post.imagePrev.file_binary}`" :alt="post.title" />
     <div class="description">
       <h2 class="title" @click="goNext('post', post.id)">{{ post.title }}</h2>
 
@@ -50,7 +61,7 @@ const goNext = (routeName: string, id: string | undefined) => {
           size-heigth="24" />
       </button>
 
-      <button class="delete" @click="deletePost(post.id)">&times;</button>
+      <button class="delete" @click="deleteDataById(post.id)">&times;</button>
     </div>
   </div>
 </template>

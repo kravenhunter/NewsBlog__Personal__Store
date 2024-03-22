@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ErrorObject } from "@vuelidate/core";
 
-const props = defineProps({
+defineProps({
   error: Array as PropType<ErrorObject[]>,
 
   value: {

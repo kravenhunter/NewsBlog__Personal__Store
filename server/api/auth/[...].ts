@@ -19,7 +19,7 @@ const prisma = new PrismaClient();
 export default NuxtAuthHandler({
   adapter: PrismaAdapter(prisma),
   pages: {
-    signIn: "/auth/login",
+    signIn: "/",
   },
   secret: useRuntimeConfig().authSecret,
   providers: [
@@ -35,7 +35,7 @@ export default NuxtAuthHandler({
         try {
           if (!credentials.email || !credentials.password) {
             throw createError({
-              statusCode: 405,
+              statusCode: 400,
               statusMessage: "Bad Request",
               message: "Missing required fields ",
             });
@@ -47,7 +47,7 @@ export default NuxtAuthHandler({
           });
           if (!user?.email || !user?.hashedPassword) {
             throw createError({
-              statusCode: 405,
+              statusCode: 400,
               statusMessage: "Bad Request",
               message: "Invalid credentials",
             });
@@ -55,7 +55,7 @@ export default NuxtAuthHandler({
           const correctPassword = await bcrypt.compare(credentials.password, user.hashedPassword);
           if (!correctPassword) {
             throw createError({
-              statusCode: 405,
+              statusCode: 400,
               statusMessage: "Bad Request",
               message: "Invalid credentials",
             });
@@ -63,6 +63,8 @@ export default NuxtAuthHandler({
           return user;
         } catch (error) {
           const errorResult = error as H3Error;
+          console.log(errorResult);
+
           throw createError({
             statusCode: errorResult.statusCode,
             message: errorResult.message,

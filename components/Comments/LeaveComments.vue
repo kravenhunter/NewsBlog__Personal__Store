@@ -1,34 +1,43 @@
 <script setup lang="ts">
-import type { IComment } from "types/IComment";
-
 const props = defineProps({
-  postId: {
-    type: String,
-  },
+  postId: String,
 });
 
-const { addComment, loadCommentsByPostId } = useCommentsStore();
+const { getAuthUserByName, createOrUpdateData } = useUnionStore();
 
-const newComment = ref<IComment>({});
-async function handleClick(id: string) {
-  newComment.value.postId = id;
-  if (
-    newComment.value.postId &&
-    newComment.value.author &&
-    newComment.value.userId &&
-    newComment.value.body
-  ) {
-    const status = await addComment(newComment.value);
-    status.statusCode === 200
-      ? (newComment.value = {})
-      : console.log(`Error ${status.statusCode} ${status.message}`);
+const { data, status } = useAuth();
+
+const newComment = reactive({
+  postId: props.postId,
+  body: "",
+  userId: "",
+  anonumousName: "",
+});
+
+async function handleClick() {
+  if (newComment.postId && newComment.body) {
+    if (status.value === "authenticated" && data.value?.user?.name) {
+      const getUser = getAuthUserByName(data.value.user.name);
+      getUser?.id && (newComment.userId = getUser.id);
+    }
+
+    try {
+      const result = await createOrUpdateData("comment/create", newComment);
+    } catch (error) {
+      console.log(error);
+    }
+
+    // const statusData = await addComment(newComment.value);
+    // status.statusCode === 200
+    //   ? (newComment.value = {})
+    //   : console.log(`Error ${status.statusCode} ${status.message}`);
   } else {
     console.log(`Form is empty`);
   }
 }
-onMounted(async () => {
-  await loadCommentsByPostId(props.postId);
-});
+// onMounted(async () => {
+//   await loadCommentsByPostId(props.postId);
+// });
 </script>
 
 <template>
@@ -45,7 +54,7 @@ onMounted(async () => {
           class="user_name input"
           type="text"
           placeholder="Name *"
-          v-model="newComment.author" />
+          v-model="newComment.anonumousName" />
         <input
           class="user_email input"
           type="text"
@@ -56,7 +65,7 @@ onMounted(async () => {
     </div>
     <div class="btn_form">
       <UiElementsAddButton
-        @click="handleClick(postId)"
+        @click="handleClick"
         title="Add comment"
         font-size="15px"
         color-bg="#000000"

@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { Contacts, Navigation, Post, Tag } from "@prisma/client";
+import type { ICategory, IContacts, INavigation, IPost } from "~/types";
 
 interface IProps {
-  categories?: Tag[] | null;
-  contacts?: Contacts[] | null;
-  aboutUsLinks?: Navigation[] | null;
-  favorites?: Post[] | null;
+  categories?: ICategory[] | null;
+  contacts?: IContacts[] | null;
+  aboutUsLinks?: INavigation[] | null;
+  favorites?: IPost[] | null;
 }
 defineProps<IProps>();
 
@@ -34,19 +34,11 @@ defineProps<IProps>();
       </div>
       <div class="about_block grid_block">
         <h2 class="title_block">About Us</h2>
-        <UiAddAboutLinks
-          v-if="aboutUsLinks"
-          direction="flex"
-          gaps="20px"
-          :aboutlinks="aboutUsLinks" />
+        <UiAddAboutLinks direction="flex" gaps="20px" :aboutlinks="aboutUsLinks" />
       </div>
       <div class="popular_block grid_block">
         <h2 class="title_block">Popular Category</h2>
-        <UiAddAboutLinks
-          v-if="categories?.length"
-          direction="grid"
-          gaps="20px"
-          :categorylinks="categories?.slice(1)" />
+        <UiAddAboutLinks direction="grid" gaps="20px" :categorylinks="categories?.slice(1)" />
       </div>
       <div class="editor_picks grid_block">
         <h2 class="title_block">Editor Piks</h2>

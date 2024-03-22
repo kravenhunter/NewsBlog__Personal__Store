@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import type { NuxtError } from "nuxt/app";
 import { storeToRefs } from "pinia";
-import type { IArticle } from "types/IArticle";
+import type { IPost } from "~/types";
 
 const route = useRoute();
-const articlesByCategory = ref<IArticle[]>([]);
+const articlesByCategory = ref<IPost[]>([]);
 const search = ref("");
 const errorResponse = ref<NuxtError>();
 
@@ -13,11 +13,8 @@ const titlePath = ref("");
 titlePath.value = route.params.id && String(route.params.slug);
 // Articles state
 // const { postsState } = useArticleStore()
-const { postsState } = storeToRefs(useArticleStore());
-const { getArticlesByCategory, findArticlesByName } = useArticleStore();
-
-// Advertisement galary state
-const { advertiseList } = storeToRefs(useAdvertiseStore());
+const { postlist, advertiseList } = storeToRefs(useUnionStore());
+const { getPostByCategory, getPostByName } = useUnionStore();
 
 // CHeck route params
 if (route.params.slug === "search") {
@@ -27,9 +24,9 @@ if (route.params.slug === "search") {
 // Getting data by search request
 const searchComputed = computed(() => {
   if (!search.value) {
-    route.params.slug === "search" && (articlesByCategory.value = postsState.value.postList);
+    route.params.slug === "search" && (articlesByCategory.value = postlist.value);
     route.params.id === "list" &&
-      (articlesByCategory.value = getArticlesByCategory(String(route.params.slug)));
+      (articlesByCategory.value = getPostByCategory(String(route.params.slug)));
     // при SSR вызывало ошибку
     if (!articlesByCategory.value.length) {
       errorResponse.value = createError({ statusCode: 404, statusMessage: "Not found results" });
@@ -37,7 +34,7 @@ const searchComputed = computed(() => {
 
     return articlesByCategory.value;
   } else {
-    articlesByCategory.value = findArticlesByName(search.value);
+    articlesByCategory.value = getPostByName(search.value);
 
     if (!articlesByCategory.value.length) {
       errorResponse.value = createError({ statusCode: 404, statusMessage: "Not found results" });
@@ -56,7 +53,7 @@ useSeoMeta({
   <section class="list_container grid_block">
     <section class="top grid_block">
       <div class="advertise_block">
-        <UiElementsAdvertise label="Advertisement" :link="advertiseList.databaseList[1]" />
+        <UiElementsAdvertise label="Advertisement" v-if="advertiseList" :link="advertiseList[1]" />
       </div>
 
       <div class="topic grid_block">
@@ -94,14 +91,14 @@ useSeoMeta({
       <section class="error_block" v-else>
         <ErrorResponse :error-event="errorResponse" />
       </section>
-      <aside class="right_bar" v-if="postsState.postList.length">
+      <aside class="right_bar" v-if="postlist.length">
         <h3>Latest News</h3>
         <ArticleSingleArticle
           class-type="image_content_rigth"
           :show-title="true"
           :show-image="true"
           :show-date="true"
-          v-for="(el, i) in postsState.postList?.slice(4, 7)"
+          v-for="(el, i) in postlist?.slice(4, 7)"
           :key="i"
           :single-post="el" />
       </aside>

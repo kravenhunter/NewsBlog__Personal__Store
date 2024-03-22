@@ -1,4 +1,5 @@
 import { getServerSession } from "#auth";
+import type { H3Error } from "h3";
 
 interface ISocials {
   title: string;
@@ -8,6 +9,7 @@ interface IProps {
   adress: string;
   copyright: string;
   email: string;
+  phone: string;
   socials: ISocials[];
 }
 export default defineEventHandler(async (event) => {
@@ -19,6 +21,7 @@ export default defineEventHandler(async (event) => {
         statusMessage: "Unauthorized",
       });
     }
+    // console.log(event.context.prisma);
 
     const body = await readBody<IProps>(event);
     const contactData = await event.context.prisma.contacts.create({
@@ -29,11 +32,15 @@ export default defineEventHandler(async (event) => {
         },
       },
     });
-    return contactData;
+    return {
+      statusCode: 200,
+      statusMessage: "Success",
+    };
   } catch (error) {
+    const getError = error as H3Error;
     throw createError({
-      statusCode: 500,
-      statusMessage: (error as Error).message,
+      statusCode: getError.statusCode,
+      statusMessage: getError.message,
     });
   }
 });

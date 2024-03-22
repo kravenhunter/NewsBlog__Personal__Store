@@ -1,27 +1,48 @@
 <script setup lang="ts">
-defineProps({
-  source: {
-    type: String,
-    reqired: true,
-  },
-  name: {
-    type: String,
-    reqired: true,
-  },
-  description: {
-    type: String,
-    reqired: true,
-  },
-});
+import type { IFileData } from "~/types";
+
+interface IProps {
+  source: string;
+  title: string;
+  description: string;
+}
+interface IImage {
+  advertiseId?: string;
+  title?: string;
+  image?: IFileData;
+}
+const props = defineProps<IImage>();
+
+const emit = defineEmits<{
+  (e: "remove", id: string): void;
+}>();
+// defineProps({
+//   source: {
+//     type: String,
+//     reqired: true,
+//   },
+//   name: {
+//     type: String,
+//     reqired: true,
+//   },
+//   description: {
+//     type: String,
+//     reqired: true,
+//   },
+// });
+const remove = () => {
+  props.advertiseId && emit("remove", props.advertiseId);
+};
 </script>
 
 <template>
-  <div class="image">
-    <img :src="source" :alt="name" />
+  <div class="image" v-if="image">
+    <NuxtImg :src="`data:image/webp;base64,${image.file_binary}`" :alt="image.title" />
     <div class="intro">
-      <h1>{{ name }}</h1>
-      <p>{{ description }}</p>
-      <NuxtLink class="btn" :to="source">Link</NuxtLink>
+      <h1>{{ title ?? image.title }}</h1>
+      <p>{{ image.description }}</p>
+
+      <button type="button" class="btn" @click="remove">Remove</button>
     </div>
   </div>
 </template>
@@ -42,7 +63,7 @@ defineProps({
   transform: translateY(20px);
 }
 .image:before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;

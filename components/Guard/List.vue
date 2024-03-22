@@ -1,40 +1,56 @@
 <script setup lang="ts">
-import type { IArticle } from 'types/IArticle';
+import type { IPost } from "~/types";
 
-defineProps({
-  list: {
-    type: Array as PropType<IArticle[]>,
-    default: () => [],
-  },
-  singlePost: {
-    type: Object as PropType<IArticle>,
-    default: () => {},
-  },
-  label: {
-    type: String,
-    default: '',
-  },
-  directionCard: {
-    type: String,
-    reqired: false,
-  },
-  directionContainer: {
-    type: String,
-    reqired: '1fr',
-  },
-  row: {
-    type: String,
-    reqired: 'auto',
-  },
-  showBody: {
-    type: Boolean,
-    reqired: false,
-  },
-  showShort: {
-    type: Boolean,
-    reqired: false,
-  },
+interface IProps {
+  list?: IPost[] | null;
+  singlePost?: IPost | null;
+  label?: string;
+  directionCard?: string;
+  directionContainer: string;
+  row: string;
+  showBody?: boolean | null;
+  showShort?: boolean | null;
+}
+
+withDefaults(defineProps<IProps>(), {
+  directionContainer: "1fr",
+  row: "auto",
 });
+
+// defineProps({
+//   list: {
+//     type: Array as PropType<IArticle[]>,
+//     default: () => [],
+//   },
+//   singlePost: {
+//     type: Object as PropType<IArticle>,
+//     default: () => {},
+//   },
+//   label: {
+//     type: String,
+//     default: '',
+//   },
+//   directionCard: {
+//     type: String,
+//     reqired: false,
+//   },
+//   directionContainer: {
+//     type: String,
+//     reqired: '1fr',
+//   },
+//   row: {
+//     type: String,
+//     reqired: 'auto',
+//   },
+//   showBody: {
+//     type: Boolean,
+//     reqired: false,
+//   },
+//   showShort: {
+//     type: Boolean,
+//     reqired: false,
+//   },
+// });
 </script>
 
 <template>

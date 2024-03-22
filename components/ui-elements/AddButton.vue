@@ -37,6 +37,10 @@ defineProps({
     type: Boolean,
     default: true,
   },
+  // disabled: {
+  //   type: Boolean,
+  //   default: false,
+  // },
 });
 </script>
 
@@ -58,7 +62,7 @@ defineProps({
 
 <style scoped lang="scss">
 .btn {
-  font-size: v-bind(fontSize);
+  /*  font-size: v-bind(fontSize); */
   font-weight: 600;
   padding: v-bind(paddings);
 

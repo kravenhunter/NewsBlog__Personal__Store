@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import formatPath from "@/utils/formatPath";
-import type { Navigation } from "@prisma/client";
+import type { INavigation } from "~/types";
 
 // import { storeToRefs } from "pinia";
 // import { useAuthStore } from "@/stores/authStore";
 interface IProps {
-  topLinks?: Navigation[] | null;
-  categoryLinks?: Navigation[] | null;
+  topLinks?: INavigation[] | null;
+  categoryLinks?: INavigation[] | null;
 }
 defineProps<IProps>();
 
@@ -15,6 +15,9 @@ defineEmits<{
 }>();
 
 const { data, signIn, signOut, status } = useAuth();
+
+console.log("Header->user", data.value?.user?.name);
+console.log("Header->auth status", status.value);
 
 const convertPath = (title: string | undefined) => title && `/${title?.toLocaleLowerCase()}/list`;
 

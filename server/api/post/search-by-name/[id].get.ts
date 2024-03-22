@@ -1,4 +1,5 @@
 import { defineEventHandler } from "#imports";
+import type { H3Error } from "h3";
 
 export default defineEventHandler(async (event) => {
   try {
@@ -14,14 +15,17 @@ export default defineEventHandler(async (event) => {
     if (!posts) {
       // throw new Error("");
       throw createError({
-        statusCode: 405,
+        statusCode: 404,
         statusMessage: "No records in database ",
       });
     }
 
     return posts;
   } catch (error) {
-    console.log(error);
-    return error;
+    const getError = error as H3Error;
+    throw createError({
+      statusCode: getError.statusCode,
+      statusMessage: getError.statusMessage,
+    });
   }
 });

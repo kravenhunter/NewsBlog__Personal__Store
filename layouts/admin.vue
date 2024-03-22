@@ -1,21 +1,11 @@
 <script setup lang="ts">
-import type {
-  About,
-  Advertise,
-  Contacts,
-  File as FileData,
-  FooterLink,
-  Navigation,
-  Post,
-  Tag,
-} from "@prisma/client";
 import { storeToRefs } from "pinia";
 
 //Get  Authorized user
 // const { isAuthorized } = useAuthStore();
 // const { data, signOut, status } = useAuth();
 
-const { loadDataList } = useUnionStore();
+const { loadDataList, fillStoreData } = useUnionStore();
 //Fetch AboutUs  data
 const {
   postlist,
@@ -29,46 +19,76 @@ const {
   podCastList,
 } = storeToRefs(useUnionStore());
 
+// const loadStores = async () => {
+//   const postPropmis = loadDataList("post/list");
+//   const tagPropmis = loadDataList("tag/list");
+//   const audioPropmis = loadDataList("file/list-by-type/audio");
+//   const contactsPropmis = loadDataList("contacts/list");
+//   const aboutPropmis = loadDataList("about/list");
+//   const imagePropmis = loadDataList("file/list-by-type/images");
+//   const padvertisePropmis = loadDataList("advertise/list");
+//   const navPropmis = loadDataList("nav-link/list");
+//   const footerPropmis = loadDataList("footer-link/list");
+//   const promiseAll = await Promise.allSettled([
+//     postPropmis,
+//     tagPropmis,
+//     audioPropmis,
+//     contactsPropmis,
+//     aboutPropmis,
+//     imagePropmis,
+//     padvertisePropmis,
+//     navPropmis,
+//     footerPropmis,
+//   ]);
+// };
 const loadStores = async () => {
   if (!postlist.value?.length) {
-    await loadDataList<Post[]>("/api/post/list", "post");
+    await loadDataList("post/list");
   }
   if (!categoryList.value?.length) {
-    await loadDataList<Tag[]>("/api/tag/list", "tag");
+    await loadDataList("tag/list");
   }
   if (!podCastList.value?.length) {
-    await loadDataList<FileData[]>("/api/file/list-by-type/audio", "podcasts");
+    await loadDataList("file/list-by-type/audio");
   }
-  if (!contactList.value) {
-    await loadDataList<Contacts[]>("/api/contacts/list", "contacts");
+  if (!contactList.value.length) {
+    await loadDataList("contacts/list");
   }
-  if (!aboutUs.value) {
-    await loadDataList<About[]>("/api/about/list", "about");
-  }
-
-  if (!imageList.value) {
-    await loadDataList<FileData[]>("/api/file/list-by-type/images", "images");
-  }
-  if (!advertiseList.value) {
-    await loadDataList<Advertise[]>("/api/advertise/list", "advertise");
+  if (!aboutUs.value.length) {
+    await loadDataList("about/list");
   }
 
-  if (!navLiks.value) {
-    await loadDataList<Navigation[]>("/api/nav-link/list", "nav-link");
+  if (!imageList.value.length) {
+    await loadDataList("file/list-by-type/images");
   }
-  if (!footerLinks.value) {
-    await loadDataList<FooterLink[]>("/api/footer-link/list", "footer-link");
+  if (!advertiseList.value.length) {
+    await loadDataList("advertise/list");
+  }
+
+  if (!navLiks.value.length) {
+    await loadDataList("nav-link/list");
+  }
+  if (!footerLinks.value.length) {
+    await loadDataList("footer-link/list");
   }
 };
 //Load all stores
-await loadStores();
-
+// await loadStores();
+// async function loadDataList(path: string) {
+//   try {
+//     const { data: response, error } = await useFetch<IResponse>(`api/${path}`);
+//     if (error.value) {
+//       throw error.value;
+//     }
+//     response.value?.table &&
+//       response.value.statusCode === 200 &&
+//       fillStoreData(response.value.table, response.value.objectResult);
+//   } catch (error) {
+//     console.log(error);
+//   }
+// }
 //CHeck Auth a
-// onMounted(async () => await isAuthorized());
-definePageMeta({
-  layout: "admin",
-  middleware: "auth", //from nuxt-config
-});
+onMounted(async () => await loadStores());
 </script>
 
 <template>

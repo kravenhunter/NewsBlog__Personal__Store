@@ -11,10 +11,16 @@ export default defineEventHandler(async (event) => {
     }
 
     const body = await readBody(event);
-    const createResult = await event.context.prisma.footerLink.create({
+    const item = await event.context.prisma.footerLink.create({
       data: body,
     });
-    return createResult;
+    return {
+      statusCode: 200,
+      statusMessage: "Success",
+      table: "footer-link",
+      method: "create",
+      objectResult: item,
+    };
   } catch (error) {
     throw createError({
       statusCode: 500,

@@ -3,7 +3,7 @@ const route = useRoute();
 
 definePageMeta({
   layout: "admin",
-  /*   middleware: ["auth"], */
+  middleware: "auth", //from nuxt-config
 });
 </script>
 

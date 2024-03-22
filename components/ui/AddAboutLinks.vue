@@ -1,38 +1,30 @@
 <script setup lang="ts">
 import formatPath from "@/utils/formatPath";
-import type { ICategory } from "types/ICategory";
-import type { INavigation } from "types/INavigation";
+import type { ICategory, INavigation } from "~/types";
 
-defineProps({
-  directionColumn: {
-    type: String,
-    default: "grid",
-  },
-  aboutlinks: {
-    type: Array as PropType<INavigation[]>,
-    default: () => [],
-  },
-  categorylinks: {
-    type: Array as PropType<ICategory[]>,
-    default: () => [],
-  },
-  gaps: {
-    type: String,
-    default: "10px",
-  },
+interface IProps {
+  directionColumn: string;
+  aboutlinks?: INavigation[] | null;
+  categorylinks?: ICategory[] | null;
+  gaps: string;
+}
+
+withDefaults(defineProps<IProps>(), {
+  directionColumn: "grid",
+  gaps: "10px",
 });
 </script>
 
 <template>
   <div class="about_container">
-    <ul class="about_links" v-if="categorylinks.length">
+    <ul class="about_links" v-if="categorylinks?.length">
       <li v-for="(link, i) in categorylinks" :key="i" :data-id="i">
         <NuxtLink :to="{ path: `/${link.title?.toLocaleLowerCase()}/list` }">
           {{ link?.title?.toLocaleUpperCase() }}
         </NuxtLink>
       </li>
     </ul>
-    <ul class="about_links" v-if="aboutlinks.length">
+    <ul class="about_links" v-if="aboutlinks?.length">
       <li v-for="(link, i) in aboutlinks" :key="i" :data-id="i">
         <NuxtLink
           v-if="link.title === 'Events'"

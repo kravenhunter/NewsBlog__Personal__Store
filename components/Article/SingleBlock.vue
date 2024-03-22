@@ -1,40 +1,34 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
-import type { IArticle } from "types/IArticle";
+import type { IPost } from "~/types";
 
 const route = useRoute();
-const article = ref<IArticle | undefined>();
+const article = ref<IPost>();
 
-const prevPage = ref<IArticle | undefined>();
-const nextPage = ref<IArticle | undefined>();
+const prevPage = ref<IPost>();
+const nextPage = ref<IPost>();
 
 //Gets  Comments list and functions
 
-const { commentsState } = storeToRefs(useCommentsStore());
-const { loadCommentsByPostId } = useCommentsStore();
+const { commentListByCurrentPost, postlist, advertiseList } = storeToRefs(useUnionStore());
 
-//Fetch Articles data
-
-const { postsState } = storeToRefs(useArticleStore());
-const { getArticleById, getArticlesByCategory } = useArticleStore();
-
-//Fetch Advertisement galary
-const { advertiseList } = storeToRefs(useAdvertiseStore());
+const { getPostByCategory, getCommentsByPostId } = useUnionStore();
 
 function getNavigations(currentPostId: string) {
-  const categoryList = getArticlesByCategory(String(route.params.slug));
+  const categoryList = getPostByCategory(String(route.params.slug));
+
   const index = categoryList.findIndex((el) => el.id === currentPostId);
   prevPage.value = categoryList[index - 1];
   nextPage.value = categoryList[index + 1];
 }
 const loadStores = async () => {
-  article.value = getArticleById(String(route.params.id));
-
-  loadCommentsByPostId(article.value?.id);
+  article.value = postlist.value.find((el) => el.id === String(route.params.id));
+  article.value?.id && (await getCommentsByPostId(article.value.id));
   getNavigations(String(route.params.id));
 };
 loadStores();
-onMounted(() => console.log(commentsState.value.commentlist));
+
+// onMounted(() => console.log(commentsState.value.commentlist));
 
 useSeoMeta({
   title: article.value && `${article.value?.title}`,
@@ -62,8 +56,8 @@ useSeoMeta({
             :show-title="true"
             :show-image="true"
             :show-date="true"
-            v-for="(el, i) in postsState.postList.slice(4, 7)"
-            :key="i"
+            v-for="el in postlist.slice(4, 7)"
+            :key="el.id"
             :single-post="el" />
         </aside>
 
@@ -76,14 +70,14 @@ useSeoMeta({
             <ul class="nav_block">
               <li class="prev" v-if="prevPage">
                 <p>Previous article</p>
-                <NuxtLink :to="{ path: `/${prevPage.category}/${prevPage.id}` }"
+                <NuxtLink :to="{ path: `/post/${prevPage.id}` }"
                   ><h4>{{ prevPage.title }}</h4></NuxtLink
                 >
               </li>
 
               <li class="next" v-if="nextPage">
                 <p>Next article</p>
-                <NuxtLink :to="{ path: `/${nextPage.category}/${nextPage.id}` }"
+                <NuxtLink :to="{ path: `/post/${nextPage.id}` }"
                   ><h4>{{ nextPage.title }}</h4></NuxtLink
                 >
               </li>
@@ -91,10 +85,10 @@ useSeoMeta({
           </div>
           <div class="comments grid_block">
             <LazyCommentsLeaveComments :post-id="article.id" />
-            <div class="comment_block grid_block" v-if="commentsState.commentlist?.length">
+            <div class="comment_block grid_block" v-if="commentListByCurrentPost?.length">
               <LazyCommentsCommentId
-                v-for="(com, i) in commentsState.commentlist"
-                :key="i"
+                v-for="com in commentListByCurrentPost"
+                :key="com.id"
                 :comment="com" />
             </div>
           </div>
@@ -104,17 +98,17 @@ useSeoMeta({
 
     <aside class="right_bar bars">
       <LazyUiElementsAdvertise
-        v-if="advertiseList.databaseList.length"
+        v-if="advertiseList?.length"
         label="Advertisement"
-        :link="advertiseList.databaseList[1]" />
+        :link="advertiseList[1]" />
       <h3>Latest News</h3>
       <ArticleSingleArticle
         class-type="image_content_rigth"
         :show-title="true"
         :show-image="true"
         :show-date="true"
-        v-for="(el, i) in postsState.postList.slice(4, 7)"
-        :key="i"
+        v-for="el in postlist.slice(4, 7)"
+        :key="el.id"
         :single-post="el" />
     </aside>
   </div>

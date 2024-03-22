@@ -22,9 +22,7 @@ export default defineEventHandler(async (event) => {
 
     const body = await readBody<IProps>(event);
 
-    // const getConverted = extractFormData<IContacts>(formData);
-
-    await event.context.prisma.contacts.update({
+    const getItem = await event.context.prisma.contacts.update({
       where: { id: event?.context?.params?.id },
       data: {
         ...body,
@@ -32,8 +30,23 @@ export default defineEventHandler(async (event) => {
           create: body.socials && body.socials,
         },
       },
+      select: {
+        id: true,
+        copyright: true,
+        adress: true,
+        date: true,
+        phone: true,
+        email: true,
+        Socials: true,
+      },
     });
-    return "Success";
+
+    return {
+      statusCode: 200,
+      statusMessage: "Success",
+      method: "update",
+      objectResult: getItem,
+    };
   } catch (error) {
     console.log(error);
     return error;

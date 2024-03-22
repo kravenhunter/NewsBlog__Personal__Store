@@ -1,39 +1,56 @@
 <script setup lang="ts">
 import type { NuxtError } from "nuxt/app";
-import type { IError } from "types/IError";
+import type { IError } from "~/types";
 
-const props = defineProps({
-  errorEvent: {
-    type: Object as PropType<NuxtError>,
-    default: null,
-  },
-
-  titleResult: {
-    type: String,
-    default: "Ooops.",
-  },
-  useSlot: {
-    type: Boolean,
-    default: false,
-  },
-  showStatusCode: {
-    type: Boolean,
-    default: true,
-  },
-  customEvent: {
-    type: Object as PropType<IError>,
-    default: null,
-  },
-
-  status: {
-    type: Number,
-    default: 404,
-  },
-  errorMessage: {
-    type: String,
-    default: "No results",
-  },
+interface IProps {
+  errorEvent?: NuxtError;
+  titleResult?: string;
+  useSlot?: boolean;
+  showStatusCode?: boolean;
+  customEvent?: IError;
+  status?: number;
+  errorMessage?: string;
+}
+const props = withDefaults(defineProps<IProps>(), {
+  titleResult: "Ooops.",
+  useSlot: false,
+  showStatusCode: true,
+  status: 404,
+  errorMessage: "No results",
 });
+
+// const props = defineProps({
+//   errorEvent: {
+//     type: Object as PropType<NuxtError>,
+//     default: null,
+//   },
+
+//   titleResult: {
+//     type: String,
+//     default: "Ooops.",
+//   },
+//   useSlot: {
+//     type: Boolean,
+//     default: false,
+//   },
+//   showStatusCode: {
+//     type: Boolean,
+//     default: true,
+//   },
+//   customEvent: {
+//     type: Object as PropType<IError>,
+//     default: null,
+//   },
+
+//   status: {
+//     type: Number,
+//     default: 404,
+//   },
+//   errorMessage: {
+//     type: String,
+//     default: "No results",
+//   },
+// });
 
 useHead({
   title: "Error response",

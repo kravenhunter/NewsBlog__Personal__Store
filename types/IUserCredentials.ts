@@ -1,3 +1,5 @@
+import type { IFileData } from "~/types";
+
 export default interface IUserCredentials {
   id?: string;
   emailField?: string;
@@ -9,7 +11,6 @@ export default interface IUserCredentials {
   birthdayField?: string;
   adressField?: string;
   accessPanel?: boolean;
-  avatarField?: string;
-  avatarImageMeta?: string;
+  avatarField?: IFileData;
   date?: number;
 }

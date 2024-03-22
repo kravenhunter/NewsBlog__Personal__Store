@@ -1,40 +1,47 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
-import type { IArticle } from "types/IArticle";
+import type { IPost } from "~/types";
 
 const search = ref("");
-const articlesByCategory = ref<IArticle[]>();
+const articlesByCategory = ref<IPost[]>();
 
-const { categoryState } = storeToRefs(useCategoryStorage());
-
-const { postsState } = storeToRefs(useArticleStore());
+const { postlist, categoryList } = storeToRefs(useUnionStore());
 
 const selected = ref("All");
 
 const searchResult = computed(() => {
-  if (selected.value === "All" && !search.value) {
-    articlesByCategory.value = [];
-    articlesByCategory.value = [
-      ...postsState.value.postList.filter((el) => el.title?.includes(search.value)),
-    ];
-
-    return articlesByCategory.value;
-  } else if (selected.value !== "All") {
-    articlesByCategory.value = [];
-    articlesByCategory.value = [
-      ...postsState.value.postList.filter((post) => post.category === selected.value),
-    ];
-
-    return articlesByCategory.value;
+  if (search.value) {
+    return [...postlist.value.filter((el) => el.title?.includes(search.value))].filter((post) =>
+      post.tags.filter((el) => el.title === selected.value),
+    );
   } else {
-    articlesByCategory.value = [];
-    articlesByCategory.value = [
-      ...postsState.value.postList.filter((el) => el.title?.includes(search.value)),
-    ];
-
-    return articlesByCategory.value;
+    return postlist.value.filter((post) => post.tags.filter((el) => el.title === selected.value));
   }
 });
+// const searchResult = computed(() => {
+//   if (selected.value === "All" && !search.value) {
+//     articlesByCategory.value = [];
+//     articlesByCategory.value = [
+//       ...postsState.value.postList.filter((el) => el.title?.includes(search.value)),
+//     ];
+
+//     return articlesByCategory.value;
+//   } else if (selected.value !== "All") {
+//     articlesByCategory.value = [];
+//     articlesByCategory.value = [
+//       ...postsState.value.postList.filter((post) => post.category === selected.value),
+//     ];
+
+//     return articlesByCategory.value;
+//   } else {
+//     articlesByCategory.value = [];
+//     articlesByCategory.value = [
+//       ...postsState.value.postList.filter((el) => el.title?.includes(search.value)),
+//     ];
+
+//     return articlesByCategory.value;
+//   }
+// });
 </script>
 
 <template>
@@ -71,14 +78,14 @@ const searchResult = computed(() => {
           <select v-model="selected">
             <!--  <option disabled value="">All</option> -->
             <option value="All">All</option>
-            <option v-for="option in categoryState" :key="option.id" :value="option.title">
+            <option v-for="option in categoryList" :key="option.id" :value="option.title">
               {{ option.title }}
             </option>
           </select>
         </div>
       </div>
 
-      <div class="list">
+      <div class="list" v-if="searchResult.length">
         <GuardList
           :label="selected"
           :list="searchResult"

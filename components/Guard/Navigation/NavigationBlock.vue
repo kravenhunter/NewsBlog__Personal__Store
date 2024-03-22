@@ -1,26 +1,24 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 
-const { navLinks, footerLinks } = storeToRefs(useNavStorage());
-const { addNewItem, deleteItem, deleteFooterLink } = useNavStorage();
+const { navLiks, footerLinks } = storeToRefs(useUnionStore());
+const { createOrUpdateData, deleteDataById } = useUnionStore();
 
-const navSubmit = async (val: string) => {
-  val && (await addNewItem({ title: val }, undefined));
+const submit = async (val: { title: string; field: string }) => {
   console.log(val);
+  if (val) {
+    val.field === "Header Links" &&
+      (await createOrUpdateData(`nav-link/create`, { title: val.title }));
+    val.field === "Footer Links" &&
+      (await createOrUpdateData(`footer-link/create`, { title: val.title }));
+  }
 };
-const navDeleteHandler = async (id: string) => {
-  id && (await deleteItem(id));
-  console.log(id);
-};
-
-const footerSubmit = async (val: string) => {
-  val && (await addNewItem(undefined, { title: val }));
-
-  console.log(val);
-};
-const footerDeleteHandler = async (id: string) => {
-  console.log(id);
-  id && (await deleteFooterLink(id));
+const deleteHandler = async (val: { id: string; field: string }) => {
+  // id && (await deleteDataById(`${type}/delete-by-id/${id}`));
+  if (val) {
+    val.field === "Header Links" && (await deleteDataById(`nav-link/delete-by-id/${val.id}`));
+    val.field === "Footer Links" && (await deleteDataById(`footer-link/delete-by-id/${val.id}`));
+  }
 };
 </script>
 
@@ -28,15 +26,15 @@ const footerDeleteHandler = async (id: string) => {
   <div class="wrapper_container">
     <GuardNavigationLinks
       label="Header Links"
-      :links="navLinks"
-      @link-emit="navSubmit"
-      @delete-link="navDeleteHandler" />
+      :links="navLiks"
+      @link-emit="submit"
+      @delete-link="deleteHandler" />
 
     <GuardNavigationLinks
       label="Footer Links"
       :links="footerLinks"
-      @link-emit="footerSubmit"
-      @delete-link="footerDeleteHandler" />
+      @link-emit="submit"
+      @delete-link="deleteHandler" />
   </div>
 </template>
 

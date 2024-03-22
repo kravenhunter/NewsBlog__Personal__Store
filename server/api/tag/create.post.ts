@@ -10,11 +10,26 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    const body = await readBody(event);
-    const category = await event.context.prisma.tag.create({
-      data: body,
-    });
-    return category;
+    const { title } = await readBody<{ title: string }>(event);
+    // console.log("Body cate", body);
+    if (title) {
+      const item = await event.context.prisma.tag.create({
+        data: { title },
+      });
+      console.log("Category created", item);
+      return {
+        statusCode: 200,
+        statusMessage: "Success",
+        table: "tag",
+        method: "create",
+        objectResult: item,
+      };
+    }
+    return {
+      statusCode: 200,
+      statusMessage: "Title is empty",
+      table: "tag",
+    };
   } catch (error) {
     throw createError({
       statusCode: 500,

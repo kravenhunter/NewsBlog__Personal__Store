@@ -1,9 +1,14 @@
 <script setup lang="ts">
+import type { NuxtError } from "nuxt/app";
 import { storeToRefs } from "pinia";
 
 //Fetch Podcast List
 const { postlist, podCastList, advertiseList } = storeToRefs(useUnionStore());
 
+const errorResponse = ref<NuxtError>();
+if (!postlist.value.length) {
+  errorResponse.value = createError({ statusCode: 404, statusMessage: "Not found results" });
+}
 const worldList = postlist.value.filter((item) => {
   return item.tags.some((el) => el.title?.includes("World"));
 });
@@ -229,12 +234,15 @@ useSeoMeta({
         </div>
       </section>
     </section>
-    <section v-else class="empty"></section>
+
+    <section class="error_block" v-else>
+      <ErrorResponse :error-event="errorResponse" />
+    </section>
   </section>
 </template>
 
 <style scoped lang="scss">
-.empty {
+.error_block {
   height: 100%;
 }
 .section_preview {

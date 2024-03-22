@@ -7,7 +7,7 @@ const converToCurrentTags = (currenttagsArray: string[], tagList: Tag[]) => {
     const getCat = tagList.find((x) => x.title === cat);
     getCat && tagsArr.push(getCat);
   });
-  return tagsArr;
+  return tagsArr; //dsfds
 };
 
 export default converToCurrentTags;

@@ -2,8 +2,10 @@ import { getServerSession } from "#auth";
 import { convertFileTOBase64, extractFormData } from "~/server/utils";
 
 interface IAdvertise {
+  id: string;
   name: string;
-  source: File;
+  sourceId: string;
+  source: File | string;
 }
 export default defineEventHandler(async (event) => {
   try {
@@ -19,22 +21,52 @@ export default defineEventHandler(async (event) => {
 
     const getConverted = extractFormData<IAdvertise>(formData);
 
-    const getBufferObject = await convertFileTOBase64(getConverted.source);
+    if (getConverted.source instanceof File) {
+      const getBufferObject = await convertFileTOBase64(getConverted.source);
 
-    await event.context.prisma.advertise.update({
-      where: { id: event?.context?.params?.id },
-      data: {
-        ...getConverted,
-        source: {
-          create: {
-            title: getConverted.source.name,
-            file_type: "Image",
-            file_binary: getBufferObject,
+      const getItem = await event.context.prisma.advertise.update({
+        where: { id: event?.context?.params?.id },
+        data: {
+          name: getConverted.name,
+          source: {
+            create: {
+              title: getConverted.source.name,
+              file_type: "Image",
+              file_binary: getBufferObject,
+            },
           },
         },
-      },
-    });
-    return "Success";
+        select: {
+          id: true,
+          name: true,
+          source: true,
+        },
+      });
+      return {
+        statusCode: 200,
+        statusMessage: "Success",
+        table: "advertise",
+        method: "update",
+        objectResult: getItem,
+      };
+    } else {
+      const getItem = await event.context.prisma.advertise.update({
+        where: { id: event?.context?.params?.id },
+        data: {
+          name: getConverted.name,
+          source: {
+            connect: { id: getConverted.sourceId },
+          },
+        },
+      });
+      return {
+        statusCode: 200,
+        statusMessage: "Success",
+        table: "advertise",
+        method: "update",
+        objectResult: getItem,
+      };
+    }
   } catch (error) {
     console.log(error);
     return error;

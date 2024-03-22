@@ -3,7 +3,7 @@ import { storeToRefs } from "pinia";
 
 const isEdit = ref(false);
 
-const { aboutUs } = storeToRefs(useAboutUsStore());
+const { aboutUs } = storeToRefs(useUnionStore());
 </script>
 
 <template>
@@ -19,10 +19,10 @@ const { aboutUs } = storeToRefs(useAboutUsStore());
 
     <div class="about_content" v-if="!isEdit && aboutUs">
       <div class="about_title">
-        <h2>{{ aboutUs.title }}</h2>
+        <h2>{{ aboutUs[0].title }}</h2>
       </div>
 
-      <div class="about_text" v-html="aboutUs?.aboutContent"></div>
+      <div class="about_text" v-html="aboutUs[0].description"></div>
     </div>
   </div>
 </template>

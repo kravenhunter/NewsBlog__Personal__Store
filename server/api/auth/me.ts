@@ -7,12 +7,19 @@ export default defineEventHandler(async (event) => {
   if (!session) {
     return { status: "Unauthorized" };
   }
-  const account = await event.context.prisma.account.findFirst({
+  // const account = await event.context.prisma.account.findFirst({
+  //   where: {
+  //     user: {
+  //       email: body.email,
+  //     },
+  //   },
+  // });
+  const userCredentials = await event.context.prisma.user_Credentials.findFirst({
     where: {
-      user: {
+      User: {
         email: body.email,
       },
     },
   });
-  return account;
+  return userCredentials;
 });

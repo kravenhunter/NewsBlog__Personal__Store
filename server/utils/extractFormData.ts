@@ -17,10 +17,11 @@
 //   };
 // };
 
-const extractFormData = <T>(formData: FormData): T => {
+export const extractFormData = <T>(formData: FormData): T => {
   const extractREsult = Object.create({});
-  for (const item in formData) {
+  for (const item of formData.keys()) {
     const getData = formData.get(item);
+
     getData &&
       Object.defineProperty(extractREsult, item, {
         value: getData,
@@ -41,6 +42,6 @@ const extractFormData = <T>(formData: FormData): T => {
     //     });
     // }
   }
+
   return extractREsult as T;
 };
-export default extractFormData;

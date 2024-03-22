@@ -49,8 +49,7 @@ model User_Credentials {
   userNameField  String
   adressField    String?
   emailField     String
-  avatarId       String?   @unique
-  avatar         File?     @relation(fields: [avatarId], references: [id], onDelete: SetNull)
+  avatar         File?
   birthdayField  DateTime?
   firstNameField String?
   lastNameField  String?
@@ -80,12 +79,16 @@ model File {
   title            String
   file_type        FileType
   file_binary      String            @db.MediumText
-  adition_binary   String?            @db.MediumText
+  adition_binary   String?           @db.MediumText
   description      String?
-  User_Credentials User_Credentials?
-  Advertise        Advertise?
-  ImageBg          Post?             @relation(name: "imageBg")
-  ImagePrev        Post?             @relation(name: "imagePrev")
+  credentialsId    String?           @unique
+  User_Credentials User_Credentials? @relation(fields: [credentialsId], references: [id], onDelete: Cascade)
+  advertise_Id     String?           @unique
+  Advertise        Advertise?        @relation(fields: [advertise_Id], references: [id], onDelete: Cascade)
+  imageBg_Id       String?           @unique
+  ImageBg          Post?             @relation(name: "imageBg", fields: [imageBg_Id], references: [id], onDelete: Cascade)
+  imagePrev_Id     String?           @unique
+  ImagePrev        Post?             @relation(name: "imagePrev", fields: [imagePrev_Id], references: [id], onDelete: Cascade)
   tagId            String?
   tag              Tag?              @relation(fields: [tagId], references: [id])
 }
@@ -96,17 +99,15 @@ enum FileType {
 }
 
 model Post {
-  id           String   @id @default(cuid())
-  date         DateTime @default(now())
-  title        String
-  author       String
-  body         String
-  imageBg_Id   String   @unique
-  imagePrev_Id String   @unique
-  imageBg      File?    @relation(fields: [imageBg_Id], references: [id], name: "imageBg")
-  imagePrev    File?    @relation(fields: [imagePrev_Id], references: [id], name: "imagePrev")
-  shortBody    String
-  tags         Tag[]
+  id        String   @id @default(cuid())
+  date      DateTime @default(now())
+  title     String
+  author    String
+  body      String
+  imageBg   File?    @relation(name: "imageBg")
+  imagePrev File?    @relation(name: "imagePrev")
+  shortBody String
+  tags      Tag[]
 
   Comment   Comment[]
   CommentId String?
@@ -121,14 +122,14 @@ model Tag {
 }
 
 model Comment {
-  id     String   @id @default(cuid())
-  date   DateTime @default(now())
-  title  String
-  body   String
-  postId String   @unique
-  Posts  Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
-  userId String   @unique
-  Author User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id            String   @id @default(cuid())
+  date          DateTime @default(now())
+  body          String
+  postId        String   @unique
+  Posts         Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId        String?  @unique
+  Author        User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  anonumousName String?  @unique
 }
 
 model About {
@@ -139,11 +140,10 @@ model About {
 }
 
 model Advertise {
-  id       String   @id @default(cuid())
-  date     DateTime @default(now())
-  name     String
-  sourceId String   @unique
-  source   File     @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  id     String   @id @default(cuid())
+  date   DateTime @default(now())
+  name   String
+  source File?
 }
 
 model Contacts {
@@ -152,6 +152,7 @@ model Contacts {
   adress    String
   copyright String
   email     String
+  phone     String
   Socials   Social[]
   // facebookLink String
   // instagram    String

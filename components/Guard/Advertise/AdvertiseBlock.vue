@@ -1,36 +1,76 @@
 <script setup lang="ts">
-import { useAdvertiseStore } from "@/stores/advertiseStore";
 import { storeToRefs } from "pinia";
 
 const state = reactive({
-  source: "",
   name: "",
   description: "",
-  date: 0,
 });
 const isUpload = ref(false);
-const fileList = ref<FileList>();
+const fileData = ref<File | null>();
 
-const { advertiseList } = storeToRefs(useAdvertiseStore());
+const { advertiseList } = storeToRefs(useUnionStore());
 
-const { uploadToStorage } = useAdvertiseStore();
+const { createOrUpdateData, deleteDataById } = useUnionStore();
 
 const onFileSelected = async (event: Event) => {
-  const fileEvent = event.target as HTMLInputElement;
-  fileEvent.files?.length && (fileList.value = fileEvent.files);
+  fileData.value = extractFileFromEvent(event);
 };
 function resetForm() {
-  state.date = 0;
   state.name = "";
   state.description = "";
-  state.source = "";
 }
-const submitForm = async () => {
-  fileList.value?.length && (isUpload.value = await uploadToStorage(fileList.value, state));
-  isUpload.value && resetForm();
-};
 
-onMounted(() => console.log(advertiseList.value.databaseList));
+const submitForm = async () => {
+  if (fileData.value) {
+    const body = new FormData();
+
+    body.append("file", fileData.value, fileData.value.name);
+
+    for (const item in state) {
+      body.append(item, `${state[item as keyof typeof state]}`);
+    }
+    // console.log(body);
+    // const {
+    //   data: response,
+    //   error,
+    //   refresh,
+    // } = await useFetch(`/api/advertise/create`, {
+    //   method: "POST",
+    //   body,
+    // });
+
+    // for (const item of body.keys()) {
+    //   const getData = body.get(item);
+    //   console.log(`${item} ==>`, getData);
+    // }
+    // for (const item of body) {
+    //   console.log(item);
+    //   // const getData = body.get(item);
+    //   // console.log(getData);
+    // }
+    const result = await createOrUpdateData("advertise/create", body);
+
+    result && result.statusCode === 200 && resetForm();
+  }
+};
+interface IType {
+  id: string;
+  name: string;
+  source: {
+    id: string;
+    title: string;
+    file_type: string;
+    file_binary: string;
+    adition_binary?: string;
+  };
+}
+const deleteHaandler = async (adver_id: string) => {
+  console.log(adver_id);
+  if (adver_id) {
+    await deleteDataById(`advertise/delete-by-id/${adver_id}`);
+  }
+};
+// onMounted(() => console.log(advertiseList.value.databaseList));
 </script>
 
 <template>
@@ -69,14 +109,15 @@ onMounted(() => console.log(advertiseList.value.databaseList));
         >
       </div>
     </div>
-    <div class="wrapp-body" v-if="advertiseList.databaseList.length">
+    <div class="wrapp-body" v-if="advertiseList?.length">
       <div class="wrapp-content">
         <LazyGuardGalaryImageCard
-          v-for="element in advertiseList.databaseList"
+          v-for="element in advertiseList"
           :key="element.id"
-          :source="element.source"
-          :name="element.name"
-          :description="element.description" />
+          :title="element.name"
+          :advertise-id="element.id"
+          :image="element.source"
+          @remove="deleteHaandler" />
       </div>
     </div>
   </div>

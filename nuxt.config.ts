@@ -23,7 +23,7 @@ export default defineNuxtConfig({
     baseURL: process.env.AUTH_ORIGIN,
     provider: {
       type: "authjs",
-      addDefaultCallbackUrl: "/auth/login",
+      addDefaultCallbackUrl: "/",
     },
 
     session: {

@@ -1,24 +1,22 @@
 import { ref, useFetch } from "#imports";
-import type {
-  About,
-  Advertise,
-  Comment,
-  Contacts,
-  FooterLink,
-  Navigation,
-  Tag,
-  User_Credentials,
-} from "@prisma/client";
+
 import { acceptHMRUpdate, defineStore } from "pinia";
-import type { IFileData, IPost } from "~/types";
+import type {
+  IAbout,
+  IAdvertisment,
+  ICategory,
+  IComment,
+  IContacts,
+  IFileData,
+  INavigation,
+  IPost,
+  IResponse,
+  IUserCredentials,
+} from "~/types";
 
 // import { compressToBestSize } from "~/composables/compressFile";
 
 //import { uuid } from "vue-uuid";
-// import type {
-
-//   IContacts,
-//  } from "~/types";
 
 type TypeTables =
   | "post"
@@ -30,79 +28,284 @@ type TypeTables =
   | "about"
   | "advertise"
   | "nav-link"
-  | "footer-link";
+  | "footer-link"
+  | "user-credential";
 
-interface IResponse {
-  statusCode: number;
-  statusMessage: string;
-}
 const apiUrl = "/api";
 export const useUnionStore = defineStore("union-store", () => {
+  //const temp = useFetch("/api/advertise/create");
   const postlist = ref<IPost[]>([]);
-  const aboutUs = ref<About[] | null>();
-  const advertiseList = ref<Advertise[] | null>();
-  const contactList = ref<Contacts[] | null>();
-  const categoryList = ref<Tag[] | null>();
-  const commentListByCurrentPost = ref<Comment[] | null>();
-
-  const imageList = ref<IFileData[] | null>();
-  const podCastList = ref<IFileData[] | null>();
-
-  const navLiks = ref<Navigation[] | null>();
-  const footerLinks = ref<FooterLink[] | null>();
-  const userCredentials = ref<User_Credentials[] | null>();
+  const aboutUs = ref<IAbout[]>([]);
+  const advertiseList = ref<IAdvertisment[]>([]);
+  const contactList = ref<IContacts[]>([]);
+  const categoryList = ref<ICategory[]>([]);
+  const commentListByCurrentPost = ref<IComment[]>([]);
+  const imageList = ref<IFileData[]>([]);
+  const podCastList = ref<IFileData[]>([]);
+  const navLiks = ref<INavigation[]>([]);
+  const footerLinks = ref<INavigation[]>([]);
+  const userCredentials = ref<IUserCredentials[]>([]);
 
   const pendingData = ref<boolean>(false);
-  const loadDataList = async <T>(apiPath: string, table: TypeTables) => {
+
+  const fillStoreData = <T>(table: string, data: T, action?: string) => {
+    switch (table) {
+      case "post":
+        action === "create" && postlist.value.push(data as IPost);
+        action === "update" &&
+          (postlist.value = postlist.value.map((el) => {
+            if (el.id === (data as IPost).id) {
+              return data as IPost;
+            }
+            return el;
+          }));
+        action === "delete" &&
+          (postlist.value = postlist.value.filter((el) => el.id !== (data as IPost).id));
+        !action && (postlist.value = data as IPost[]);
+
+        break;
+      case "images":
+        action === "create" && imageList.value.push(data as IFileData);
+        action === "update" &&
+          (imageList.value = imageList.value.map((el) => {
+            if (el.id === (data as IFileData).id) {
+              return data as IFileData;
+            }
+            return el;
+          }));
+        action === "delete" &&
+          (imageList.value = imageList.value.filter((el) => el.id !== (data as IFileData).id));
+        !action && (imageList.value = data as IFileData[]);
+
+        break;
+      case "podcasts":
+        action === "create" && podCastList.value.push(data as IFileData);
+        action === "update" &&
+          (podCastList.value = podCastList.value.map((el) => {
+            if (el.id === (data as IFileData).id) {
+              return data as IFileData;
+            }
+            return el;
+          }));
+        action === "delete" &&
+          (podCastList.value = podCastList.value.filter((el) => el.id !== (data as IFileData).id));
+        !action && (podCastList.value = data as IFileData[]);
+
+        break;
+      case "about":
+        action === "create" && aboutUs.value.push(data as IAbout);
+        action === "update" &&
+          (aboutUs.value = aboutUs.value.map((el) => {
+            if (el.id === (data as IAbout).id) {
+              return data as IAbout;
+            }
+            return el;
+          }));
+        action === "delete" &&
+          (aboutUs.value = aboutUs.value.filter((el) => el.id !== (data as IAbout).id));
+        !action && (aboutUs.value = data as IAbout[]);
+
+        break;
+      case "advertise":
+        action === "create" && advertiseList.value.push(data as IAdvertisment);
+        action === "update" &&
+          (advertiseList.value = advertiseList.value.map((el) => {
+            if (el.id === (data as IAdvertisment).id) {
+              return data as IAdvertisment;
+            }
+            return el;
+          }));
+        action === "delete" &&
+          (advertiseList.value = advertiseList.value.filter(
+            (el) => el.id !== (data as IAdvertisment).id,
+          ));
+        !action && (advertiseList.value = data as IAdvertisment[]);
+
+        break;
+      case "contacts":
+        action === "create" && contactList.value.push(data as IContacts);
+        action === "update" &&
+          (contactList.value = contactList.value.map((el) => {
+            if (el.id === (data as IContacts).id) {
+              return data as IContacts;
+            }
+            return el;
+          }));
+        action === "delete" &&
+          (contactList.value = contactList.value.filter((el) => el.id !== (data as IContacts).id));
+        !action && (contactList.value = data as IContacts[]);
+
+        break;
+      case "tag":
+        action === "create" && categoryList.value.push(data as ICategory);
+        action === "update" &&
+          (categoryList.value = categoryList.value.map((el) => {
+            if (el.id === (data as ICategory).id) {
+              return data as ICategory;
+            }
+            return el;
+          }));
+        action === "delete" &&
+          (categoryList.value = categoryList.value.filter(
+            (el) => el.id !== (data as ICategory).id,
+          ));
+        !action && (categoryList.value = data as ICategory[]);
+        console.log(categoryList.value);
+        break;
+      case "nav-link":
+        action === "create" && navLiks.value.push(data as INavigation);
+        action === "update" &&
+          (navLiks.value = navLiks.value.map((el) => {
+            if (el.id === (data as INavigation).id) {
+              return data as INavigation;
+            }
+            return el;
+          }));
+        action === "delete" &&
+          (navLiks.value = navLiks.value.filter((el) => el.id !== (data as INavigation).id));
+        !action && (navLiks.value = data as INavigation[]);
+
+        break;
+      case "footer-link":
+        action === "create" && footerLinks.value.push(data as INavigation);
+        action === "update" &&
+          (footerLinks.value = footerLinks.value.map((el) => {
+            if (el.id === (data as INavigation).id) {
+              return data as INavigation;
+            }
+            return el;
+          }));
+        action === "delete" &&
+          (footerLinks.value = footerLinks.value.filter(
+            (el) => el.id !== (data as INavigation).id,
+          ));
+        !action && (footerLinks.value = data as INavigation[]);
+        break;
+      case "user-credential":
+        action === "create" && userCredentials.value.push(data as IUserCredentials);
+        action === "update" &&
+          (userCredentials.value = userCredentials.value.map((el) => {
+            if (el.id === (data as IUserCredentials).id) {
+              return data as IUserCredentials;
+            }
+            return el;
+          }));
+        action === "delete" &&
+          (userCredentials.value = userCredentials.value.filter(
+            (el) => el.id !== (data as IUserCredentials).id,
+          ));
+        !action && (userCredentials.value = data as IUserCredentials[]);
+
+        break;
+
+      default:
+        break;
+    }
+
+    // console.log(categoryList.value);
+  };
+  /**
+   * async Function Returns void
+   * @param {string} apiPath   apiPath
+   * @param {TypeTables} table   table
+   * @return {Promise<void>}  Promise void.
+   *
+   **/
+  const loadDataList = async (apiPath: string) => {
     try {
-      //  const temp = useFetch<Tag[]>(`/api/contacts/list`);
-      const { data, error, refresh: refreshPost } = await useFetch<T[]>(`${apiUrl}/${apiPath}`);
+      console.log(apiPath);
+
+      const { data: response, error, refresh } = await useFetch<IResponse>(`${apiUrl}/${apiPath}`);
       if (error.value) {
         throw error.value;
       }
-      if (data.value) {
-        switch (table) {
-          case "post":
-            postlist.value = data.value as IPost[];
 
-            break;
-          case "comment":
-            commentListByCurrentPost.value = data.value as Comment[];
-            break;
-          case "images":
-            imageList.value = data.value as IFileData[];
-            break;
-          case "podcasts":
-            podCastList.value = data.value as IFileData[];
-            break;
-          case "about":
-            aboutUs.value = data.value as About[];
-            break;
-          case "advertise":
-            advertiseList.value = data.value as Advertise[];
-            break;
-          case "contacts":
-            contactList.value = data.value as Contacts[];
-            break;
-          case "tag":
-            categoryList.value = data.value as Tag[];
-            break;
-          case "nav-link":
-            navLiks.value = data.value as Navigation[];
-            break;
-          case "footer-link":
-            footerLinks.value = data.value as FooterLink[];
-            break;
-
-          default:
-            break;
-        }
-      }
+      response.value?.table &&
+        response.value.statusCode === 200 &&
+        fillStoreData(response.value.table, response.value.objectResult);
     } catch (error) {
       console.log(error);
     }
   };
 
+  const createOrUpdateData = async <T extends Record<string, any>>(
+    apiPath: string,
+    formData: T,
+  ) => {
+    try {
+      const {
+        data: response,
+        error,
+        refresh,
+      } = await useFetch<IResponse>(`${apiUrl}/${apiPath}`, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (error.value) {
+        throw error.value;
+      }
+      if (!response.value) {
+        throw new Error("The instance isn't created");
+      }
+
+      response.value?.table &&
+        response.value.statusCode === 200 &&
+        fillStoreData(response.value.table, response.value.objectResult, response.value.method);
+
+      return {
+        statusCode: response.value.statusCode,
+        statusMessage: response.value.statusMessage,
+      };
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  /**
+   * async Function Returns  void
+   * @param {string} apiPath   apiPath
+   * @return { Promise<void>}  Promise void
+   *
+   **/
+  const deleteDataById = async (apiPath: string) => {
+    try {
+      const { data: response, error } = await useFetch<IResponse>(`${apiUrl}/${apiPath}`);
+
+      if (error.value) {
+        throw error.value;
+      }
+
+      response.value?.table &&
+        response.value.statusCode === 200 &&
+        fillStoreData(response.value.table, response.value.objectResult, "delete");
+      // userCredentials.value = userCredentials.value?.filter(u => u.id !== )
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  /**
+   * async Function Returns voidt
+   * @param {string} postId   postId
+   * @return {Promise<void>}  Promise void.
+   *
+   **/
+  const getCommentsByPostId = async (postId: string) => {
+    try {
+      const {
+        data,
+        error,
+        refresh: refreshPost,
+      } = await useFetch<IComment[]>(`${apiUrl}/comment/list-by-post-id/list/${postId}`);
+      if (error.value) {
+        throw error.value;
+      }
+      data.value && (commentListByCurrentPost.value = data.value);
+    } catch (error) {
+      console.log(error);
+    }
+  };
   const getSizeImage = async (fileImage: File): Promise<number> => {
     return await new Promise((resolve) => {
       const newImage = new Image();
@@ -114,6 +317,34 @@ export const useUnionStore = defineStore("union-store", () => {
       };
     });
   };
+  /**
+   * async Function Returns   IPost array
+   * @param {string} category   category
+   * @return {Promise<IPost[]>}  Promise Post[].
+   *
+   **/
+  const getPostByCategory = (category: string) => {
+    return postlist.value.filter((el) => {
+      return el.tags.some((el) => el.title?.includes(category));
+    });
+  };
+
+  /**
+   * async Function Returns  IPost array
+   * @param {string} search   search
+   * @return {Promise<IPost[]>}  Promise Post[].
+   *
+   **/
+  const getPostByName = (search: string) => postlist.value.filter((el) => el.title.match(search));
+
+  /**
+   * async Function Returns  IPost object
+   * @param {string} search   search
+   * @return {Promise<IPost>}  Promise Post.
+   *
+   **/
+  const getPostById = (postId: string) => postlist.value.find((el) => el.id === postId);
+
   // async function loadImageToStore(
   //   fileCover: File,
   //   typeImage: TypeImage,
@@ -147,41 +378,16 @@ export const useUnionStore = defineStore("union-store", () => {
   //     return linkDefault;
   //   }
   // }
-  const createOrUpdateData = async <T extends globalThis.Ref<Record<string, any> | BodyInit>>(
-    apiPath: string,
-    table: TypeTables,
-    formData: T,
-  ) => {
-    try {
-      const {
-        data: response,
-        error,
-        refresh,
-      } = await useFetch<IResponse>(apiPath, {
-        method: "POST",
-        body: formData,
-      });
-      console.log(response.value);
+  //const createOrUpdateData = async <T extends Record<string, any> | BodyInit>
 
-      if (error.value) {
-        throw error.value;
-      }
+  /**
+   * async Function Returns  IResponse object | null
+   * @param {string} apiPath   apiPath
+   * @param {T} formData   formData
+   * @return {Promise<IResponse | null>}  Promise IResponse | null.
+   *
+   **/
 
-      return response.value;
-    } catch (error) {}
-  };
-  const deleteDataById = async (apiPath: string) => {
-    try {
-      const { data: response, error } = await useFetch<IResponse>(apiPath);
-      console.log(response.value);
-
-      if (error.value) {
-        throw error.value;
-      }
-
-      return response.value;
-    } catch (error) {}
-  };
   // const createData2 = async <T extends TypeInterfaces>(
   //   fileDataCover: File,
   //   fileDataPreview: File,
@@ -520,7 +726,25 @@ export const useUnionStore = defineStore("union-store", () => {
   //   }
   // };
 
+  /**
+   * async Function Returns IUserCredentials | undefined
+   * @param {string} name   apiPath
+   * @return { IUserCredentials | undefined}  IUserCredentials | undefined
+   *
+   **/
+  const getAuthUserByName = (name?: string) =>
+    userCredentials.value?.find((u) => u.userNameField === name);
+
+  /**
+   * async Function Returns boolean
+   * @param {string} id   apiPath
+   * @return {boolean}  boolean
+   *
+   **/
+  const isPostExist = (id: string) => postlist.value.some((el) => el.id === id);
   return {
+    getPostById,
+    fillStoreData,
     pendingData,
     postlist,
     aboutUs,
@@ -528,13 +752,19 @@ export const useUnionStore = defineStore("union-store", () => {
     contactList,
     categoryList,
     commentListByCurrentPost,
+    userCredentials,
     imageList,
     podCastList,
     navLiks,
     footerLinks,
+    isPostExist,
+    getPostByName,
     createOrUpdateData,
+    getCommentsByPostId,
     loadDataList,
     deleteDataById,
+    getPostByCategory,
+    getAuthUserByName,
   };
 });
 

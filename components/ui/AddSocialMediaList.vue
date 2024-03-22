@@ -1,29 +1,19 @@
 <script setup lang="ts">
-import type { PropType } from "nuxt/dist/app/compat/capi";
-import type { ILinks } from "types/ILinks";
+import type { INavigation } from "~/types";
 
-defineProps({
-  popelarCategory: {
-    type: Array as PropType<ILinks[]>,
-    default: () => [],
-  },
+interface IProps {
+  popelarCategory?: INavigation[] | null;
+  isInlineBlock: boolean;
+  enableBg: boolean;
+  colorIcon: string;
+  paddings: string;
+}
 
-  isInlineBlock: {
-    type: Boolean,
-    default: false,
-  },
-  enableBg: {
-    type: Boolean,
-    default: false,
-  },
-  colorIcon: {
-    type: String,
-    default: "white",
-  },
-  paddings: {
-    type: String,
-    default: "0.5rem",
-  },
+withDefaults(defineProps<IProps>(), {
+  isInlineBlock: false,
+  enableBg: false,
+  colorIcon: "white",
+  paddings: "0.5rem",
 });
 </script>
 

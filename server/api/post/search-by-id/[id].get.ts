@@ -1,4 +1,5 @@
 import { createError, defineEventHandler } from "#imports";
+import type { H3Error } from "h3";
 
 export default defineEventHandler(async (event) => {
   try {
@@ -10,14 +11,17 @@ export default defineEventHandler(async (event) => {
 
     if (!post) {
       throw createError({
-        statusCode: 405,
-        statusMessage: "Wrong Id ",
+        statusCode: 404,
+        statusMessage: "No records in database ",
       });
     }
 
     return post;
   } catch (error) {
-    console.log(error);
-    return error;
+    const getError = error as H3Error;
+    throw createError({
+      statusCode: getError.statusCode,
+      statusMessage: getError.statusMessage,
+    });
   }
 });

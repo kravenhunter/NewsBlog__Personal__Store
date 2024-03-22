@@ -1,15 +1,13 @@
 <script setup lang="ts">
-import type { INavigation } from "types/INavigation";
+import type { INavigation } from "~/types";
 
-defineProps({
-  links: {
-    type: Array as PropType<INavigation[]>,
-    default: null,
-  },
-  label: {
-    type: String,
-    default: "label",
-  },
+interface IProps {
+  links?: INavigation[] | null;
+  label: string;
+}
+
+const props = withDefaults(defineProps<IProps>(), {
+  label: "label",
 });
 
 const emit = defineEmits(["linkEmit", "deleteLink"]);
@@ -18,10 +16,10 @@ const state = reactive({
   title: "",
 });
 const submitForm = () => {
-  emit("linkEmit", state.title);
+  emit("linkEmit", { title: state.title, field: props.label });
 };
-const deleteHandler = (id: string | undefined) => {
-  id && emit("deleteLink", id);
+const deleteHandler = (linkId: string | undefined) => {
+  linkId && emit("deleteLink", { id: linkId, field: props.label });
 };
 </script>
 
@@ -33,7 +31,7 @@ const deleteHandler = (id: string | undefined) => {
         label="Title"
         width-form="100%"
         font-size="2rem"
-        name="title"
+        :name="label"
         placeholder="Input Title"
         v-model:value.trim="state.title" />
       <div class="btn_block">

@@ -1,16 +1,15 @@
 <script setup lang="ts">
-import type { IComment } from "@/types/IComment";
+import type { IComment } from "~/types";
 
-defineProps({
-  comment: {
-    type: Object as PropType<IComment>,
-  },
-});
+interface IProps {
+  comment: IComment;
+}
+defineProps<IProps>();
 </script>
 
 <template>
   <div class="user_comment_block" v-if="comment">
-    <div v-if="!comment.avatar" class="avatar">
+    <div v-if="!comment.Author?.avatarField" class="avatar">
       <UiElementsAddIcon
         icon-name="mingcute:user-4-fill"
         color-icon="#64748b"
@@ -18,11 +17,13 @@ defineProps({
         size-heigth="80" />
     </div>
     <div v-else class="avatar">
-      <img :src="comment.avatar" :alt="comment.avatar" />
+      <NuxtImg
+        :src="`data:image/webp;base64,${comment.Author.avatarField.file_binary}`"
+        :alt="comment.Author.userNameField" />
     </div>
     <div class="description">
       <div class="credentials">
-        <h4>{{ comment.author }}</h4>
+        <h4>{{ comment.Author?.userNameField }}</h4>
         <h5>{{ comment.date && formatDate(comment.date) }}</h5>
       </div>
       <div class="admin_message"><p>Your comment is awaiting moderation</p></div>

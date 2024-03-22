@@ -1,24 +1,23 @@
 <script setup lang="ts">
-import { storeToRefs } from "pinia";
-
 const isExpanded = ref(false);
 
-const { statAuth } = storeToRefs(useAuthStore());
-const { signOutUser } = useAuthStore();
+// const { statAuth } = storeToRefs(useAuthStore());
+const { signOut, status } = useAuth();
 
 const toggleMenu = () => {
   isExpanded.value = !isExpanded.value;
 };
 
 const logOutHandler = async () => {
-  if (statAuth.value.authUser.id) {
-    const status = await signOutUser();
-    if (status.statusCode === 200) {
+  try {
+    await signOut();
+    if (status.value === "unauthenticated") {
       navigateTo("/");
+    } else {
+      throw new Error("Error Log out");
     }
-    status.statusCode === 405 && console.log("Error Log out", status.message);
-  } else {
-    console.log("Current user object empty", statAuth.value.authUser);
+  } catch (error) {
+    console.log(error);
   }
 };
 </script>

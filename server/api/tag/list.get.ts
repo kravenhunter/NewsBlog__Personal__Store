@@ -1,22 +1,29 @@
 // import { getServerSession } from "#auth";
+import type { H3Error } from "h3";
 
 export default defineEventHandler(async (event) => {
   try {
-    const getPostList = await event.context.prisma.tag.findMany({
+    const getItemList = await event.context.prisma.tag.findMany({
       orderBy: { date: "desc" },
     });
 
-    if (!getPostList.length) {
+    if (!getItemList.length) {
       throw createError({
-        statusCode: 405,
+        statusCode: 404,
         statusMessage: "No records in database ",
       });
     }
-    return getPostList;
+    return {
+      statusCode: 200,
+      statusMessage: "Success",
+      table: "tag",
+      objectResult: getItemList,
+    };
   } catch (error) {
+    const getError = error as H3Error;
     throw createError({
-      statusCode: 500,
-      statusMessage: (error as Error).message,
+      statusCode: getError.statusCode,
+      statusMessage: getError.statusMessage,
     });
   }
 });

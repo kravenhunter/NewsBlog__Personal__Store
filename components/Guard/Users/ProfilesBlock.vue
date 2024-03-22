@@ -1,14 +1,17 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 
-const { usersState } = storeToRefs(useUserStore());
-const { deleteUser } = useUserStore();
+const { userCredentials } = storeToRefs(useUnionStore());
+const { deleteDataById } = useUnionStore();
+const deleteUser = async (userId?: string) => {
+  userId && (await deleteDataById(`auth/delete-by-id/${userId}`));
+};
 </script>
 
 <template>
   <div class="wrapper_block">
     <h2>Users List</h2>
-    <ul class="list_block" v-for="(user, i) in usersState.userList" :key="i" :id="user.id">
+    <ul class="list_block" v-for="user in userCredentials" :key="user.id" :id="user.id">
       <li>
         <h4>{{ user.userNameField }}</h4>
       </li>

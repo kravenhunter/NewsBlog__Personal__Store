@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { IGalaryCard } from "types/IGalaryCard";
+import type { IAdvertisment } from "~/types";
 
 defineProps({
   label: {
@@ -7,7 +7,7 @@ defineProps({
     default: "",
   },
   link: {
-    type: Object as PropType<IGalaryCard>,
+    type: Object as PropType<IAdvertisment>,
     default: null,
   },
 });
@@ -19,7 +19,10 @@ defineProps({
       <h5 v-if="label">{{ label }}</h5>
     </div>
     <div class="advertise">
-      <img class="advertise_image" v-if="link" :src="link.source" :alt="link.name" />
+      <NuxtImg
+        v-if="link.source"
+        :src="`data:image/webp;base64,${link.source.file_binary}`"
+        :alt="link.name" />
     </div>
   </div>
 </template>

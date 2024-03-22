@@ -1,19 +1,20 @@
 <script setup lang="ts">
-import type { IArticle } from "types/IArticle";
+import { storeToRefs } from "pinia";
+import type { IPost } from "~/types";
+
+//Fetch Podcast List
+const { postlist } = storeToRefs(useUnionStore());
 
 const route = useRoute();
-const currentPost = ref<IArticle>();
-
-const articleStore = useArticleStore();
-const { getArticleById } = articleStore;
+const currentPost = ref<IPost>();
 
 route.params.slug === "post" &&
   route.params.id &&
-  (currentPost.value = getArticleById(String(route.params.id)));
+  (currentPost.value = postlist.value.find((el) => el.id === String(route.params.id)));
 
 definePageMeta({
   layout: "admin",
-  /*   middleware: ["auth"], */
+  middleware: ["auth"],
 });
 </script>
 
@@ -30,7 +31,6 @@ definePageMeta({
         :show-image="true"
         :show-date="true"
         :show-content="true" />
-      <!--   <div class="editor_content" v-html="currentPost.body"></div> -->
     </div>
   </div>
 </template>

@@ -1,11 +1,9 @@
 import { useVuelidate } from "@vuelidate/core";
-import { alpha, helpers, maxLength, minLength, required } from "@vuelidate/validators";
+import { helpers, maxLength, minLength, required } from "@vuelidate/validators";
 
 interface IPodcastData {
   title: string;
-  author: string;
   description: string;
-  category: string;
 }
 const alphabetRegex = helpers.regex(/^[^!@#№%^&*_+]+$/); // (/^[a-zA-Z]*$/)
 
@@ -26,18 +24,6 @@ export const validatePodcastHelper = (statePodcast: IPodcastData) => {
       description: {
         required: helpers.withMessage("Body cannot be empty", required),
         regexField: helpers.withMessage("Только слова, цифры и символы: () , $", alphabetRegex),
-        minLength: minLengthLimit(3),
-      },
-      author: {
-        required: helpers.withMessage("Author cannot be empty", required),
-        regexField: helpers.withMessage("Только слова, цифры и символы: () , $", alphabetRegex),
-        minLength: minLengthLimit(3),
-        maxLength: maxLengthLimit(40),
-      },
-
-      category: {
-        required: helpers.withMessage("Category cannot be empty", required),
-        regexField: helpers.withMessage("Только слова", alpha),
         minLength: minLengthLimit(3),
       },
     };

@@ -2,41 +2,43 @@
 <script setup lang="ts">
 import type { NuxtError } from "nuxt/app";
 import { storeToRefs } from "pinia";
+import type { ICategory } from "~/types";
+import fileFromEvent from "~/utils/extractFileFromEvent";
 
+const { data } = useAuth();
 const state = reactive({
-  id: "",
   title: "",
-  author: "",
-  category: "",
-  image: "",
-  imageMeta: "",
+  author: data.value?.user?.name ?? "",
   shortBody: "",
   body: "",
-  date: 0,
+  tags: [] as ICategory[],
 });
 
+const file_binary = ref<File | null>();
+
+const { categoryList } = storeToRefs(useUnionStore());
+const { createOrUpdateData } = useUnionStore();
+
 const isCreated = ref("");
-const fileList = ref<FileList>();
 
 const resetForm = () => {
   state.title = "";
   state.author = "";
-  state.category = "";
-  state.image = "";
+  state.tags = [];
   state.shortBody = "";
-  fileList.value = {} as FileList;
   state.body = "";
-  state.date = 0;
 };
 const createResponse = ref<NuxtError>();
-// const createResponse = createError({ statusCode: 200, statusMessage: "Poste Created" });
-const { categoryState } = storeToRefs(useCategoryStorage());
 
-const { addPost } = useArticleStore();
+const selectedTags = ref<string>();
+
+watch(selectedTags, () => {
+  const getTag = categoryList.value.find((el) => el.title === selectedTags.value);
+  getTag && state.tags.push(getTag);
+});
 
 const onFileSelected = async (event: Event) => {
-  const fileEvent = event.target as HTMLInputElement;
-  fileEvent.files?.length && (fileList.value = fileEvent.files);
+  file_binary.value = fileFromEvent(event);
 };
 
 const v$ = validatePostHelper(state);
@@ -46,23 +48,30 @@ const responseHandler = async (path: string | undefined) => {
   !path && (await clearError());
   isCreated.value = "";
 };
+
 const submitForm = async () => {
   v$.value.$validate();
   if (!v$.value.$error) {
-    if (fileList.value) {
-      const result = await addPost(fileList.value, state);
+    const body = new FormData();
+    file_binary.value && body.append("file_binary", file_binary.value, file_binary.value.name);
 
-      if (result.statusCode === 200) {
+    if (file_binary.value) {
+      for (const item in state) {
+        body.append(item, `${state[item as keyof typeof state]}`);
+      }
+      const result = await createOrUpdateData(`post/create`, body);
+
+      if (result && result.statusCode === 200) {
         resetForm();
         isCreated.value = "created";
-        createResponse.value = createError({ statusCode: 200, statusMessage: result.message });
+        createResponse.value = createError({
+          statusCode: 200,
+          statusMessage: result.statusMessage,
+        });
       } else {
         isCreated.value = "error";
-        createResponse.value = createError({ statusCode: 405, statusMessage: result.message });
+        createResponse.value = createError({ statusCode: 405, statusMessage: "Can't save post" });
       }
-
-      /* 
-      alert(result.message); */
     }
   } else {
     // console.log(v$.value.$errors[0]);
@@ -97,10 +106,10 @@ const submitForm = async () => {
             v-model:value.trim="v$.author.$model"
             :error="v$.author.$errors" />
 
-          <div class="select_block" v-if="categoryState">
+          <div class="select_block" v-if="categoryList">
             <label for="category">Category</label>
-            <select name="category" v-model.trim="state.category">
-              <option v-for="option in categoryState" :key="option.id" :value="option.title">
+            <select name="category" v-model.trim="selectedTags">
+              <option v-for="option in categoryList" :key="option.id" :value="option.title">
                 {{ option.title }}
               </option>
             </select>
