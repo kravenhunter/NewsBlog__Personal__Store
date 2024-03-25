@@ -1,5 +1,4 @@
 import { getServerSession } from "#auth";
-import { convertFileTOBase64, extractFormData } from "~/server/utils";
 
 interface IAdvertise {
   id: string;
@@ -7,6 +6,7 @@ interface IAdvertise {
   sourceId: string;
   source: File | string;
 }
+
 export default defineEventHandler(async (event) => {
   try {
     const session = await getServerSession(event);

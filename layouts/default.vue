@@ -31,33 +31,33 @@ const {
 
 const loadStores = async () => {
   if (!postlist.value?.length) {
-    await loadDataList("post/list", "post");
+    await loadDataList("post/list");
   }
   if (!categoryList.value?.length) {
-    await loadDataList("tag/list", "tag");
+    await loadDataList("tag/list");
   }
   if (!podCastList.value?.length) {
-    await loadDataList("file/list-by-type/audio", "podcasts");
+    await loadDataList("file/list-by-type/audio");
   }
   if (!contactList.value) {
-    await loadDataList("contacts/list", "contacts");
+    await loadDataList("contacts/list");
   }
   if (!aboutUs.value) {
-    await loadDataList("about/list", "about");
+    await loadDataList("about/list");
   }
 
   if (!imageList.value) {
-    await loadDataList("file/list-by-type/images", "images");
+    await loadDataList("file/list-by-type/images");
   }
   if (!advertiseList.value) {
-    await loadDataList("advertise/list", "advertise");
+    await loadDataList("advertise/list");
   }
 
   if (!navLiks.value) {
-    await loadDataList("nav-link/list", "nav-link");
+    await loadDataList("nav-link/list");
   }
   if (!footerLinks.value) {
-    await loadDataList("footer-link/list", "footer-link");
+    await loadDataList("footer-link/list");
   }
 };
 // const loadStores = async () => {

@@ -6,10 +6,10 @@ export default defineEventHandler(async (event) => {
     const getItemList = await event.context.prisma.footerLink.findMany();
 
     if (!getItemList.length) {
-      throw createError({
+      return {
         statusCode: 404,
         statusMessage: "No records in database ",
-      });
+      };
     }
     return {
       statusCode: 200,

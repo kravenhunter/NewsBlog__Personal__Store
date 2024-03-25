@@ -1,8 +1,17 @@
+import { getServerSession } from "#auth";
 import type { H3Error } from "h3";
 
 export default defineEventHandler(async (event) => {
   try {
-    const getItemList = await event.context.prisma.tag.findMany({
+    const session = await getServerSession(event);
+    if (!session) {
+      throw createError({
+        statusCode: 401,
+        statusMessage: "Unauthorized",
+      });
+    }
+
+    const getItemList = await event.context.prisma.user_Credentials.findMany({
       orderBy: { date: "desc" },
     });
 
@@ -12,10 +21,11 @@ export default defineEventHandler(async (event) => {
         statusMessage: "No records in database ",
       };
     }
+
     return {
       statusCode: 200,
       statusMessage: "Success",
-      table: "tag",
+      table: "user-credential",
       objectResult: getItemList,
     };
   } catch (error) {

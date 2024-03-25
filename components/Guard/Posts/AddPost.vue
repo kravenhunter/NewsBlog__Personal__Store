@@ -2,16 +2,17 @@
 <script setup lang="ts">
 import type { NuxtError } from "nuxt/app";
 import { storeToRefs } from "pinia";
-import type { ICategory } from "~/types";
+
 import fileFromEvent from "~/utils/extractFileFromEvent";
 
+// import type { ICategory } from "~/types";
 const { data } = useAuth();
 const state = reactive({
   title: "",
   author: data.value?.user?.name ?? "",
   shortBody: "",
   body: "",
-  tags: [] as ICategory[],
+  tags: "World",
 });
 
 const file_binary = ref<File | null>();
@@ -24,18 +25,11 @@ const isCreated = ref("");
 const resetForm = () => {
   state.title = "";
   state.author = "";
-  state.tags = [];
+  state.tags = "World";
   state.shortBody = "";
   state.body = "";
 };
 const createResponse = ref<NuxtError>();
-
-const selectedTags = ref<string>();
-
-watch(selectedTags, () => {
-  const getTag = categoryList.value.find((el) => el.title === selectedTags.value);
-  getTag && state.tags.push(getTag);
-});
 
 const onFileSelected = async (event: Event) => {
   file_binary.value = fileFromEvent(event);
@@ -49,29 +43,57 @@ const responseHandler = async (path: string | undefined) => {
   isCreated.value = "";
 };
 
+const creatingResult = (statusCode: number, message: string) => {
+  if (statusCode === 200) {
+    resetForm();
+    isCreated.value = "created";
+    createResponse.value = createError({ statusCode: 200, statusMessage: message });
+  } else {
+    isCreated.value = "error";
+    createResponse.value = createError({ statusCode: 405, statusMessage: message });
+  }
+};
 const submitForm = async () => {
   v$.value.$validate();
   if (!v$.value.$error) {
-    const body = new FormData();
-    file_binary.value && body.append("file_binary", file_binary.value, file_binary.value.name);
-
     if (file_binary.value) {
+      const body = new FormData();
+
+      const getImageSize = await getSizeImage(file_binary.value);
+      const getCompressedImageFBGile = await compressToBestSize(getImageSize, file_binary.value);
+      const getCompressedImagePrevFile = await compressToBestSize(274, file_binary.value);
+
+      getCompressedImageFBGile?.compressedFILE &&
+        body.append(
+          "imageBg",
+          getCompressedImageFBGile?.compressedFILE,
+          getCompressedImageFBGile.compressedFILE.name,
+        );
+      getCompressedImagePrevFile?.compressedFILE &&
+        body.append(
+          "imagePrev",
+          getCompressedImagePrevFile?.compressedFILE,
+          getCompressedImagePrevFile.compressedFILE.name,
+        );
+
       for (const item in state) {
-        body.append(item, `${state[item as keyof typeof state]}`);
+        body.append(item, state[item as keyof typeof state].toString());
       }
       const result = await createOrUpdateData(`post/create`, body);
 
-      if (result && result.statusCode === 200) {
-        resetForm();
-        isCreated.value = "created";
-        createResponse.value = createError({
-          statusCode: 200,
-          statusMessage: result.statusMessage,
-        });
-      } else {
-        isCreated.value = "error";
-        createResponse.value = createError({ statusCode: 405, statusMessage: "Can't save post" });
-      }
+      result && creatingResult(result.statusCode, result.statusMessage);
+      // if (result && result.statusCode === 200) {
+      //   resetForm();
+      //   isCreated.value = "created";
+      //   createResponse.value = createError({
+      //     statusCode: 200,
+      //     statusMessage: result.statusMessage,
+      //   });
+      // } else {
+      //   isCreated.value = "error";
+      //   createResponse.value = createError({ statusCode: 405, statusMessage: "Can't save post" });
+      //   console.log(result.statusMessage);
+      // }
     }
   } else {
     // console.log(v$.value.$errors[0]);
@@ -108,7 +130,7 @@ const submitForm = async () => {
 
           <div class="select_block" v-if="categoryList">
             <label for="category">Category</label>
-            <select name="category" v-model.trim="selectedTags">
+            <select name="category" v-model.trim="state.tags">
               <option v-for="option in categoryList" :key="option.id" :value="option.title">
                 {{ option.title }}
               </option>

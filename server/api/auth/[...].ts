@@ -22,6 +22,7 @@ export default NuxtAuthHandler({
     signIn: "/",
   },
   secret: useRuntimeConfig().authSecret,
+
   providers: [
     // @ts-expect-error You need to use .default here for it to work during SSR. May be fixed via Vite at some point
     CredentialsProvider.default({
@@ -74,9 +75,10 @@ export default NuxtAuthHandler({
       },
     }),
   ],
+
   session: {
     strategy: "jwt",
-    maxAge: 600, //2592000 - 30 days
+    maxAge: 60 * 60 * 24, //2592000 - 30 days ,   token expiration  60 * 60 * 24 - 1d
   },
   callbacks: {
     async jwt({ token, user, account }) {
@@ -94,7 +96,7 @@ export default NuxtAuthHandler({
         ...session.user,
       };
 
-      console.log("request session", token);
+      //  console.log("request session", token);
       //session.expires
       return session;
     },

@@ -19,7 +19,7 @@ const { aboutUs } = storeToRefs(useUnionStore());
 
     <div class="about_content" v-if="!isEdit && aboutUs">
       <div class="about_title">
-        <h2>{{ aboutUs[0].title }}</h2>
+        <h2>{{ aboutUs[0]?.title }}</h2>
       </div>
 
       <div class="about_text" v-html="aboutUs[0].description"></div>

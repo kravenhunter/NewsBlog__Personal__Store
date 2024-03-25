@@ -1,14 +1,16 @@
 import { getServerSession } from "#auth";
-import { converArrayToTags, convertFileTOBase64, extractFormData } from "~/server/utils";
+import type { H3Error, MultiPartData } from "h3";
 
-interface IPost {
+// import type { ICategory } from "~/types";
+
+interface IProps {
   title: string;
   body: string;
   shortBody: string;
   author: string;
-  imageBg: File;
-  imagePrev: File;
-  tags: string[];
+  imageBg: MultiPartData;
+  imagePrev: MultiPartData;
+  tags: string;
 }
 export default defineEventHandler(async (event) => {
   try {
@@ -20,45 +22,75 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    const formData = await readFormData(event);
-    const categoryList = await event.context.prisma.tag.findMany();
+    const formData = await readMultipartFormData(event);
 
-    const getConverted = extractFormData<IPost>(formData);
+    if (formData?.length) {
+      const getConverted = extractMultipartData<IProps>(formData);
 
-    const getImageBgBufferObject = await convertFileTOBase64(getConverted.imageBg);
-    const getImagePrevBufferObject = await convertFileTOBase64(getConverted.imagePrev);
-
-    const postCreate = await event.context.prisma.post.create({
-      data: {
-        ...getConverted,
-        tags: {
-          connect: converArrayToTags(getConverted.tags, categoryList),
+      const categoryList = await event.context.prisma.tag.findFirst({
+        where: {
+          title: getConverted.tags,
         },
+      });
 
-        imageBg: {
-          create: {
-            title: getConverted.imageBg.name,
-            file_type: "Image",
-            file_binary: getImageBgBufferObject,
+      const getImageBgBufferObject = await convertFileTOBase64(getConverted.imageBg);
+      const getImagePrevBufferObject = await convertFileTOBase64(getConverted.imagePrev);
+
+      // const getTags = converArrayToTags(getConverted.tags, categoryList);
+
+      const getItem = await event.context.prisma.post.create({
+        data: {
+          title: getConverted.title,
+          body: getConverted.body,
+          shortBody: getConverted.shortBody,
+          author: getConverted.author,
+
+          tags: {
+            connect: {
+              id: categoryList?.id,
+              title: categoryList?.title,
+            },
+          },
+
+          imageBg: {
+            create: {
+              title: getConverted.imageBg.filename ?? getConverted.title,
+              file_type: "Image",
+              file_binary: getImageBgBufferObject,
+            },
+          },
+          imagePrev: {
+            create: {
+              title: getConverted.imagePrev.filename ?? getConverted.title,
+              file_type: "Image",
+              file_binary: getImagePrevBufferObject,
+            },
           },
         },
-        imagePrev: {
-          create: {
-            title: getConverted.imagePrev.name,
-            file_type: "Image",
-            file_binary: getImagePrevBufferObject,
-          },
-        },
-      },
-    });
+      });
+      return {
+        statusCode: 200,
+        statusMessage: "Success",
+        table: "post",
+        method: "create",
+        objectResult: getItem,
+      };
+    }
     return {
-      statusCode: 200,
-      statusMessage: "Success",
+      statusCode: 400,
+      statusMessage: "Form data is empty",
+      table: "post",
     };
   } catch (error) {
     console.log(error);
-    return error;
+
+    const getError = error as H3Error;
+    throw createError({
+      statusCode: getError.statusCode,
+      statusMessage: getError.statusMessage,
+    });
   }
+
   /*  body.array.forEach(async prod => {
       await prismaCLient.orderItem.create({
         data:{

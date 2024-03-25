@@ -1,23 +1,24 @@
 <script setup lang="ts">
-import { storeToRefs } from "pinia";
+// import { storeToRefs } from "pinia";
 
 //Get  Authorized user
 // const { isAuthorized } = useAuthStore();
 // const { data, signOut, status } = useAuth();
 
-const { loadDataList, fillStoreData } = useUnionStore();
+const { loadDataList } = useUnionStore();
 //Fetch AboutUs  data
-const {
-  postlist,
-  categoryList,
-  advertiseList,
-  aboutUs,
-  contactList,
-  navLiks,
-  footerLinks,
-  imageList,
-  podCastList,
-} = storeToRefs(useUnionStore());
+// const {
+//   postlist,
+//   categoryList,
+//   advertiseList,
+//   aboutUs,
+//   contactList,
+//   navLiks,
+//   footerLinks,
+//   imageList,
+//   podCastList,
+//   userCredentials,
+// } = storeToRefs(useUnionStore());
 
 // const loadStores = async () => {
 //   const postPropmis = loadDataList("post/list");
@@ -41,37 +42,71 @@ const {
 //     footerPropmis,
 //   ]);
 // };
+
+// const article = await loadDataList("article/list");
+const article = loadDataList("post/list");
+const categoryList = loadDataList("tag/list");
+const contacts = loadDataList("contacts/list");
+const about = loadDataList("about/list");
+const images = loadDataList("file/list-by-type/images");
+const advertise = loadDataList("advertise/list");
+const nav = loadDataList("nav-link/list");
+const footer = loadDataList("footer-link/list");
+const user = loadDataList("user-credentials/list");
+const audio = loadDataList("file/list-by-type/audio");
+
 const loadStores = async () => {
-  if (!postlist.value?.length) {
-    await loadDataList("post/list");
-  }
-  if (!categoryList.value?.length) {
-    await loadDataList("tag/list");
-  }
-  if (!podCastList.value?.length) {
-    await loadDataList("file/list-by-type/audio");
-  }
-  if (!contactList.value.length) {
-    await loadDataList("contacts/list");
-  }
-  if (!aboutUs.value.length) {
-    await loadDataList("about/list");
-  }
-
-  if (!imageList.value.length) {
-    await loadDataList("file/list-by-type/images");
-  }
-  if (!advertiseList.value.length) {
-    await loadDataList("advertise/list");
-  }
-
-  if (!navLiks.value.length) {
-    await loadDataList("nav-link/list");
-  }
-  if (!footerLinks.value.length) {
-    await loadDataList("footer-link/list");
-  }
+  // if (!postlist.value?.length) {
+  //   const result = await loadDataList("article/list");
+  //   console.log(result);
+  // }
 };
+// const loadStores = async () => {
+//   if (!categoryList.value?.length) {
+//     const result = await loadDataList("tag/list");
+//     console.log(result);
+//   }
+
+//   if (!contactList.value.length) {
+//     const result = await loadDataList("contacts/list");
+//     console.log(result);
+//   }
+//   if (!aboutUs.value.length) {
+//     const result = await loadDataList("about/list");
+//     console.log(result);
+//   }
+
+//   if (!imageList.value.length) {
+//     const result = await loadDataList("file/list-by-type/images");
+//     console.log(result);
+//   }
+//   if (!advertiseList.value.length) {
+//     const result = await loadDataList("advertise/list");
+//     console.log(result);
+//   }
+
+//   if (!navLiks.value.length) {
+//     const result = await loadDataList("nav-link/list");
+//     console.log(result);
+//   }
+//   if (!footerLinks.value.length) {
+//     const result = await loadDataList("footer-link/list");
+//     console.log(result);
+//   }
+//   if (!userCredentials.value.length) {
+//     const result = await loadDataList("user-credentials/list");
+//     console.log(result);
+//   }
+//   if (!podCastList.value?.length) {
+//     const result = await loadDataList("file/list-by-type/audio");
+//     console.log(result);
+//   }
+
+//   // if (!postlist.value?.length) {
+//   //   const result = await loadDataList("article/list");
+//   //   console.log(result);
+//   // }
+// };
 //Load all stores
 // await loadStores();
 // async function loadDataList(path: string) {
@@ -88,7 +123,21 @@ const loadStores = async () => {
 //   }
 // }
 //CHeck Auth a
-onMounted(async () => await loadStores());
+onMounted(
+  async () =>
+    await Promise.allSettled([
+      article,
+      categoryList,
+      contacts,
+      about,
+      images,
+      advertise,
+      nav,
+      footer,
+      user,
+      audio,
+    ]),
+);
 </script>
 
 <template>

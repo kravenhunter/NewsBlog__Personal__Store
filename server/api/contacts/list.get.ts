@@ -10,10 +10,10 @@ export default defineEventHandler(async (event) => {
     });
 
     if (!getItemList.length) {
-      throw createError({
-        statusCode: 405,
+      return {
+        statusCode: 404,
         statusMessage: "No records in database ",
-      });
+      };
     }
     return {
       statusCode: 200,

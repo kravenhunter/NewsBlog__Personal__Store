@@ -6,16 +6,22 @@ const search = ref("");
 const articlesByCategory = ref<IPost[]>();
 
 const { postlist, categoryList } = storeToRefs(useUnionStore());
+// const { data: response, error, refresh } = await useFetch<IResponse>(`/api/post/getList`);
+console.log(postlist.value);
 
 const selected = ref("All");
 
 const searchResult = computed(() => {
   if (search.value) {
-    return [...postlist.value.filter((el) => el.title?.includes(search.value))].filter((post) =>
-      post.tags.filter((el) => el.title === selected.value),
+    const getDat = postlist.value.filter((el) => el.title?.includes(search.value));
+    const posts = getDat.filter((post) =>
+      post.tags?.filter((el) => (selected.value === "All" ? el : el.title === selected.value)),
     );
+    return posts;
   } else {
-    return postlist.value.filter((post) => post.tags.filter((el) => el.title === selected.value));
+    return postlist.value.filter((post) =>
+      post.tags?.filter((el) => (selected.value === "All" ? el : el.title === selected.value)),
+    );
   }
 });
 // const searchResult = computed(() => {
@@ -85,10 +91,10 @@ const searchResult = computed(() => {
         </div>
       </div>
 
-      <div class="list" v-if="searchResult.length">
+      <div class="list" v-if="postlist.length">
         <GuardList
           :label="selected"
-          :list="searchResult"
+          :list="postlist"
           direction-card="1fr 2fr 0.5fr"
           :show-short="true" />
       </div>

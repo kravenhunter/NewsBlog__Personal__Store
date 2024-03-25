@@ -4,10 +4,10 @@ import type { IPost } from "~/types";
 interface IProps {
   list?: IPost[] | null;
   singlePost?: IPost | null;
-  label?: string;
+  label?: string | null;
   directionCard?: string;
-  directionContainer: string;
-  row: string;
+  directionContainer?: string | null;
+  row?: string | null;
   showBody?: boolean | null;
   showShort?: boolean | null;
 }

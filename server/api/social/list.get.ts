@@ -6,12 +6,17 @@ export default defineEventHandler(async (event) => {
     const getItemList = await event.context.prisma.social.findMany();
 
     if (!getItemList.length) {
-      throw createError({
+      return {
         statusCode: 404,
         statusMessage: "No records in database ",
-      });
+      };
     }
-    return getItemList;
+    return {
+      statusCode: 200,
+      statusMessage: "Success",
+      table: "social",
+      objectResult: getItemList,
+    };
   } catch (error) {
     const getError = error as H3Error;
     throw createError({

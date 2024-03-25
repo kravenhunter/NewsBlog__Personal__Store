@@ -7,7 +7,7 @@ interface IProps {
   description: string;
 }
 interface IImage {
-  advertiseId?: string;
+  itemId?: string;
   title?: string;
   image?: IFileData;
 }
@@ -31,7 +31,7 @@ const emit = defineEmits<{
 //   },
 // });
 const remove = () => {
-  props.advertiseId && emit("remove", props.advertiseId);
+  props.itemId && emit("remove", props.itemId);
 };
 </script>
 

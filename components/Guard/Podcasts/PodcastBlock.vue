@@ -6,25 +6,18 @@ const { podCastList, categoryList } = storeToRefs(useUnionStore());
 const search = ref("");
 const selected = ref("All");
 const searchHandler = computed(() => {
-  if (search.value) {
-    return [...podCastList.value.filter((el) => el.title?.includes(search.value))].filter(
-      (post) => post.category === selected.value,
+  if (search.value && podCastList.value.length) {
+    return [...podCastList.value.filter((el) => el.title?.includes(search.value))].filter((post) =>
+      selected.value === "All" ? post : post.category === selected.value,
     );
   } else {
-    return podCastList.value.filter((post) => post.category === selected.value);
+    return (
+      podCastList.value?.filter((post) =>
+        selected.value === "All" ? post : post.category === selected.value,
+      ) ?? []
+    );
   }
 });
-// const searchHandler = () => {
-//   if (search && selected.value !== "All") {
-//     return [
-//       ...podCastList.value.filter((el) => el.title?.includes(search.value)),
-//     ].filter((post) => post.category === selected.value);
-//   } else if (search && selected.value === "All") {
-//     return [...podcastsState.value.podcastList.filter((el) => el.title?.includes(search.value))];
-//   } else if (!search && selected.value !== "All") {
-//     return [...podcastsState.value.podcastList.filter((post) => post.category === selected.value)];
-//   }
-// };
 </script>
 
 <template>
@@ -37,11 +30,8 @@ const searchHandler = computed(() => {
           Read the latest news with the Best WordPress News Theme – Newspaper by Sergio Belov!
         </h4>
 
-        <div class="aqualizer_container">
-          <UiElementsMusicAqualizer
-            v-if="podCastList.length"
-            :list="podCastList"
-            :show-list="true" />
+        <div class="aqualizer_container" v-if="podCastList.length">
+          <UiElementsMusicAqualizer :show-list="true" />
         </div>
       </div>
       <div class="create_post">

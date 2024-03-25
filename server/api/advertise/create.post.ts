@@ -6,7 +6,7 @@ import type { H3Error } from "h3";
 interface IAdvertise {
   name: string;
   description: string;
-  file: File;
+  image_file: File;
 }
 export default defineEventHandler(async (event) => {
   try {
@@ -24,15 +24,15 @@ export default defineEventHandler(async (event) => {
     // const file = formData.get("file");
     const getConverted = extractFormData<IAdvertise>(formData);
 
-    const getBufferObject = await convertFileTOBase64(getConverted.file);
-    console.log("getBufferObject========");
+    const getBufferObject = await convertFileTOBase64(getConverted.image_file);
+    console.log("Advertise getConverted========", getConverted);
 
     const getItem = await event.context.prisma.advertise.create({
       data: {
         name: getConverted.name,
         source: {
           create: {
-            title: getConverted.file.name,
+            title: getConverted.name,
             description: getConverted.description,
             file_type: "Image",
             file_binary: getBufferObject,

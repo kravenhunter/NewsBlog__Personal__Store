@@ -1,19 +1,17 @@
-import { defineEventHandler } from "#imports";
 import type { H3Error } from "h3";
 
 export default defineEventHandler(async (event) => {
+  console.log("Post API ROUTE ===============");
+
   try {
-    const getItem = await event.context.prisma.social.delete({
-      where: {
-        id: event?.context?.params?.id,
-      },
-    });
+    const getItemList = await event.context.prisma.post.findMany();
+
+    console.log("Posy List ===============", getItemList[0].title);
     return {
       statusCode: 200,
       statusMessage: "Success",
-      table: "social",
-      method: "delete",
-      objectResult: getItem,
+      table: "post",
+      objectResult: getItemList,
     };
   } catch (error) {
     const getError = error as H3Error;

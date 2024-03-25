@@ -28,19 +28,15 @@ const { categoryList } = storeToRefs(useUnionStore());
 const { createOrUpdateData, getPostById } = useUnionStore();
 
 const getPost = getPostById(String(route.params.id));
-
+const state2 = reactive({
+  title: "",
+});
 const state = reactive({
   title: getPost?.id ?? "",
   author: data.value?.user?.name ?? "",
   shortBody: getPost?.shortBody ?? "",
   body: getPost?.body ?? "",
-  tags: getPost?.tags.length ? getPost.tags : ([] as ICategory[]),
-});
-const selectedTags = ref<string>();
-
-watch(selectedTags, () => {
-  const getTag = categoryList.value.find((el) => el.title === selectedTags.value);
-  getTag && state.tags.push(getTag);
+  tags: getPost?.tags.length && getPost.tags[0].title ? getPost.tags[0].title : "World",
 });
 
 const onFileSelected = async (event: Event) => {
@@ -87,12 +83,30 @@ const submitForm = async () => {
 
   if (!v$.value.$error) {
     const body = new FormData();
-    file_binary.value && body.append("file_binary", file_binary.value, file_binary.value.name);
+    if (file_binary.value) {
+      const getImageSize = await getSizeImage(file_binary.value);
+      const getCompressedImageFBGile = await compressToBestSize(getImageSize, file_binary.value);
+      const getCompressedImagePrevFile = await compressToBestSize(274, file_binary.value);
+
+      getCompressedImageFBGile?.compressedFILE &&
+        body.append(
+          "imageBg",
+          getCompressedImageFBGile?.compressedFILE,
+          getCompressedImageFBGile.compressedFILE.name,
+        );
+      getCompressedImagePrevFile?.compressedFILE &&
+        body.append(
+          "imagePrev",
+          getCompressedImagePrevFile?.compressedFILE,
+          getCompressedImagePrevFile.compressedFILE.name,
+        );
+    }
 
     if (getPost?.id) {
       for (const item in state) {
-        body.append(item, `${state[item as keyof typeof state]}`);
+        body.append(item, state[item as keyof typeof state].toString());
       }
+
       const result = await createOrUpdateData(`post/update/${getPost?.id}`, body);
 
       result && creatingResult(result.statusCode, result.statusMessage);
@@ -138,7 +152,8 @@ const submitForm = async () => {
 
           <div class="select_block" v-if="categoryList">
             <label for="category">Category</label>
-            <select name="category" v-model.trim="selectedTags">
+
+            <select name="category" v-model.trim="state.tags">
               <option v-for="option in categoryList" :key="option.id" :value="option.title">
                 {{ option.title }}
               </option>

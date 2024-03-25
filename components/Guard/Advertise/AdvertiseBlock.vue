@@ -1,72 +1,72 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 
-const state = reactive({
-  name: "",
-  description: "",
-});
-const isUpload = ref(false);
+const isLoading = ref(false);
 const fileData = ref<File | null>();
 
-const { advertiseList } = storeToRefs(useUnionStore());
+const { advertiseList, userCredentials } = storeToRefs(useUnionStore());
+const { createOrUpdateData, deleteDataById, isItemExist, getAuthUserByName } = useUnionStore();
+const { data, status } = useAuth();
 
-const { createOrUpdateData, deleteDataById } = useUnionStore();
+const state = reactive({
+  name: "",
+  description:
+    "Lorem ipsum dolor sit amet consectetur adipisicing elit. Alias inventore atque voluptas!",
+  tag: "Advertising",
+  authorId:
+    userCredentials.value.find((el) => el.userNameField === data.value?.user?.name)?.id ?? "",
+});
+
+console.log(userCredentials.value);
 
 const onFileSelected = async (event: Event) => {
   fileData.value = extractFileFromEvent(event);
 };
 function resetForm() {
   state.name = "";
-  state.description = "";
 }
 
-const submitForm = async () => {
-  if (fileData.value) {
-    const body = new FormData();
-
-    body.append("file", fileData.value, fileData.value.name);
-
-    for (const item in state) {
-      body.append(item, `${state[item as keyof typeof state]}`);
-    }
-    // console.log(body);
-    // const {
-    //   data: response,
-    //   error,
-    //   refresh,
-    // } = await useFetch(`/api/advertise/create`, {
-    //   method: "POST",
-    //   body,
-    // });
-
-    // for (const item of body.keys()) {
-    //   const getData = body.get(item);
-    //   console.log(`${item} ==>`, getData);
-    // }
-    // for (const item of body) {
-    //   console.log(item);
-    //   // const getData = body.get(item);
-    //   // console.log(getData);
-    // }
-    const result = await createOrUpdateData("advertise/create", body);
-
-    result && result.statusCode === 200 && resetForm();
-  }
+const submitForm1 = async () => {
+  const {
+    data: response,
+    error,
+    refresh,
+  } = await useFetch(`/api/auth/me`, {
+    method: "POST",
+    body: { email: "admin@ya.ru" },
+  });
+  console.log(response.value);
+  console.log(status.value);
 };
-interface IType {
-  id: string;
-  name: string;
-  source: {
-    id: string;
-    title: string;
-    file_type: string;
-    file_binary: string;
-    adition_binary?: string;
-  };
-}
+const submitForm = async () => {
+  isLoading.value = !isLoading.value;
+  if (fileData.value) {
+    const getImageSize = await getSizeImage(fileData.value);
+    const getCompressedFile = await compressToBestSize(getImageSize, fileData.value);
+    if (getCompressedFile) {
+      const body = new FormData();
+      body.append(
+        "image_file",
+        getCompressedFile.compressedFILE,
+        getCompressedFile.compressedFILE.name,
+      );
+
+      for (const item in state) {
+        body.append(item, `${state[item as keyof typeof state]}`);
+      }
+      const result = await createOrUpdateData("advertise/create", body);
+
+      result && result.statusCode === 200 && resetForm();
+      console.log(result);
+    }
+  }
+  setTimeout(() => {
+    isLoading.value = !isLoading.value;
+  }, 500);
+};
 const deleteHaandler = async (adver_id: string) => {
   console.log(adver_id);
-  if (adver_id) {
+  if (isItemExist(adver_id, "advertise")) {
     await deleteDataById(`advertise/delete-by-id/${adver_id}`);
   }
 };
@@ -99,6 +99,7 @@ const deleteHaandler = async (adver_id: string) => {
       </div>
       <div class="btn_block">
         <UiElementsAddButton
+          :disabled="isLoading"
           title="Upload"
           font-size="16px"
           paddings="0.4em"
@@ -115,7 +116,7 @@ const deleteHaandler = async (adver_id: string) => {
           v-for="element in advertiseList"
           :key="element.id"
           :title="element.name"
-          :advertise-id="element.id"
+          :item-id="element.id"
           :image="element.source"
           @remove="deleteHaandler" />
       </div>

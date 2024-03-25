@@ -1,39 +1,61 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
+import { compressToBestSize, getSizeImage } from "~/composables/compressFile";
 
 // import { uuid } from 'vue-uuid';
 
+const isLoading = ref(false);
+const fileData = ref<File | null>();
+
+const { imageList, categoryList } = storeToRefs(useUnionStore());
+const { createOrUpdateData, deleteDataById, isItemExist } = useUnionStore();
+
 const state = reactive({
   title: "",
-  description: "",
+  description:
+    "Lorem ipsum dolor sit amet consectetur adipisicing elit. Alias inventore atque voluptas!",
+  tag: categoryList.value[0]?.title ?? "World",
 });
-const isUpload = ref(false);
-const fileData = ref<File>();
-
-const { imageList } = storeToRefs(useUnionStore());
-const { createOrUpdateData } = useUnionStore();
 
 const onFileSelected = async (event: Event) => {
-  const fileEvent = event.target as HTMLInputElement;
-  fileEvent.files?.length && (fileData.value = fileEvent.files[0]);
+  fileData.value = extractFileFromEvent(event);
 };
+
 function resetForm() {
   state.title = "";
-  state.description = "";
 }
 
 const submitForm = async () => {
+  isLoading.value = !isLoading.value;
   if (fileData.value) {
-    const body = new FormData();
+    const getImageSize = await getSizeImage(fileData.value);
+    const getCompressedFile = await compressToBestSize(getImageSize, fileData.value);
+    if (getCompressedFile) {
+      const body = new FormData();
+      body.append(
+        "image_file",
+        getCompressedFile.compressedFILE,
+        getCompressedFile.compressedFILE.name,
+      );
+      body.append("type", "image");
+      for (const item in state) {
+        body.append(item, `${state[item as keyof typeof state]}`);
+      }
+      const result = await createOrUpdateData("file/upload", body);
 
-    body.append("file", fileData.value, fileData.value.name);
-
-    for (const item in state) {
-      body.append(item, `${state[item as keyof typeof state]}`);
+      result && result.statusCode === 200 && resetForm();
+      console.log(result);
     }
-    const result = await createOrUpdateData("file/upload", body);
+  }
+  setTimeout(() => {
+    isLoading.value = !isLoading.value;
+  }, 500);
+};
 
-    result && result.statusCode === 200 && resetForm();
+const deleteHaandler = async (itemId: string) => {
+  console.log(itemId);
+  if (isItemExist(itemId, "images")) {
+    await deleteDataById(`file/delete-by-id/${itemId}`);
   }
 };
 </script>
@@ -59,12 +81,21 @@ const submitForm = async () => {
         name="description"
         placeholder="Input Description"
         v-model:value.trim="state.description" />
+      <div class="select_block" v-if="categoryList">
+        <label for="category">Category</label>
+        <select name="category" v-model.trim="state.tag">
+          <option v-for="option in categoryList" :key="option.id" :value="option.title">
+            {{ option.title }}
+          </option>
+        </select>
+      </div>
       <div class="upload">
         <label for="upload">Upload image</label>
         <input type="file" name="upload" @change="onFileSelected" />
       </div>
       <div class="btn_block">
         <UiElementsAddButton
+          :disabled="isLoading"
           title="Send"
           font-size="16px"
           paddings="0.4em"
@@ -77,20 +108,29 @@ const submitForm = async () => {
     </div>
     <div class="wrapp-body">
       <div class="wrapp-content" v-if="imageList?.length">
-        <GuardGalaryImageCard
+        <LazyGuardGalaryImageCard
           v-for="element in imageList"
           :key="element.id"
-          :image="{
-            source: element.file_binary,
-            title: element.title!,
-            description: element.description,
-          }" />
+          :item-id="element.id"
+          :image="element"
+          @remove="deleteHaandler" />
       </div>
     </div>
   </div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
+.select_block {
+  & select {
+    background-color: transparent;
+    color: var(--color-dark);
+    border: 1px solid var(--color-dark);
+  }
+  & label {
+    margin-right: 15px;
+  }
+}
+
 .grid_block {
   display: grid;
 }
@@ -107,7 +147,7 @@ const submitForm = async () => {
 
 .wrapp-body {
   font-family: serif;
-  box-sizing: border-box;
+  /* box-sizing: border-box; */
 
   display: flex;
 

@@ -1,4 +1,5 @@
 import { defineEventHandler } from "#imports";
+import type { H3Error } from "h3";
 
 export default defineEventHandler(async (event) => {
   try {
@@ -7,10 +8,18 @@ export default defineEventHandler(async (event) => {
         id: event?.context?.params?.id,
       },
     });
-
-    return "Success";
+    return {
+      statusCode: 200,
+      statusMessage: "Success",
+      table: "post",
+      method: "delete",
+      objectResult: result,
+    };
   } catch (error) {
-    console.log(error);
-    return error;
+    const getError = error as H3Error;
+    throw createError({
+      statusCode: getError.statusCode,
+      statusMessage: getError.statusMessage,
+    });
   }
 });

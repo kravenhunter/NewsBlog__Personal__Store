@@ -20,9 +20,9 @@ defineProps({
     </div>
     <div class="advertise">
       <NuxtImg
-        v-if="link.source"
+        v-if="link?.source"
         :src="`data:image/webp;base64,${link.source.file_binary}`"
-        :alt="link.name" />
+        :alt="link?.name" />
     </div>
   </div>
 </template>

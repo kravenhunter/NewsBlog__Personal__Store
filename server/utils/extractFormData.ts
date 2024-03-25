@@ -1,3 +1,5 @@
+import type { MultiPartData } from "h3";
+
 // const extractFormData = (formData: FormData) => {
 //   const titleData = formData.get("title");
 //   const bodyData = formData.get("body");
@@ -25,6 +27,39 @@ export const extractFormData = <T>(formData: FormData): T => {
     getData &&
       Object.defineProperty(extractREsult, item, {
         value: getData,
+      });
+    // if (getData) {
+
+    //   getData instanceof File &&
+    //     Object.defineProperty(extractREsult, item, {
+    //       value: getData,
+    //     });
+    //   Array.isArray(getData) &&
+    //     Object.defineProperty(extractREsult, item, {
+    //       value: getData as string[],
+    //     });
+    //   typeof getData === "string" &&
+    //     Object.defineProperty(extractREsult, item, {
+    //       value: getData,
+    //     });
+    // }
+  }
+
+  return extractREsult as T;
+};
+
+export const extractMultipartData = <T>(formData: MultiPartData[]): T => {
+  const extractREsult = Object.create({});
+  for (const item of formData) {
+    !item.type &&
+      item.name &&
+      Object.defineProperty(extractREsult, item.name, {
+        value: item.data.toString("utf8"),
+      });
+    item.type &&
+      item.name &&
+      Object.defineProperty(extractREsult, item.name, {
+        value: item,
       });
     // if (getData) {
 

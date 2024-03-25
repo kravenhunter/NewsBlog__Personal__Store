@@ -25,7 +25,7 @@ withDefaults(defineProps<IProps>(), {
 <template>
   <article class="single_post" :class="classType">
     <div class="tag" v-if="showCategory">
-      <h5>{{ singlePost?.tags.join(" ")?.toLocaleUpperCase() }}</h5>
+      <h5>{{ singlePost?.tags?.join(" ")?.toLocaleUpperCase() }}</h5>
     </div>
     <div class="title_post" v-if="showTitle">
       <NuxtLink :to="{ path: `/post/${singlePost?.id}` }">
@@ -36,7 +36,7 @@ withDefaults(defineProps<IProps>(), {
     <div class="preview_image" v-if="showImage">
       <!-- <img class="image" :src="singlePost?.image" alt="postPriview" /> -->
       <NuxtImg
-        v-if="singlePost.imagePrev"
+        v-if="singlePost?.imagePrev"
         :src="`data:image/webp;base64,${singlePost.imagePrev.file_binary}`"
         alt="Image" />
     </div>

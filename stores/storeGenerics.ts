@@ -1,5 +1,5 @@
 import { ref, useFetch } from "#imports";
-
+import type { H3Error } from "h3";
 import { acceptHMRUpdate, defineStore } from "pinia";
 import type {
   IAbout,
@@ -33,7 +33,7 @@ type TypeTables =
 
 const apiUrl = "/api";
 export const useUnionStore = defineStore("union-store", () => {
-  //const temp = useFetch("/api/advertise/create");
+  //const { data: response, error, refresh } = await useFetch<IResponse>(`/api/advertise/create`);
   const postlist = ref<IPost[]>([]);
   const aboutUs = ref<IAbout[]>([]);
   const advertiseList = ref<IAdvertisment[]>([]);
@@ -47,8 +47,32 @@ export const useUnionStore = defineStore("union-store", () => {
   const userCredentials = ref<IUserCredentials[]>([]);
 
   const pendingData = ref<boolean>(false);
-
+  const isItemExist = (idItem: string, table: TypeTables) => {
+    switch (table) {
+      case "post":
+        return postlist.value.some((el) => el.id === idItem);
+      case "images":
+        return imageList.value.some((el) => el.id === idItem);
+      case "podcasts":
+        return podCastList.value.some((el) => el.id === idItem);
+      case "about":
+        return aboutUs.value.some((el) => el.id === idItem);
+      case "advertise":
+        return advertiseList.value.some((el) => el.id === idItem);
+      case "contacts":
+        return contactList.value.some((el) => el.id === idItem);
+      case "tag":
+        return categoryList.value.some((el) => el.id === idItem);
+      case "nav-link":
+        return navLiks.value.some((el) => el.id === idItem);
+      case "footer-link":
+        return footerLinks.value.some((el) => el.id === idItem);
+      case "user-credential":
+        return userCredentials.value.some((el) => el.id === idItem);
+    }
+  };
   const fillStoreData = <T>(table: string, data: T, action?: string) => {
+    console.log(table);
     switch (table) {
       case "post":
         action === "create" && postlist.value.push(data as IPost);
@@ -122,6 +146,20 @@ export const useUnionStore = defineStore("union-store", () => {
         !action && (advertiseList.value = data as IAdvertisment[]);
 
         break;
+      case "file":
+        action === "create" && imageList.value.push(data as IFileData);
+        action === "update" &&
+          (imageList.value = imageList.value.map((el) => {
+            if (el.id === (data as IFileData).id) {
+              return data as IFileData;
+            }
+            return el;
+          }));
+        action === "delete" &&
+          (imageList.value = imageList.value.filter((el) => el.id !== (data as IFileData).id));
+        !action && (imageList.value = data as IFileData[]);
+
+        break;
       case "contacts":
         action === "create" && contactList.value.push(data as IContacts);
         action === "update" &&
@@ -150,7 +188,6 @@ export const useUnionStore = defineStore("union-store", () => {
             (el) => el.id !== (data as ICategory).id,
           ));
         !action && (categoryList.value = data as ICategory[]);
-        console.log(categoryList.value);
         break;
       case "nav-link":
         action === "create" && navLiks.value.push(data as INavigation);
@@ -195,6 +232,7 @@ export const useUnionStore = defineStore("union-store", () => {
             (el) => el.id !== (data as IUserCredentials).id,
           ));
         !action && (userCredentials.value = data as IUserCredentials[]);
+        console.log(userCredentials.value);
 
         break;
 
@@ -213,18 +251,35 @@ export const useUnionStore = defineStore("union-store", () => {
    **/
   const loadDataList = async (apiPath: string) => {
     try {
-      console.log(apiPath);
-
+      // console.log(`${apiUrl}/${apiPath}`);
+      // const { data: response2 } = await useFetch<IResponse>(`/api/article/list`);
+      // console.log(response2.value);
       const { data: response, error, refresh } = await useFetch<IResponse>(`${apiUrl}/${apiPath}`);
       if (error.value) {
         throw error.value;
       }
 
+      if (!response.value) {
+        return {
+          statusCode: 400,
+          statusMessage: "Response object is null",
+        };
+      }
+
       response.value?.table &&
         response.value.statusCode === 200 &&
         fillStoreData(response.value.table, response.value.objectResult);
+
+      return {
+        statusCode: response.value.statusCode,
+        statusMessage: response.value.statusMessage,
+      };
     } catch (error) {
-      console.log(error);
+      const getError = error as H3Error;
+      return {
+        statusCode: getError.statusCode,
+        statusMessage: getError.message,
+      };
     }
   };
 
@@ -246,7 +301,10 @@ export const useUnionStore = defineStore("union-store", () => {
         throw error.value;
       }
       if (!response.value) {
-        throw new Error("The instance isn't created");
+        throw createError({
+          statusCode: 401,
+          statusMessage: "Response object is null",
+        });
       }
 
       response.value?.table &&
@@ -258,7 +316,11 @@ export const useUnionStore = defineStore("union-store", () => {
         statusMessage: response.value.statusMessage,
       };
     } catch (error) {
-      console.log(error);
+      const getError = error as H3Error;
+      return {
+        statusCode: getError.statusCode,
+        statusMessage: getError.message,
+      };
     }
   };
 
@@ -306,17 +368,7 @@ export const useUnionStore = defineStore("union-store", () => {
       console.log(error);
     }
   };
-  const getSizeImage = async (fileImage: File): Promise<number> => {
-    return await new Promise((resolve) => {
-      const newImage = new Image();
-      //Create Blob Link
-      newImage.src = URL.createObjectURL(fileImage);
-      newImage.onload = function () {
-        console.log(`${newImage.width} x ${newImage.height}`);
-        resolve(newImage.width);
-      };
-    });
-  };
+
   /**
    * async Function Returns   IPost array
    * @param {string} category   category
@@ -344,41 +396,6 @@ export const useUnionStore = defineStore("union-store", () => {
    *
    **/
   const getPostById = (postId: string) => postlist.value.find((el) => el.id === postId);
-
-  // async function loadImageToStore(
-  //   fileCover: File,
-  //   typeImage: TypeImage,
-  //   imageWidth: number,
-  // ): Promise<string> {
-  //   const urlImage = `https://epjfkkmrnhyxzevpvbjf.supabase.co/storage/v1/object/public/images/${typeImage}/`;
-
-  //   const linkDefault = "image";
-  //   try {
-  //     const compressedFile = await compressToBestSize(imageWidth, fileCover);
-
-  //     if (compressedFile?.compressedFILE) {
-  //       console.log(compressedFile.compressedFILE);
-  //       const imageName = `${uuid.v4()}_${typeImage}_${compressedFile?.compressedFILE.name}`;
-
-  //       const { data: imagePath, error: errorCover } = await supabaseStore.storage
-  //         .from(`images/${typeImage}`)
-  //         .upload(imageName, compressedFile.compressedFILE);
-
-  //       if (errorCover) {
-  //         throw errorCover;
-  //       }
-
-  //       const newImageSource = urlImage + imagePath.path;
-  //       return newImageSource;
-  //     } else {
-  //       throw new Error(`The compression  Fails`);
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //     return linkDefault;
-  //   }
-  // }
-  //const createOrUpdateData = async <T extends Record<string, any> | BodyInit>
 
   /**
    * async Function Returns  IResponse object | null
@@ -743,6 +760,7 @@ export const useUnionStore = defineStore("union-store", () => {
    **/
   const isPostExist = (id: string) => postlist.value.some((el) => el.id === id);
   return {
+    isItemExist,
     getPostById,
     fillStoreData,
     pendingData,

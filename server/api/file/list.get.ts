@@ -1,28 +1,24 @@
-// import { getServerSession } from "#auth";
 import type { H3Error } from "h3";
 
 export default defineEventHandler(async (event) => {
   try {
-    // const session = await getServerSession(event);
-    // if (!session) {
-    //   throw createError({
-    //     statusCode: 401,
-    //     statusMessage: "Unauthorized",
-    //   });
-    // }
-
-    const getPostList = await event.context.prisma.file.findMany({
+    const getItemList = await event.context.prisma.file.findMany({
       orderBy: { create_at: "desc" },
     });
 
-    if (!getPostList.length) {
-      throw createError({
+    if (!getItemList.length) {
+      return {
         statusCode: 404,
         statusMessage: "No records in database ",
-      });
+      };
     }
 
-    return getPostList;
+    return {
+      statusCode: 200,
+      statusMessage: "Success",
+      table: "file",
+      objectResult: getItemList,
+    };
   } catch (error) {
     const getError = error as H3Error;
     throw createError({

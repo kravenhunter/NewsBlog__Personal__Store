@@ -1,5 +1,4 @@
 import { getServerSession } from "#auth";
-import { convertFileTOBase64, extractFormData } from "~/server/utils";
 
 interface ICredentials {
   id: string;

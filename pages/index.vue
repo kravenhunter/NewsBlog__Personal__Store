@@ -10,28 +10,28 @@ if (!postlist.value.length) {
   errorResponse.value = createError({ statusCode: 404, statusMessage: "Not found results" });
 }
 const worldList = postlist.value.filter((item) => {
-  return item.tags.some((el) => el.title?.includes("World"));
+  return item.tags?.some((el) => el.title?.includes("World"));
 });
 const businessList = postlist.value.filter((item) => {
-  return item.tags.some((el) => el.title?.includes("World"));
+  return item.tags?.some((el) => el.title?.includes("World"));
 });
 const policyList = postlist.value.filter((item) => {
-  return item.tags.some((el) => el.title?.includes("World"));
+  return item.tags?.some((el) => el.title?.includes("World"));
 });
 const artList = postlist.value.filter((item) => {
-  return item.tags.some((el) => el.title?.includes("World"));
+  return item.tags?.some((el) => el.title?.includes("World"));
 });
 const culture = postlist.value.filter((item) => {
-  return item.tags.some((el) => el.title?.includes("World"));
+  return item.tags?.some((el) => el.title?.includes("World"));
 });
 const styleList = postlist.value.filter((item) => {
-  return item.tags.some((el) => el.title?.includes("World"));
+  return item.tags?.some((el) => el.title?.includes("World"));
 });
 const sportList = postlist.value.filter((item) => {
-  return item.tags.some((el) => el.title?.includes("World"));
+  return item.tags?.some((el) => el.title?.includes("World"));
 });
 const travelList = postlist.value.filter((item) => {
-  return item.tags.some((el) => el.title?.includes("World"));
+  return item.tags?.some((el) => el.title?.includes("World"));
 });
 
 useSeoMeta({

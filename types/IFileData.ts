@@ -8,6 +8,6 @@ export default interface IFileData {
   file_binary: string;
   adition_binary?: string;
   description: string;
-  User?: IUserCredentials;
+  UserCredentials?: IUserCredentials;
   category?: ICategory;
 }

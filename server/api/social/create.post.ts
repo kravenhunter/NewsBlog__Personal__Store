@@ -1,4 +1,5 @@
 import { getServerSession } from "#auth";
+import type { H3Error } from "h3";
 
 export default defineEventHandler(async (event) => {
   try {
@@ -14,11 +15,18 @@ export default defineEventHandler(async (event) => {
     const createResult = await event.context.prisma.social.create({
       data: body,
     });
-    return createResult;
+    return {
+      statusCode: 200,
+      statusMessage: "Success",
+      table: "social",
+      method: "create",
+      objectResult: createResult,
+    };
   } catch (error) {
+    const getError = error as H3Error;
     throw createError({
-      statusCode: 500,
-      statusMessage: (error as Error).message,
+      statusCode: getError.statusCode,
+      statusMessage: getError.statusMessage,
     });
   }
 });

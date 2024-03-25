@@ -1,4 +1,5 @@
 import { defineEventHandler } from "#imports";
+import type { H3Error } from "h3";
 
 export default defineEventHandler(async (event) => {
   try {
@@ -22,7 +23,10 @@ export default defineEventHandler(async (event) => {
       });
     }
   } catch (error) {
-    console.log(error);
-    return error;
+    const getError = error as H3Error;
+    throw createError({
+      statusCode: getError.statusCode,
+      statusMessage: getError.statusMessage,
+    });
   }
 });

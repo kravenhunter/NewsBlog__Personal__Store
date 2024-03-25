@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { storeToRefs } from "pinia";
+import { compressToBestSize, getSizeImage } from "~/composables/compressFile";
 import fileFromEvent from "~/utils/extractFileFromEvent";
 
 interface IFileData {
@@ -11,15 +13,21 @@ interface IFileData {
   description: string;
 }
 
-const state = reactive({
-  title: "",
-  description: "",
-});
-
+const isLoading = ref(false);
 const file_binary = ref<File | null>();
 const adition_binary = ref<File | null>();
 
-const { createOrUpdateData } = useUnionStore();
+const { data } = useAuth();
+const { createOrUpdateData, loadDataList } = useUnionStore();
+const { categoryList, userCredentials } = storeToRefs(useUnionStore());
+
+const state = reactive({
+  title: "",
+  description: "",
+  tag: categoryList.value[categoryList.value.length - 1].title,
+  authorId:
+    userCredentials.value.find((el) => el.userNameField === data.value?.user?.name)?.id ?? "",
+});
 
 const onImageSelected = async (event: Event) => {
   file_binary.value = fileFromEvent(event);
@@ -39,24 +47,38 @@ const resetForm = () => {
 
 const submitForm = async () => {
   v$.value.$validate();
+  isLoading.value = !isLoading.value;
   if (!v$.value.$error) {
     if (file_binary.value && adition_binary.value) {
-      const body = new FormData();
+      const getImageSize = await getSizeImage(file_binary.value);
+      const getCompressedImageFile = await compressToBestSize(getImageSize, file_binary.value);
+      if (getCompressedImageFile?.compressedFILE) {
+        const body = new FormData();
 
-      body.append("file_binary", file_binary.value, file_binary.value.name);
-      body.append("adition_binary", adition_binary.value, adition_binary.value.name);
+        body.append("type", "audio");
+        body.append("image_file", getCompressedImageFile?.compressedFILE, file_binary.value.name);
+        body.append("audio_file", adition_binary.value, adition_binary.value.name);
 
-      for (const item in state) {
-        body.append(item, `${state[item as keyof typeof state]}`);
+        for (const item in state) {
+          body.append(item, `${state[item as keyof typeof state]}`);
+        }
+        const result = await createOrUpdateData("file/upload", body);
+
+        if (result && result.statusCode === 200) {
+          result && result.statusCode === 200 && resetForm();
+          await loadDataList("file/list-by-type/audio");
+        }
+      } else {
+        console.log("Компрессия не удалась ");
       }
-      const result = await createOrUpdateData("file/upload", body);
-
-      result && result.statusCode === 200 && resetForm();
     }
   } else {
     // eslint-disable-next-line no-alert
     alert("not  submit!");
   }
+  setTimeout(() => {
+    isLoading.value = !isLoading.value;
+  }, 500);
 };
 </script>
 
@@ -74,14 +96,6 @@ const submitForm = async () => {
             placeholder="Input Title"
             v-model:value.trim="v$.title.$model"
             :error="v$.title.$errors" />
-          <UiElementsAddPostInput
-            label="Author"
-            width-form="100%"
-            font-size="2rem"
-            name="author"
-            placeholder="Input your Author"
-            v-model:value.trim="v$.author.$model"
-            :error="v$.author.$errors" />
 
           <div class="upload">
             <label for="upload">Upload title image </label>
@@ -91,6 +105,14 @@ const submitForm = async () => {
             <label for="upload">Upload audio </label>
             <input type="file" name="upload" @change="onAudioSelected" />
           </div>
+        </div>
+        <div class="select_block">
+          <select v-model="state.tag">
+            <option value="All">All</option>
+            <option v-for="option in categoryList" :key="option.id" :value="option.title">
+              {{ option.title }}
+            </option>
+          </select>
         </div>
 
         <div class="content_group">
@@ -126,7 +148,7 @@ const submitForm = async () => {
 <style scoped lang="scss">
 .new_post_container {
   display: grid;
-  grid-template-columns: 1230px;
+  width: min(100%, 1000px);
   justify-content: center;
   row-gap: 30px;
 }

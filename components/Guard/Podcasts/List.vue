@@ -3,12 +3,11 @@ import type { IFileData } from "~/types";
 
 interface IProps {
   list?: IFileData[] | null;
-  singlePost?: IFileData[] | null;
   label?: string;
-  directionCard?: string;
-  directionContainer: string;
-  row: string;
-  showBody: boolean;
+  directionCard?: string | null;
+  directionContainer?: string;
+  row?: string;
+  showBody?: boolean | null;
 }
 
 withDefaults(defineProps<IProps>(), {
@@ -66,18 +65,18 @@ const deleteHandler = async (audioId?: string) => {
         </NuxtLink> -->
 
         <p class="created">
-          By {{ el.User?.userNameField }} {{ el.update_at && formatDate(el.update_at) }}
+          By {{ el.UserCredentials?.userNameField }} {{ el.update_at && formatDate(el.update_at) }}
         </p>
         <p class="post_body" v-if="showBody">
           {{ el.description }}
         </p>
       </div>
       <div class="edit_block">
-        <UiElementsAddIcon
+        <!-- <UiElementsAddIcon
           icon-name="bx:edit"
           color-icon="black"
           size-width="24"
-          size-heigth="24" />
+          size-heigth="24" /> -->
 
         <button class="delete" @click="deleteHandler(el.id)">&times;</button>
       </div>
@@ -116,7 +115,7 @@ const deleteHandler = async (audioId?: string) => {
 }
 .postListPreview .description {
   display: grid;
-  grid-template-rows: 50px 50px auto;
+  grid-template-rows: 50px auto;
   row-gap: 10px;
 }
 .postListPreview .post_body {

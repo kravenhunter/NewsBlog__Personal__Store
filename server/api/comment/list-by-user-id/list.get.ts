@@ -10,12 +10,17 @@ export default defineEventHandler(async (event) => {
     });
 
     if (!getItemList.length) {
-      throw createError({
-        statusCode: 405,
+      return {
+        statusCode: 404,
         statusMessage: "No records in database ",
-      });
+      };
     }
-    return getItemList;
+    return {
+      statusCode: 200,
+      statusMessage: "Success",
+      table: "comment",
+      objectResult: getItemList,
+    };
   } catch (error) {
     const getError = error as H3Error;
     throw createError({

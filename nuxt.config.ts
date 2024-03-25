@@ -28,7 +28,7 @@ export default defineNuxtConfig({
 
     session: {
       enableRefreshOnWindowFocus: true, //default - true
-      enableRefreshPeriodically: false, // default -false , 1000 ms /1 sec
+      enableRefreshPeriodically: 1000 * 60 * 60, // Refetch user session data every 1h, // default -false , 1000 ms /1 sec
     },
   },
   css: ["~/assets/styles/global.scss", "~/assets/styles/sizeMixin.scss"],

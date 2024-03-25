@@ -1,40 +1,41 @@
 import { getServerSession } from "#auth";
 import type { Tag } from "@prisma/client";
-import { Buffer } from "node:buffer";
 
-const extractFormData = (formData: FormData) => {
-  const titleData = formData.get("title");
-  const bodyData = formData.get("body");
-  const shortBodyData = formData.get("shortBody");
-  const authorData = formData.get("author");
-  const imageBg = formData.get("imageBg");
-  const imagePrev = formData.get("imagePrev");
-  const tagsData = formData.get("tags");
-  return {
-    title: titleData && (titleData as string),
-    body: bodyData && (bodyData as string),
-    shortBody: shortBodyData && (shortBodyData as string),
-    author: authorData && (authorData as string),
-    imageBg,
-    imagePrev,
-    tags: tagsData && Array.isArray(tagsData) && (tagsData as Array<string>),
-  };
-};
+//import { Buffer } from "node:buffer";
 
-const converToCurrentTags = (currenttagsArray: string[], tagList: Tag[]) => {
-  const tagsArr: Tag[] = [];
+// const extractFormData = (formData: FormData) => {
+//   const titleData = formData.get("title");
+//   const bodyData = formData.get("body");
+//   const shortBodyData = formData.get("shortBody");
+//   const authorData = formData.get("author");
+//   const imageBg = formData.get("imageBg");
+//   const imagePrev = formData.get("imagePrev");
+//   const tagsData = formData.get("tags");
+//   return {
+//     title: titleData && (titleData as string),
+//     body: bodyData && (bodyData as string),
+//     shortBody: shortBodyData && (shortBodyData as string),
+//     author: authorData && (authorData as string),
+//     imageBg,
+//     imagePrev,
+//     tags: tagsData && Array.isArray(tagsData) && (tagsData as Array<string>),
+//   };
+// };
 
-  currenttagsArray.forEach((cat) => {
-    const getCat = tagList.find((x) => x.title === cat);
-    getCat && tagsArr.push(getCat);
-  });
-  return tagsArr;
-};
+// const converToCurrentTags = (currenttagsArray: string[], tagList: Tag[]) => {
+//   const tagsArr: Tag[] = [];
 
-const convertFileTOBase64 = async (file: File) => {
-  const fileBUffer = await file.arrayBuffer();
-  return Buffer.from(fileBUffer).toString("base64");
-};
+//   currenttagsArray.forEach((cat) => {
+//     const getCat = tagList.find((x) => x.title === cat);
+//     getCat && tagsArr.push(getCat);
+//   });
+//   return tagsArr;
+// };
+
+// const convertFileTOBase64 = async (file: File) => {
+//   const fileBUffer = await file.arrayBuffer();
+//   return Buffer.from(fileBUffer).toString("base64");
+// };
 
 export default defineEventHandler(async (event) => {
   try {
@@ -70,7 +71,7 @@ export default defineEventHandler(async (event) => {
       } else if (Array.isArray(getData)) {
         const categoryList = await event.context.prisma.tag.findMany();
 
-        const tagsArr: Tag[] = converToCurrentTags(getData as Array<string>, categoryList);
+        const tagsArr: Tag[] = converArrayToTags(getData as Array<string>, categoryList);
 
         await event.context.prisma.post.update({
           where: { id: event?.context?.params?.id },

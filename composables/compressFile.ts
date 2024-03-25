@@ -4,6 +4,19 @@ export interface IFileObject {
   compressedFILE: File;
   preview: string;
 }
+
+export async function getSizeImage(fileImage: File): Promise<number> {
+  return await new Promise((resolve) => {
+    const newImage = new Image();
+    //Create Blob Link
+    newImage.src = URL.createObjectURL(fileImage);
+    newImage.onload = function () {
+      // console.log(`${newImage.width} x ${newImage.height}`);
+      resolve(newImage.width);
+    };
+  });
+}
+
 export async function compressToBestSize(
   imaageWidth: number,
   fileImage: File,
@@ -17,7 +30,7 @@ export async function compressToBestSize(
 
   const promise = await new Promise((resolve, reject) => {
     const compress = new Compressor(fileImage, {
-      quality: 0.1,
+      quality: 0.8,
       // quality: 0.6,
       width: imaageWidth,
       height: currentHeight,
@@ -32,9 +45,9 @@ export async function compressToBestSize(
   })
     .then(async (result) => {
       const resultBlob = result as Blob;
-      console.log(resultBlob);
-      console.log(resultBlob.name);
-      console.log(resultBlob.type);
+      // console.log(resultBlob);
+      // console.log(resultBlob.name);
+      // console.log(resultBlob.type);
       const newFile = new File([resultBlob], resultBlob.name, { type: resultBlob.type });
 
       const previewLink = await getPreviewLink(newFile);
@@ -52,6 +65,7 @@ export async function compressToBestSize(
 
   return promise;
 }
+
 export async function compressToBestSizeImage(fileImage: File) {
   // Kbite
   const sizeImage = fileImage.size / 1024;
@@ -117,15 +131,4 @@ async function getPreviewLink(file: File): Promise<string> {
     };
   });
   return promise;
-}
-
-export function customeCompressor() {
-  const date = new Date();
-  const { minutes, seconds, miliseconds } = {
-    minutes: date.getMinutes(),
-    seconds: date.getSeconds(),
-    miliseconds: date.getMilliseconds(),
-  };
-
-  return date.toLocaleTimeString();
 }

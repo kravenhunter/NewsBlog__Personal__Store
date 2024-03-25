@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import { storeToRefs } from "pinia";
 import type { IFileData } from "~/types";
 
 interface IProps {
-  list: IFileData[];
-  showList?: boolean;
+  showList?: boolean | null;
 }
 const props = defineProps<IProps>();
 
@@ -11,6 +11,8 @@ interface IDurationObject {
   id?: string;
   durationTime?: string;
 }
+
+const { podCastList } = storeToRefs(useUnionStore());
 
 const currentSongObject = ref<IFileData | null>(null);
 const currentIndex = ref(0);
@@ -25,15 +27,15 @@ const duration = ref("0:00");
 const correntTime = ref("0:00");
 const isSpinNext = ref(false);
 const isSpinBack = ref(false);
-const playPromise = ref<Promise<void> | undefined>(undefined);
+const playPromise = ref<Promise<void>>();
 
 const isPlaying = ref(false);
 
 const propgresBar = ref("0%");
 
-const prevExisted = computed(() => !!props.list[currentIndex.value - 1]);
+const prevExisted = computed(() => !!podCastList.value[currentIndex.value - 1]);
 
-const nextExisted = computed(() => !!props.list[currentIndex.value - 1]);
+const nextExisted = computed(() => !!podCastList.value[currentIndex.value + 1]);
 
 const timeConvert = (timeNum: number) => {
   const totalMin = Math.floor(timeNum / 60);
@@ -65,30 +67,20 @@ const resetData = () => {
 
 const initializeSong = async () => {
   resetData();
-  currentSongObject.value = props.list[currentIndex.value];
-  // currentSongObject.value.file_binary = `data:audio/mpeg;base64,${props.list[currentIndex.value].file_binary}`;
+  currentSongObject.value = podCastList.value[currentIndex.value];
+  if (currentSongObject.value) {
+    console.log(currentSongObject.value);
 
-  duration.value = await getDuration(
-    `data:audio/mpeg;base64,${currentSongObject.value.file_binary}`,
-  );
+    duration.value = await getDuration(currentSongObject.value);
 
-  audioPlayer.value?.src &&
-    currentSongObject.value &&
-    (audioPlayer.value.src = `data:audio/mpeg;base64,${currentSongObject.value.file_binary}`);
+    audioPlayer.value?.src &&
+      currentSongObject.value?.adition_binary &&
+      (audioPlayer.value.src = currentSongObject.value.adition_binary);
 
-  setTimeout(() => (previosSong.value = currentSongObject.value), 500);
+    setTimeout(() => (previosSong.value = currentSongObject.value), 500);
+  }
 };
 
-function getDuration(song: string) {
-  return new Promise<string>((resolve) => {
-    const musicPlayer = new Audio();
-    musicPlayer.src = song;
-    musicPlayer.src &&
-      (musicPlayer.onloadeddata = () => {
-        resolve(timeConvert(musicPlayer.duration));
-      });
-  });
-}
 const play = (val: boolean) => {
   isPlaying.value = val;
 
@@ -107,8 +99,9 @@ const play = (val: boolean) => {
 };
 
 const prev = async () => {
+  console.log("prev");
   currentIndex.value = currentIndex.value - 1;
-  isSpinBack.value = !isSpinBack.value; // true
+  isSpinBack.value = true; // true
   await initializeSong();
 
   // play();
@@ -117,14 +110,17 @@ const prev = async () => {
 
 const next = async () => {
   // play(false);
+  console.log("Next");
+
   currentIndex.value = currentIndex.value + 1;
-  isSpinNext.value = !isSpinNext.value; // true
+
+  isSpinNext.value = true; // true
   await initializeSong();
   // play(true);
   setTimeout(() => (isSpinNext.value = false), 1500);
 };
 const selectHandler = async (id: string | undefined) => {
-  id && (currentIndex.value = props.list.findIndex((el) => el.id === id));
+  id && (currentIndex.value = podCastList.value.findIndex((el) => el.id === id));
 
   isSpinNext.value = !isSpinNext.value; // true
   await initializeSong();
@@ -132,40 +128,53 @@ const selectHandler = async (id: string | undefined) => {
   setTimeout(() => (isSpinNext.value = false), 1500);
 };
 
-const loadDurationList = async () => {
-  props.list.forEach(async (el) => {
-    const promisResulte = await getDuration(`data:audio/mpeg;base64,${el.file_binary}`);
+function getDuration(song: IFileData) {
+  return new Promise<string>((resolve) => {
+    const musicPlayer = new Audio();
+    song.adition_binary && (musicPlayer.src = song.adition_binary);
 
+    musicPlayer.src &&
+      (musicPlayer.onloadeddata = () => {
+        resolve(timeConvert(musicPlayer.duration));
+      });
+  });
+}
+
+const loadDurationList = async () => {
+  podCastList.value?.forEach(async (el) => {
+    const promisResulte = await getDuration(el);
     durationList.value?.push({ id: el.id, durationTime: promisResulte });
   });
 };
+
 const loadData = async () => {
   await loadDurationList();
   await initializeSong();
 };
+
 onMounted(async () => await loadData());
 </script>
 
 <template>
   <div class="aqializer_container">
-    <div class="aqualizer_block" v-if="currentSongObject">
+    <div class="aqualizer_block" v-if="currentSongObject?.adition_binary">
       <audio
         id="player"
         preload="none"
         ref="audioPlayer"
         @timeupdate="onPlaying"
-        :src="`data:audio/mpeg;base64,${currentSongObject.file_binary}`"></audio>
+        :src="currentSongObject.adition_binary"></audio>
       <div class="album_block">
-        <img
+        <NuxtImg
           :class="{ spin_next: isSpinNext, spin_back: isSpinBack }"
-          :src="`data:image/webp;base64,${previosSong?.adition_binary}`"
-          :alt="previosSong?.title" />
+          :src="`data:image/webp;base64,${currentSongObject.file_binary}`"
+          :alt="currentSongObject.title" />
         <span></span>
       </div>
-      <div class="aqualizer_wrapper" v-if="props.list">
+      <div class="aqualizer_wrapper" v-if="podCastList">
         <div class="title_block">
           <div class="name_block">
-            <ul class="title_song" v-for="(el, i) in props.list" :key="i">
+            <ul class="title_song" v-for="(el, i) in podCastList" :key="i">
               <Transition name="slide-up">
                 <li v-if="el.id === currentSongObject.id">
                   <h4>{{ el.title }}</h4>
@@ -229,11 +238,11 @@ onMounted(async () => await loadData());
         </div>
       </div>
     </div>
-    <div class="aqializer_container_list" v-if="showList && props.list">
+    <div class="aqializer_container_list" v-if="showList && podCastList">
       <ul>
         <li
-          v-for="(el, i) in props.list"
-          :key="i"
+          v-for="el in podCastList"
+          :key="el.id"
           @click="selectHandler(el?.id)"
           :class="{ active_item: el.id === currentSongObject?.id }">
           <div class="item_title">

@@ -40,7 +40,10 @@ const goNext = (routeName: string, id: string | undefined) => {
 
 <template>
   <div class="postListPreview" v-if="post?.id">
-    <NuxtImg :src="`data:image/webp;base64,${post.imagePrev.file_binary}`" :alt="post.title" />
+    <NuxtImg
+      v-if="post.imagePrev?.file_binary"
+      :src="`data:image/webp;base64,${post.imagePrev.file_binary}`"
+      :alt="post.title" />
     <div class="description">
       <h2 class="title" @click="goNext('post', post.id)">{{ post.title }}</h2>
 
@@ -61,7 +64,9 @@ const goNext = (routeName: string, id: string | undefined) => {
           size-heigth="24" />
       </button>
 
-      <button class="delete" @click="deleteDataById(post.id)">&times;</button>
+      <button class="delete" @click="deleteDataById(`post/delete-by-id/${post.id}`)">
+        &times;
+      </button>
     </div>
   </div>
 </template>
