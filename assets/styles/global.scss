@@ -78,6 +78,7 @@ p {
 .editor_content {
   max-width: 900px;
   display: grid;
+  row-gap: 20px;
 }
 .paragraph_class {
   font-size: 18px;
@@ -89,6 +90,7 @@ p {
 }
 
 .code_block_rule {
+  white-space: wrap;
   background: #0d0d0d;
   color: #fff;
   font-family: var(--font-standart), monospace;
@@ -103,8 +105,13 @@ p {
   margin-left: 4rem;
 }
 .image_rule {
-  max-width: 100%;
-  max-height: 100%;
+  width: 100;
+  // max-width: 100%;
+  // max-height: 100%;
+}
+.pre {
+  display: grid;
+  row-gap: 2rem;
 }
 
 /*

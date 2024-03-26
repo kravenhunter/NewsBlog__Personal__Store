@@ -28,15 +28,13 @@ const { categoryList } = storeToRefs(useUnionStore());
 const { createOrUpdateData, getPostById } = useUnionStore();
 
 const getPost = getPostById(String(route.params.id));
-const state2 = reactive({
-  title: "",
-});
+
 const state = reactive({
-  title: getPost?.id ?? "",
+  title: getPost?.title ?? "",
   author: data.value?.user?.name ?? "",
   shortBody: getPost?.shortBody ?? "",
   body: getPost?.body ?? "",
-  tags: getPost?.tags.length && getPost.tags[0].title ? getPost.tags[0].title : "World",
+  tags: getPost?.tags[getPost.tags.length - 1]?.title ?? "World",
 });
 
 const onFileSelected = async (event: Event) => {
@@ -51,18 +49,6 @@ const resetForm = () => {
 };
 const v$ = validatePostHelper(state);
 
-// const fillState = (id: string) => {
-//   const getArticle = getArticleById(id);
-//   getArticle?.id && (state.id = getArticle.id);
-//   getArticle?.title && (state.title = getArticle.title);
-//   getArticle?.author && (state.author = getArticle.author);
-//   getArticle?.category && (state.category = getArticle.category);
-//   getArticle?.image && (state.image = getArticle.image);
-//   getArticle?.imageMeta && (state.imageMeta = getArticle.imageMeta);
-//   getArticle?.shortBody && (state.shortBody = getArticle.shortBody);
-//   getArticle?.body && (state.body = getArticle.body);
-//   state.date = 0;
-// };
 const responseHandler = async (path: string | undefined) => {
   path && setTimeout(async () => await clearError({ redirect: path }), 1000);
   !path && (await clearError());
@@ -112,12 +98,15 @@ const submitForm = async () => {
       result && creatingResult(result.statusCode, result.statusMessage);
       //  result &&  resetForm();
     } else {
-      for (const item in state) {
-        body.append(item, `${state[item as keyof typeof state]}`);
-      }
-      const result = await createOrUpdateData("post/create", body);
-      result && creatingResult(result.statusCode, result.statusMessage);
+      creatingResult(405, "Wrong Post ID. Try again.");
     }
+    // else {
+    //   for (const item in state) {
+    //     body.append(item, `${state[item as keyof typeof state]}`);
+    //   }
+    //   const result = await createOrUpdateData("post/create", body);
+    //   result && creatingResult(result.statusCode, result.statusMessage);
+    // }
   } else {
     creatingResult(405, "Form not submit. Try again.");
   }

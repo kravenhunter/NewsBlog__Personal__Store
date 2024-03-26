@@ -4,14 +4,20 @@ import type { IAbout } from "~/types";
 
 const { aboutUs } = storeToRefs(useUnionStore());
 
+// const state = reactive({
+//   title: aboutUs.value?.length ? aboutUs.value[0].title : "",
+//   description: aboutUs.value?.length ? aboutUs.value[0].description : "",
+// });
 const state = reactive({
-  title: aboutUs.value?.length ? aboutUs.value[0].title : "",
-  description: aboutUs.value?.length ? aboutUs.value[0].description : "",
+  title: aboutUs.value[0]?.title ?? "",
+  description: aboutUs.value[0]?.description ?? "",
 });
 // const { updateAboutUs, addAbout } = useAboutUsStore();
 const { createOrUpdateData } = useUnionStore();
 const submitForm = async () => {
-  await createOrUpdateData<IAbout>("about/create", state);
+  aboutUs.value[0]?.id &&
+    (await createOrUpdateData<IAbout>(`about/update/${aboutUs.value[0].id}`, state));
+  !aboutUs.value[0]?.id && (await createOrUpdateData<IAbout>("about/create", state));
 };
 
 // const fillState = () => {

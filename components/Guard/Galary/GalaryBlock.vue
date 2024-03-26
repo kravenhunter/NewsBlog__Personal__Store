@@ -53,7 +53,6 @@ const submitForm = async () => {
 };
 
 const deleteHaandler = async (itemId: string) => {
-  console.log(itemId);
   if (isItemExist(itemId, "images")) {
     await deleteDataById(`file/delete-by-id/${itemId}`);
   }

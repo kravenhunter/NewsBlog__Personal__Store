@@ -3,10 +3,10 @@ import formatPath from "@/utils/formatPath";
 import type { ICategory, INavigation } from "~/types";
 
 interface IProps {
-  directionColumn: string;
-  aboutlinks?: INavigation[] | null;
-  categorylinks?: ICategory[] | null;
-  gaps: string;
+  directionColumn?: string;
+  aboutlinks?: INavigation[];
+  categorylinks?: ICategory[];
+  gaps?: string;
 }
 
 withDefaults(defineProps<IProps>(), {

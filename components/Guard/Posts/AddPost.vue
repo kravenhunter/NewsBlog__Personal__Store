@@ -82,26 +82,10 @@ const submitForm = async () => {
       const result = await createOrUpdateData(`post/create`, body);
 
       result && creatingResult(result.statusCode, result.statusMessage);
-      // if (result && result.statusCode === 200) {
-      //   resetForm();
-      //   isCreated.value = "created";
-      //   createResponse.value = createError({
-      //     statusCode: 200,
-      //     statusMessage: result.statusMessage,
-      //   });
-      // } else {
-      //   isCreated.value = "error";
-      //   createResponse.value = createError({ statusCode: 405, statusMessage: "Can't save post" });
-      //   console.log(result.statusMessage);
-      // }
     }
   } else {
-    // console.log(v$.value.$errors[0]);
     isCreated.value = "error";
-    createResponse.value = createError({
-      statusCode: 405,
-      statusMessage: "Form not submit. Try again.",
-    });
+    creatingResult(405, "Form not submit. Try again.");
   }
 };
 </script>

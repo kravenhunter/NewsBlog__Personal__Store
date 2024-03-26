@@ -15,37 +15,6 @@ withDefaults(defineProps<IProps>(), {
   row: "auto",
 });
 
-// defineProps({
-//   list: {
-//     type: Array as PropType<IPodcast[]>,
-//     default: null,
-//   },
-//   singlePost: {
-//     type: Object as PropType<IPodcast>,
-//     default: null,
-//   },
-//   label: {
-//     type: String,
-//     default: "",
-//   },
-//   directionCard: {
-//     type: String,
-//     reqired: false,
-//   },
-//   directionContainer: {
-//     type: String,
-//     reqired: "1fr",
-//   },
-//   row: {
-//     type: String,
-//     reqired: "auto",
-//   },
-//   showBody: {
-//     type: Boolean,
-//     reqired: false,
-//   },
-// });
-
 const { deleteDataById } = useUnionStore();
 const deleteHandler = async (audioId?: string) => {
   audioId && (await deleteDataById(`file/delete-by-id/${audioId}`));

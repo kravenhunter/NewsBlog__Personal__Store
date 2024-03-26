@@ -53,7 +53,7 @@ useSeoMeta({
   <section class="list_container grid_block">
     <section class="top grid_block">
       <div class="advertise_block">
-        <UiElementsAdvertise label="Advertisement" v-if="advertiseList" :link="advertiseList[1]" />
+        <UiElementsAdvertise label="Advertisement" v-if="advertiseList" :link="advertiseList[0]" />
       </div>
 
       <div class="topic grid_block">

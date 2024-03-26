@@ -55,12 +55,6 @@ const footer = loadDataList("footer-link/list");
 const user = loadDataList("user-credentials/list");
 const audio = loadDataList("file/list-by-type/audio");
 
-const loadStores = async () => {
-  // if (!postlist.value?.length) {
-  //   const result = await loadDataList("article/list");
-  //   console.log(result);
-  // }
-};
 // const loadStores = async () => {
 //   if (!categoryList.value?.length) {
 //     const result = await loadDataList("tag/list");

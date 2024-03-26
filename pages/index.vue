@@ -13,25 +13,25 @@ const worldList = postlist.value.filter((item) => {
   return item.tags?.some((el) => el.title?.includes("World"));
 });
 const businessList = postlist.value.filter((item) => {
-  return item.tags?.some((el) => el.title?.includes("World"));
+  return item.tags?.some((el) => el.title?.includes("Business"));
 });
 const policyList = postlist.value.filter((item) => {
-  return item.tags?.some((el) => el.title?.includes("World"));
+  return item.tags?.some((el) => el.title?.includes("Politics"));
 });
 const artList = postlist.value.filter((item) => {
-  return item.tags?.some((el) => el.title?.includes("World"));
+  return item.tags?.some((el) => el.title?.includes("Art"));
 });
 const culture = postlist.value.filter((item) => {
-  return item.tags?.some((el) => el.title?.includes("World"));
+  return item.tags?.some((el) => el.title?.includes("Culture"));
 });
 const styleList = postlist.value.filter((item) => {
-  return item.tags?.some((el) => el.title?.includes("World"));
+  return item.tags?.some((el) => el.title?.includes("Style"));
 });
-const sportList = postlist.value.filter((item) => {
-  return item.tags?.some((el) => el.title?.includes("World"));
+const scienceList = postlist.value.filter((item) => {
+  return item.tags?.some((el) => el.title?.includes("Science"));
 });
-const travelList = postlist.value.filter((item) => {
-  return item.tags?.some((el) => el.title?.includes("World"));
+const favoriteList = postlist.value.filter((item) => {
+  return item.tags?.some((el) => el.title?.includes("Favorite"));
 });
 
 useSeoMeta({
@@ -46,7 +46,7 @@ useSeoMeta({
       <section class="section_preview">
         <ArticleSingleArticle
           class-type="image_content_middle"
-          :single-post="postlist[0]"
+          :single-post="favoriteList[0]"
           font-size="30px"
           row-size="700px"
           :show-title="true"
@@ -70,7 +70,7 @@ useSeoMeta({
 
           <ArticleSingleArticle
             class-type="image_content_rigth"
-            :single-post="postlist[4]"
+            :single-post="favoriteList[4]"
             :show-title="true"
             :show-image="true"
             :show-date="true" />
@@ -150,7 +150,7 @@ useSeoMeta({
             :show-date="true"
             row-size="700px"
             font-size="30px"
-            :single-post="postlist[1]" />
+            :single-post="favoriteList[1]" />
         </div>
         <div class="must_read_list bars">
           <ArticleSingleArticle
@@ -164,7 +164,7 @@ useSeoMeta({
         </div>
       </section>
 
-      <LazyUiElementsAdvertise v-if="advertiseList" :link="advertiseList[1]" />
+      <LazyUiElementsAdvertise v-if="advertiseList" :link="advertiseList[0]" />
 
       <section class="style_container">
         <div class="art bars">

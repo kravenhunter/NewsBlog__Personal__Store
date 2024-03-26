@@ -69,8 +69,6 @@ const initializeSong = async () => {
   resetData();
   currentSongObject.value = podCastList.value[currentIndex.value];
   if (currentSongObject.value) {
-    console.log(currentSongObject.value);
-
     duration.value = await getDuration(currentSongObject.value);
 
     audioPlayer.value?.src &&

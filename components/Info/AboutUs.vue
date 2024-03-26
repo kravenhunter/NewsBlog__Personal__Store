@@ -14,7 +14,7 @@ const errorResponse = createError({ statusCode: 201, statusMessage: "Content not
         <h2>{{ aboutUs[0].title }}</h2>
       </div>
 
-      <div class="about_text" v-html="aboutUs[0].description"></div>
+      <div class="pre" v-html="aboutUs[0].description"></div>
     </div>
     <div v-else class="no_content">
       <LazyErrorResponse :error-event="errorResponse" />

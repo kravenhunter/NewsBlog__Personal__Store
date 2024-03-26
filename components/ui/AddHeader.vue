@@ -28,7 +28,7 @@ function clickOnTab(path: string | undefined) {
       </li>
       <li v-for="(link, i) in navLinks" :key="i" :data-id="i">
         <NuxtLink
-          :to="{ path: `/${link?.title?.toLocaleLowerCase()}/list` }"
+          :to="{ path: `/${link?.title}/list` }"
           :class="{ active: selectedTab === link.title }"
           class="link"
           @click="clickOnTab(link.title)"

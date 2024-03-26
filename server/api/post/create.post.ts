@@ -67,6 +67,17 @@ export default defineEventHandler(async (event) => {
             },
           },
         },
+        select: {
+          id: true,
+          title: true,
+          author: true,
+          body: true,
+          shortBody: true,
+          imageBg: true,
+          imagePrev: true,
+          tags: true,
+          Comment: true,
+        },
       });
       return {
         statusCode: 200,

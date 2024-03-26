@@ -7,7 +7,7 @@ const { aboutUs } = storeToRefs(useUnionStore());
 </script>
 
 <template>
-  <div class="about_block" v-if="aboutUs">
+  <div class="about_block">
     <h2>About Us</h2>
     <div class="about_btn">
       <UiElementsAddButton title="Change" color-bg="dark" font-size="16px" @click="isEdit = !isEdit"
@@ -17,12 +17,12 @@ const { aboutUs } = storeToRefs(useUnionStore());
 
     <LazyGuardAboutusEditAbout v-if="isEdit" />
 
-    <div class="about_content" v-if="!isEdit && aboutUs">
+    <div class="about_content" v-if="!isEdit && aboutUs.length">
       <div class="about_title">
         <h2>{{ aboutUs[0]?.title }}</h2>
       </div>
 
-      <div class="about_text" v-html="aboutUs[0].description"></div>
+      <div class="about_text" v-if="aboutUs[0]?.description" v-html="aboutUs[0].description"></div>
     </div>
   </div>
 </template>

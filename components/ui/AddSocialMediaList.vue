@@ -3,10 +3,10 @@ import type { INavigation } from "~/types";
 
 interface IProps {
   popelarCategory?: INavigation[] | null;
-  isInlineBlock: boolean;
-  enableBg: boolean;
-  colorIcon: string;
-  paddings: string;
+  isInlineBlock?: boolean | null;
+  enableBg?: boolean | null;
+  colorIcon?: string;
+  paddings?: string | null;
 }
 
 withDefaults(defineProps<IProps>(), {

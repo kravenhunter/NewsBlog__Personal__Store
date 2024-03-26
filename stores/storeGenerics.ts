@@ -72,7 +72,6 @@ export const useUnionStore = defineStore("union-store", () => {
     }
   };
   const fillStoreData = <T>(table: string, data: T, action?: string) => {
-    console.log(table);
     switch (table) {
       case "post":
         action === "create" && postlist.value.push(data as IPost);
@@ -232,7 +231,6 @@ export const useUnionStore = defineStore("union-store", () => {
             (el) => el.id !== (data as IUserCredentials).id,
           ));
         !action && (userCredentials.value = data as IUserCredentials[]);
-        console.log(userCredentials.value);
 
         break;
 
@@ -251,9 +249,7 @@ export const useUnionStore = defineStore("union-store", () => {
    **/
   const loadDataList = async (apiPath: string) => {
     try {
-      // console.log(`${apiUrl}/${apiPath}`);
       // const { data: response2 } = await useFetch<IResponse>(`/api/article/list`);
-      // console.log(response2.value);
       const { data: response, error, refresh } = await useFetch<IResponse>(`${apiUrl}/${apiPath}`);
       if (error.value) {
         throw error.value;
@@ -341,7 +337,6 @@ export const useUnionStore = defineStore("union-store", () => {
       response.value?.table &&
         response.value.statusCode === 200 &&
         fillStoreData(response.value.table, response.value.objectResult, "delete");
-      // userCredentials.value = userCredentials.value?.filter(u => u.id !== )
     } catch (error) {
       console.log(error);
     }
@@ -405,344 +400,6 @@ export const useUnionStore = defineStore("union-store", () => {
    *
    **/
 
-  // const createData2 = async <T extends TypeInterfaces>(
-  //   fileDataCover: File,
-  //   fileDataPreview: File,
-  //   content: T,
-  //   table: TypeTables,
-  //   methodRequest: ReqiestMethod,
-  // ): Promise<string> => {
-  //   const getUrls = `${apiUrl}/${table}/${methodRequest}`;
-
-  //   try {
-  //     const getCoverWidth = await getSizeImage(fileDataCover);
-  //     const coverPromise = loadImageToStore(fileDataCover, "cover", getCoverWidth);
-  //     const previewPromise = loadImageToStore(fileDataPreview, "preview", 600);
-  //     const promiseAll = await Promise.all([coverPromise, previewPromise]);
-
-  //     content.imageBgLink = promiseAll[0];
-  //     content.imagePreviewLink = promiseAll[1];
-  //     console.log(content);
-
-  //     const { data: response, error } = await useFetch<TypeModels>(getUrls, {
-  //       method: "post",
-  //       body: JSON.stringify(content),
-  //     });
-  //     console.log(response.value);
-
-  //     if (error.value) {
-  //       throw error.value;
-  //     }
-
-  //     // switch (table) {
-  //     //   case "post":
-  //     //     refreshPost();
-  //     //     break;
-  //     //   case "specie":
-  //     //     refreshSpecie();
-  //     //     break;
-  //     //   case "main-content-pages":
-  //     //     refreshMainPages();
-  //     //     break;
-  //     //   case "contacts":
-  //     //     refreshContactUs();
-  //     //     break;
-  //     //   case "membership":
-  //     //     refreshMembershipPrice();
-  //     //     break;
-  //     //   case "ticket":
-  //     //     refreshTicketPrice();
-  //     //     break;
-  //     // }
-
-  //     return "Success";
-  //   } catch (error) {
-  //     console.log(error);
-  //   } finally {
-  //     console.log("CreateData complete");
-  //   }
-
-  //   return "Error";
-  // };
-
-  // const updateData = async <T extends TypeInterfaces>(
-  //   idData: string,
-  //   fileDataCover: 0 | File | undefined,
-  //   fileDataPreview: 0 | File | undefined,
-  //   content: T,
-  //   table: TypeTables,
-  //   methodRequest: ReqiestMethod,
-  // ) => {
-  //   if (idData) {
-  //     const getUrls = `${apiUrl}/${table}/${methodRequest}/${idData}`;
-  //     try {
-  //       if (fileDataCover) {
-  //         const getCoverWidth = await getSizeImage(fileDataCover);
-  //         console.log(getCoverWidth);
-
-  //         content.imageBgLink = await loadImageToStore(fileDataCover, "cover", getCoverWidth);
-  //         console.log(content.imageBgLink);
-  //       }
-
-  //       fileDataPreview &&
-  //         (content.imagePreviewLink = await loadImageToStore(fileDataPreview, "preview", 600));
-  //       console.log(content);
-  //       const { data: response, error } = await useFetch<TypeModels>(getUrls, {
-  //         method: "post",
-  //         body: JSON.stringify(content),
-  //       });
-
-  //       if (error.value) {
-  //         throw error.value;
-  //       }
-  //       // switch (table) {
-  //       //   case "post":
-  //       //     refreshPost();
-  //       //     break;
-  //       //   case "specie":
-  //       //     refreshSpecie();
-  //       //     break;
-  //       //   case "main-content-pages":
-  //       //     refreshMainPages();
-  //       //     break;
-  //       //   case "contacts":
-  //       //     refreshContactUs();
-  //       //     break;
-  //       //   case "membership":
-  //       //     refreshMembershipPrice();
-  //       //     break;
-  //       //   case "ticket":
-  //       //     refreshTicketPrice();
-  //       //     break;
-  //       // }
-
-  //       return "Success";
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   }
-  //   return "Error";
-  // };
-  // const createPlanData = async <TypeIntefacesPrice>(
-  //   table: TypeTables,
-  //   methodRequest: ReqiestMethod,
-  //   firstPricesTable: TypeIntefacesPrice,
-  //   secondPricesTable: TypeIntefacesPrice,
-  //   thirdPricesTable: TypeIntefacesPrice,
-  // ): Promise<string> => {
-  //   const getUrls = `${apiUrl}/${table}/${methodRequest}`;
-
-  //   try {
-  //     const { data: response, error } = await useFetch<TypeModelsPrice[]>(getUrls, {
-  //       method: "post",
-  //       body: JSON.stringify({
-  //         first: firstPricesTable,
-  //         second: secondPricesTable,
-  //         third: thirdPricesTable,
-  //       }),
-  //     });
-
-  //     console.log(response.value);
-
-  //     if (error.value) {
-  //       throw error.value;
-  //     }
-
-  //     return "Success";
-  //   } catch (error) {
-  //     console.log(error);
-  //     return "Error";
-  //   }
-  // };
-  // const updatePlanPrices = async (
-  //   idFirst: string,
-  //   idSecond: string,
-  //   idThird: string,
-  //   table: TypeTables,
-  //   methodRequest: ReqiestMethod,
-  //   firstPricesTable: TypeModelsPrice,
-  //   secondPricesTable: TypeModelsPrice,
-  //   thirdPricesTable: TypeModelsPrice,
-  // ) => {
-  //   if (idFirst && idSecond) {
-  //     const getUrlsFirst = `${apiUrl}/${table}/${methodRequest}/${idFirst}`;
-  //     const getUrlsSecond = `${apiUrl}/${table}/${methodRequest}/${idSecond}`;
-  //     const getUrlsThird = `${apiUrl}/${table}/${methodRequest}/${idThird}`;
-  //     try {
-  //       const firstResult = useFetch<TypeModelsPrice>(getUrlsFirst, {
-  //         method: "post",
-  //         body: JSON.stringify(firstPricesTable),
-  //       });
-
-  //       const secondResult = useFetch<TypeModelsPrice>(getUrlsSecond, {
-  //         method: "post",
-  //         body: JSON.stringify(secondPricesTable),
-  //       });
-  //       const thirdResult = useFetch<TypeModelsPrice>(getUrlsThird, {
-  //         method: "post",
-  //         body: JSON.stringify(thirdPricesTable),
-  //       });
-  //       const promiseAll = await Promise.all([firstResult, secondResult, thirdResult]);
-
-  //       const { data: responseFirst, error: errorFirst } = promiseAll[0];
-  //       const { data: responseSecond, error: errorSecond } = promiseAll[1];
-  //       const { data: responseThird, error: erroThird } = promiseAll[2];
-
-  //       if (errorFirst.value && errorSecond.value && erroThird.value) {
-  //         throw new Error(`Error First: ${errorFirst.value}, Error Second: ${errorSecond.value}`);
-  //       } else if (errorFirst.value) {
-  //         throw errorFirst.value;
-  //       } else if (errorSecond.value) {
-  //         throw errorSecond.value;
-  //       } else if (erroThird.value) {
-  //         throw errorSecond.value;
-  //       }
-  //       console.log(responseFirst.value);
-  //       console.log(responseSecond.value);
-  //       console.log(responseThird.value);
-  //       // switch (table) {
-  //       //   case "membership":
-  //       //     refreshMembershipPrice();
-  //       //     break;
-  //       //   case "ticket":
-  //       //     refreshTicketPrice();
-  //       //     break;
-  //       // }
-
-  //       return "Success";
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   }
-  //   return "Error";
-  // };
-  // const createTablesData = async <TypeIntefacesPrice>(
-  //   table: TypeTables,
-  //   methodRequest: ReqiestMethod,
-  //   firstPricesTable: TypeIntefacesPrice,
-  //   secondPricesTable: TypeIntefacesPrice,
-  // ): Promise<string> => {
-  //   const getUrls = `${apiUrl}/${table}/${methodRequest}`;
-
-  //   try {
-  //     const firstResult = useFetch<TypeModelsPrice>(getUrls, {
-  //       method: "post",
-  //       body: JSON.stringify(firstPricesTable),
-  //     });
-
-  //     const secondResult = useFetch<TypeModelsPrice>(getUrls, {
-  //       method: "post",
-  //       body: JSON.stringify(secondPricesTable),
-  //     });
-  //     const promiseAll = await Promise.all([firstResult, secondResult]);
-  //     const { data: responseFirst, error: errorFirst } = promiseAll[0];
-  //     const { data: responseSecond, error: errorSecond } = promiseAll[1];
-
-  //     if (errorFirst.value && errorSecond.value) {
-  //       throw new Error(`Error First: ${errorFirst.value}, Error Second: ${errorSecond.value}`);
-  //     } else if (errorFirst.value) {
-  //       throw errorFirst.value;
-  //     } else if (errorSecond.value) {
-  //       throw errorSecond.value;
-  //     }
-
-  //     // switch (table) {
-  //     //   case "membership":
-  //     //     refreshMembershipPrice();
-  //     //     break;
-  //     //   case "ticket":
-  //     //     refreshTicketPrice();
-  //     //     break;
-  //     // }
-
-  //     return "Success";
-  //   } catch (error) {
-  //     console.log(error);
-  //     return "Error";
-  //   }
-  // };
-  // const updateDataPrices = async <TypeIntefacesPrice>(
-  //   idFirst: string,
-  //   idSecond: string,
-  //   table: TypeTables,
-  //   methodRequest: ReqiestMethod,
-  //   firstPricesTable: TypeIntefacesPrice,
-  //   secondPricesTable: TypeIntefacesPrice,
-  // ) => {
-  //   if (idFirst && idSecond) {
-  //     const getUrlsFirst = `${apiUrl}/${table}/${methodRequest}/${idFirst}`;
-  //     const getUrlsSecond = `${apiUrl}/${table}/${methodRequest}/${idSecond}`;
-
-  //     try {
-  //       const firstResult = useFetch<TypeModelsPrice>(getUrlsFirst, {
-  //         method: "post",
-  //         body: JSON.stringify(firstPricesTable),
-  //       });
-
-  //       const secondResult = useFetch<TypeModelsPrice>(getUrlsSecond, {
-  //         method: "post",
-  //         body: JSON.stringify(secondPricesTable),
-  //       });
-  //       const promiseAll = await Promise.all([firstResult, secondResult]);
-  //       const { data: responseFirst, error: errorFirst } = promiseAll[0];
-  //       const { data: responseSecond, error: errorSecond } = promiseAll[1];
-
-  //       if (errorFirst.value && errorSecond.value) {
-  //         throw new Error(`Error First: ${errorFirst.value}, Error Second: ${errorSecond.value}`);
-  //       } else if (errorFirst.value) {
-  //         throw errorFirst.value;
-  //       } else if (errorSecond.value) {
-  //         throw errorSecond.value;
-  //       }
-
-  //       // switch (table) {
-  //       //   case "membership":
-  //       //     refreshMembershipPrice();
-  //       //     break;
-  //       //   case "ticket":
-  //       //     refreshTicketPrice();
-  //       //     break;
-  //       // }
-
-  //       return "Success";
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   }
-  //   return "Error";
-  // };
-  // const getDataByTitle = (title: string, table: TypeTables): TypeModels[] | undefined => {
-  //   switch (table) {
-  //     case "post":
-  //       return postlist.value?.filter((el) => el.title === title);
-  //     case "specie":
-  //       return specieList.value?.filter((el) => el.title === title);
-  //     case "main-content-pages":
-  //       return mainPages.value?.filter((el) => el.title === title);
-  //     case "contacts":
-  //       return contactPage.value?.filter((el) => el.title === title);
-  //   }
-  // };
-  // const getDataById = (
-  //   idData: string,
-  //   table: TypeTables,
-  // ): TypeModels | TypeModelsPrice | undefined => {
-  //   switch (table) {
-  //     case "post":
-  //       return postlist.value?.find((el) => el.id === idData);
-  //     case "specie":
-  //       return specieList.value?.find((el) => el.id === idData);
-  //     case "main-content-pages":
-  //       return mainPages.value?.find((el) => el.id === idData);
-  //     case "contacts":
-  //       return contactPage.value?.find((el) => el.id === idData);
-  //     case "membership":
-  //       return membershipTable.value?.find((el) => el.id === idData);
-  //     case "ticket":
-  //       return ticketTable.value?.find((el) => el.id === idData);
-  //   }
-  // };
-
   /**
    * async Function Returns IUserCredentials | undefined
    * @param {string} name   apiPath
@@ -758,7 +415,8 @@ export const useUnionStore = defineStore("union-store", () => {
    * @return {boolean}  boolean
    *
    **/
-  const isPostExist = (id: string) => postlist.value.some((el) => el.id === id);
+  const isPostExist = (id: string): boolean => postlist.value.some((el) => el.id === id);
+
   return {
     isItemExist,
     getPostById,

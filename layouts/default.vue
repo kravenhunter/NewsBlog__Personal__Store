@@ -1,99 +1,69 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 
-// import type {
-//   About,
-//   Advertise,
-//   Contacts,
-//   File as FileData,
-//   FooterLink,
-//   Navigation,
-//   Post,
-//   Tag,
-// } from "@prisma/client";
-//Get  Authorized user
-// const { isAuthorized } = useAuthStore();
-// const { data, signOut, status } = useAuth();
-
 const { loadDataList } = useUnionStore();
 //Fetch AboutUs  data
-const {
-  postlist,
-  categoryList,
-  advertiseList,
-  aboutUs,
-  contactList,
-  navLiks,
-  footerLinks,
-  imageList,
-  podCastList,
-} = storeToRefs(useUnionStore());
+const { postlist, categoryList, contactList, navLiks, footerLinks } = storeToRefs(useUnionStore());
 
-const loadStores = async () => {
-  if (!postlist.value?.length) {
-    await loadDataList("post/list");
-  }
-  if (!categoryList.value?.length) {
-    await loadDataList("tag/list");
-  }
-  if (!podCastList.value?.length) {
-    await loadDataList("file/list-by-type/audio");
-  }
-  if (!contactList.value) {
-    await loadDataList("contacts/list");
-  }
-  if (!aboutUs.value) {
-    await loadDataList("about/list");
-  }
-
-  if (!imageList.value) {
-    await loadDataList("file/list-by-type/images");
-  }
-  if (!advertiseList.value) {
-    await loadDataList("advertise/list");
-  }
-
-  if (!navLiks.value) {
-    await loadDataList("nav-link/list");
-  }
-  if (!footerLinks.value) {
-    await loadDataList("footer-link/list");
-  }
-};
 // const loadStores = async () => {
 //   if (!postlist.value?.length) {
-//     await loadDataList<Post[]>("post/list", "post");
+//     await loadDataList("post/list");
 //   }
 //   if (!categoryList.value?.length) {
-//     await loadDataList<Tag[]>("tag/list", "tag");
+//     const res = await loadDataList("tag/list");
+//     console.log(res);
+//     console.log(categoryList.value);
 //   }
 //   if (!podCastList.value?.length) {
-//     await loadDataList<FileData[]>("file/list-by-type/audio", "podcasts");
+//     await loadDataList("file/list-by-type/audio");
 //   }
 //   if (!contactList.value) {
-//     await loadDataList<Contacts[]>("contacts/list", "contacts");
+//     await loadDataList("contacts/list");
 //   }
 //   if (!aboutUs.value) {
-//     await loadDataList<About[]>("about/list", "about");
+//     await loadDataList("about/list");
 //   }
 
 //   if (!imageList.value) {
-//     await loadDataList<FileData[]>("file/list-by-type/images", "images");
+//     await loadDataList("file/list-by-type/images");
 //   }
 //   if (!advertiseList.value) {
-//     await loadDataList<Advertise[]>("advertise/list", "advertise");
+//     await loadDataList("advertise/list");
 //   }
 
 //   if (!navLiks.value) {
-//     await loadDataList<Navigation[]>("nav-link/list", "nav-link");
+//     await loadDataList("nav-link/list");
 //   }
 //   if (!footerLinks.value) {
-//     await loadDataList<FooterLink[]>("footer-link/list", "footer-link");
+//     await loadDataList("footer-link/list");
 //   }
 // };
-//Load all stores
-await loadStores();
 
+// //Load all stores
+// await loadStores();
+const articlePromise = loadDataList("post/list");
+const categoryListPromise = loadDataList("tag/list");
+const contactsPromise = loadDataList("contacts/list");
+const aboutPromise = loadDataList("about/list");
+const imagesPromise = loadDataList("file/list-by-type/images");
+const advertisePromise = loadDataList("advertise/list");
+const navPromise = loadDataList("nav-link/list");
+const footerPromise = loadDataList("footer-link/list");
+const userPromise = loadDataList("user-credentials/list");
+const audioPromise = loadDataList("file/list-by-type/audio");
+
+await Promise.allSettled([
+  articlePromise,
+  categoryListPromise,
+  contactsPromise,
+  aboutPromise,
+  imagesPromise,
+  advertisePromise,
+  navPromise,
+  footerPromise,
+  userPromise,
+  audioPromise,
+]);
 useSeoMeta({
   description: "the whole world daily news",
   ogDescription: "the whole world daily news",

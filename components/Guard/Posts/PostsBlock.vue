@@ -1,53 +1,24 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
-import type { IPost } from "~/types";
-
-const search = ref("");
-const articlesByCategory = ref<IPost[]>();
 
 const { postlist, categoryList } = storeToRefs(useUnionStore());
-// const { data: response, error, refresh } = await useFetch<IResponse>(`/api/post/getList`);
-console.log(postlist.value);
 
+const search = ref("");
 const selected = ref("All");
 
 const searchResult = computed(() => {
   if (search.value) {
-    const getDat = postlist.value.filter((el) => el.title?.includes(search.value));
-    const posts = getDat.filter((post) =>
-      post.tags?.filter((el) => (selected.value === "All" ? el : el.title === selected.value)),
-    );
-    return posts;
+    return [
+      ...postlist.value?.filter((post) =>
+        selected.value === "All" ? post : post.tags[post.tags.length - 1].title === selected.value,
+      ),
+    ].filter((el) => el.title.includes(search.value));
   } else {
-    return postlist.value.filter((post) =>
-      post.tags?.filter((el) => (selected.value === "All" ? el : el.title === selected.value)),
+    return postlist.value?.filter((post) =>
+      selected.value === "All" ? post : post.tags[post.tags.length - 1].title === selected.value,
     );
   }
 });
-// const searchResult = computed(() => {
-//   if (selected.value === "All" && !search.value) {
-//     articlesByCategory.value = [];
-//     articlesByCategory.value = [
-//       ...postsState.value.postList.filter((el) => el.title?.includes(search.value)),
-//     ];
-
-//     return articlesByCategory.value;
-//   } else if (selected.value !== "All") {
-//     articlesByCategory.value = [];
-//     articlesByCategory.value = [
-//       ...postsState.value.postList.filter((post) => post.category === selected.value),
-//     ];
-
-//     return articlesByCategory.value;
-//   } else {
-//     articlesByCategory.value = [];
-//     articlesByCategory.value = [
-//       ...postsState.value.postList.filter((el) => el.title?.includes(search.value)),
-//     ];
-
-//     return articlesByCategory.value;
-//   }
-// });
 </script>
 
 <template>
@@ -91,10 +62,10 @@ const searchResult = computed(() => {
         </div>
       </div>
 
-      <div class="list" v-if="postlist.length">
+      <div class="list" v-if="searchResult.length">
         <GuardList
           :label="selected"
-          :list="postlist"
+          :list="searchResult"
           direction-card="1fr 2fr 0.5fr"
           :show-short="true" />
       </div>

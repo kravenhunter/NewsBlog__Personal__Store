@@ -17,8 +17,6 @@ const state = reactive({
     userCredentials.value.find((el) => el.userNameField === data.value?.user?.name)?.id ?? "",
 });
 
-console.log(userCredentials.value);
-
 const onFileSelected = async (event: Event) => {
   fileData.value = extractFileFromEvent(event);
 };
@@ -57,7 +55,6 @@ const submitForm = async () => {
       const result = await createOrUpdateData("advertise/create", body);
 
       result && result.statusCode === 200 && resetForm();
-      console.log(result);
     }
   }
   setTimeout(() => {
@@ -65,7 +62,6 @@ const submitForm = async () => {
   }, 500);
 };
 const deleteHaandler = async (adver_id: string) => {
-  console.log(adver_id);
   if (isItemExist(adver_id, "advertise")) {
     await deleteDataById(`advertise/delete-by-id/${adver_id}`);
   }

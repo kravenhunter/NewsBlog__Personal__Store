@@ -22,6 +22,8 @@ export default defineEventHandler(async (event) => {
     }
 
     const formData = await readMultipartFormData(event);
+    console.log("Post ID=========", event?.context?.params?.id);
+
     if (formData?.length) {
       const getConverted = extractMultipartData<IProps>(formData);
 
@@ -34,6 +36,14 @@ export default defineEventHandler(async (event) => {
       if (getConverted.imageBg && getConverted.imagePrev) {
         const getImageBgBufferObject = await convertFileTOBase64(getConverted.imageBg);
         const getImagePrevBufferObject = await convertFileTOBase64(getConverted.imagePrev);
+        const getPostTag = await event.context.prisma.post.findFirst({
+          where: { id: event?.context?.params?.id },
+          select: {
+            title: true,
+            tags: true,
+          },
+        });
+
         const getItem = await event.context.prisma.post.update({
           where: { id: event?.context?.params?.id },
           data: {
@@ -41,7 +51,6 @@ export default defineEventHandler(async (event) => {
             body: getConverted.body,
             shortBody: getConverted.shortBody,
             author: getConverted.author,
-
             tags: {
               connect: {
                 id: categoryList?.id,
@@ -63,14 +72,118 @@ export default defineEventHandler(async (event) => {
               },
             },
           },
+          select: {
+            id: true,
+            title: true,
+            author: true,
+            body: true,
+            shortBody: true,
+            imageBg: true,
+            imagePrev: true,
+            tags: true,
+            Comment: true,
+          },
         });
         return {
           statusCode: 200,
           statusMessage: "Success",
           table: "post",
-          method: "create",
+          method: "update",
           objectResult: getItem,
         };
+        // if(getPostTag && getPostTag.tags.some(el => el.title.includes(getConverted.title))){
+        //   const getItem = await event.context.prisma.post.update({
+        //     where: { id: event?.context?.params?.id },
+        //     data: {
+        //       title: getConverted.title,
+        //       body: getConverted.body,
+        //       shortBody: getConverted.shortBody,
+        //       author: getConverted.author,
+        //       imageBg: {
+        //         create: {
+        //           title: getConverted.imageBg.filename ?? getConverted.title,
+        //           file_type: "Image",
+        //           file_binary: getImageBgBufferObject,
+        //         },
+        //       },
+        //       imagePrev: {
+        //         create: {
+        //           title: getConverted.imagePrev.filename ?? getConverted.title,
+        //           file_type: "Image",
+        //           file_binary: getImagePrevBufferObject,
+        //         },
+        //       },
+        //     },
+        //     select: {
+        //       id: true,
+        //       title: true,
+        //       author: true,
+        //       body: true,
+        //       shortBody: true,
+        //       imageBg: true,
+        //       imagePrev: true,
+        //       tags: true,
+        //       Comment: true,
+        //     },
+        //   });
+        //   return {
+        //     statusCode: 200,
+        //     statusMessage: "Success",
+        //     table: "post",
+        //     method: "update",
+        //     objectResult: getItem,
+        //   };
+        // }else{
+
+        //   const getItem = await event.context.prisma.post.update({
+        //     where: { id: event?.context?.params?.id },
+        //     data: {
+        //       title: getConverted.title,
+        //       body: getConverted.body,
+        //       shortBody: getConverted.shortBody,
+        //       author: getConverted.author,
+
+        //       tags: {
+        //         connect: {
+        //           id: categoryList?.id,
+        //           title: categoryList?.title,
+        //         },
+        //       },
+        //       imageBg: {
+        //         create: {
+        //           title: getConverted.imageBg.filename ?? getConverted.title,
+        //           file_type: "Image",
+        //           file_binary: getImageBgBufferObject,
+        //         },
+        //       },
+        //       imagePrev: {
+        //         create: {
+        //           title: getConverted.imagePrev.filename ?? getConverted.title,
+        //           file_type: "Image",
+        //           file_binary: getImagePrevBufferObject,
+        //         },
+        //       },
+        //     },
+        //     select: {
+        //       id: true,
+        //       title: true,
+        //       author: true,
+        //       body: true,
+        //       shortBody: true,
+        //       imageBg: true,
+        //       imagePrev: true,
+        //       tags: true,
+        //       Comment: true,
+        //     },
+        //   });
+        //   return {
+        //     statusCode: 200,
+        //     statusMessage: "Success",
+        //     table: "post",
+        //     method: "update",
+        //     objectResult: getItem,
+        //   };
+        // }
       } else {
         const getItem = await event.context.prisma.post.update({
           where: { id: event?.context?.params?.id },
@@ -79,18 +192,32 @@ export default defineEventHandler(async (event) => {
             shortBody: getConverted.shortBody,
             body: getConverted.body,
             tags: {
+              //отсоединяем связи
+              set: [],
+              //создаем новую связь
               connect: {
                 id: categoryList?.id,
                 title: categoryList?.title,
               },
             },
           },
+          select: {
+            id: true,
+            title: true,
+            author: true,
+            body: true,
+            shortBody: true,
+            imageBg: true,
+            imagePrev: true,
+            tags: true,
+            Comment: true,
+          },
         });
         return {
           statusCode: 200,
           statusMessage: "Success",
           table: "post",
-          method: "create",
+          method: "update",
           objectResult: getItem,
         };
       }

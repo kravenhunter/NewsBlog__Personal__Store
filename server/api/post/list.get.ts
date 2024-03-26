@@ -10,12 +10,17 @@ export default defineEventHandler(async (event) => {
       //   tags: true,
       //   Comment: true,
       // },
-      // select: {
-      //   imageBg: true,
-      //   imagePrev: true,
-      //   tags: true,
-      //   Comment: true,
-      // },
+      select: {
+        id: true,
+        title: true,
+        author: true,
+        body: true,
+        shortBody: true,
+        imageBg: true,
+        imagePrev: true,
+        tags: true,
+        Comment: true,
+      },
     });
     console.log(getItemList);
 

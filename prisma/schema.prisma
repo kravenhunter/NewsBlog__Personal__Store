@@ -103,10 +103,10 @@ model Post {
   date      DateTime @default(now())
   title     String
   author    String
-  body      String
+  body      String  @db.Text
   imageBg   File?    @relation(name: "imageBg")
   imagePrev File?    @relation(name: "imagePrev")
-  shortBody String
+  shortBody String    @db.Text
   tags      Tag[]
 
   Comment   Comment[]
@@ -136,7 +136,7 @@ model About {
   id          String   @id @default(cuid())
   date        DateTime @default(now())
   title       String
-  description String
+  description String  @db.Text
 }
 
 model Advertise {

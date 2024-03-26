@@ -3,16 +3,6 @@ import { storeToRefs } from "pinia";
 import { compressToBestSize, getSizeImage } from "~/composables/compressFile";
 import fileFromEvent from "~/utils/extractFileFromEvent";
 
-interface IFileData {
-  id?: string;
-  update_at?: number;
-  title?: string;
-  file_type?: string;
-  file_binary: string;
-  adition_binary?: string;
-  description: string;
-}
-
 const isLoading = ref(false);
 const file_binary = ref<File | null>();
 const adition_binary = ref<File | null>();
