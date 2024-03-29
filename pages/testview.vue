@@ -1,48 +1,13 @@
 <script setup lang="ts">
-const formData = reactive({
-  emailField: "admin@ya.ru",
-  passwordField: "p@ssw0rd",
-});
-
-const { signIn } = useAuth();
-
-const isLoading = ref(false);
-const v$ = validateLoginHelper(formData);
-
 async function submitForm() {
-  v$.value.$validate();
-  if (!v$.value.$error) {
-    try {
-      isLoading.value = true;
-      setTimeout(async () => {
-        const result = await signIn("credentials", {
-          email: v$.value.emailField.$model,
-          password: v$.value.passwordField.$model,
-          redirect: false,
-        });
-        isLoading.value = false;
-      }, 1000);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setTimeout(() => {
-        isLoading.value = false;
-      }, 1000);
-    }
-    // // console.log('password', v$.value.passwordField.$model);
-    // const reseulAuth = await logInInUser(v$.value.emailField.$model, v$.value.passwordField.$model);
-    // if (reseulAuth.statusCode === 200) {
-    //   // userState.value = true;
-
-    //   closeHandler();
-    // }
-
-    // reseulAuth.statusCode === 405 && console.log("submit! isAutState", reseulAuth.statusCode);
-  } else {
-    // console.log(v$.value.$errors[0]);
-    console.log("password", v$.value.passwordField.$model);
-    // eslint-disable-next-line no-alert
-    alert("not  submit!");
+  try {
+    const { data, error } = await useFetch("/api/post/list");
+    console.log(data.value);
+    console.log(error.value);
+  } catch (error) {
+    console.log(error);
+  } finally {
+    console.log("Done");
   }
 }
 </script>
@@ -62,17 +27,13 @@ async function submitForm() {
         label="YOUR EMAIL"
         :color-label="true"
         name="emailField"
-        placeholder="Input your email"
-        v-model:value.trim="v$.emailField.$model"
-        :error="v$.emailField.$errors" />
+        placeholder="Input your email" />
 
       <UiElementsAddLoginInput
         label="Your password"
         :color-label="true"
         name="passwordField"
         placeholder="Please input password"
-        v-model:value.trim:="v$.passwordField.$model"
-        :error="v$.passwordField.$errors"
         type="password" />
 
       <UiElementsAddButton title="Log In" font-size="16px" color-bg="light"
