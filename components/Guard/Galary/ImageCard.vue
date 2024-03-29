@@ -31,7 +31,12 @@ const emit = defineEmits<{
 //   },
 // });
 const remove = () => {
-  props.itemId && emit("remove", props.itemId);
+  if (props.itemId) {
+    emit("remove", props.itemId);
+  } else {
+    props.image?.id && emit("remove", props.image?.id);
+  }
+  console.log(props.itemId, props.image?.id);
 };
 </script>
 

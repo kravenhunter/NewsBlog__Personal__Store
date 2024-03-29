@@ -130,6 +130,6 @@ h4 {
   max-width: 500px;
   min-height: 600px;
   background-image: linear-gradient(rgb(62, 54, 131), rgba(62, 54, 131, 0.67), rgb(62 54 131 / 92%)),
-    url("/images/login_img.jpg");
+    url("/images/login_img.webp");
 }
 </style>

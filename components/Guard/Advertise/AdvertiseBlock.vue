@@ -5,7 +5,7 @@ const isLoading = ref(false);
 const fileData = ref<File | null>();
 
 const { advertiseList, userCredentials } = storeToRefs(useUnionStore());
-const { createOrUpdateData, deleteDataById, isItemExist, getAuthUserByName } = useUnionStore();
+const { createOrUpdateData, deleteDataById, isItemExist, loadDataList } = useUnionStore();
 const { data, status } = useAuth();
 
 const state = reactive({
@@ -24,18 +24,18 @@ function resetForm() {
   state.name = "";
 }
 
-const submitForm1 = async () => {
-  const {
-    data: response,
-    error,
-    refresh,
-  } = await useFetch(`/api/auth/me`, {
-    method: "POST",
-    body: { email: "admin@ya.ru" },
-  });
-  console.log(response.value);
-  console.log(status.value);
-};
+// const submitForm1 = async () => {
+//   const {
+//     data: response,
+//     error,
+//     refresh,
+//   } = await useFetch(`/api/auth/me`, {
+//     method: "POST",
+//     body: { email: "admin@ya.ru" },
+//   });
+//   console.log(response.value);
+//   console.log(status.value);
+// };
 const submitForm = async () => {
   isLoading.value = !isLoading.value;
   if (fileData.value) {
@@ -54,7 +54,11 @@ const submitForm = async () => {
       }
       const result = await createOrUpdateData("advertise/create", body);
 
-      result && result.statusCode === 200 && resetForm();
+      // result && result.statusCode === 200 && resetForm();
+      if (result && result.statusCode === 200) {
+        resetForm();
+        await loadDataList("advertise/list");
+      }
     }
   }
   setTimeout(() => {
@@ -64,6 +68,8 @@ const submitForm = async () => {
 const deleteHaandler = async (adver_id: string) => {
   if (isItemExist(adver_id, "advertise")) {
     await deleteDataById(`advertise/delete-by-id/${adver_id}`);
+  } else {
+    console.log("File not exist");
   }
 };
 // onMounted(() => console.log(advertiseList.value.databaseList));

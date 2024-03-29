@@ -8,7 +8,7 @@ const isLoading = ref(false);
 const fileData = ref<File | null>();
 
 const { imageList, categoryList } = storeToRefs(useUnionStore());
-const { createOrUpdateData, deleteDataById, isItemExist } = useUnionStore();
+const { createOrUpdateData, deleteDataById, isItemExist, loadDataList } = useUnionStore();
 
 const state = reactive({
   title: "",
@@ -43,8 +43,10 @@ const submitForm = async () => {
       }
       const result = await createOrUpdateData("file/upload", body);
 
-      result && result.statusCode === 200 && resetForm();
-      console.log(result);
+      if (result && result.statusCode === 200) {
+        result && result.statusCode === 200 && resetForm();
+        await loadDataList("file/list-by-type/images");
+      }
     }
   }
   setTimeout(() => {

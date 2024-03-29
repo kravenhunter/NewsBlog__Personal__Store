@@ -27,7 +27,7 @@ export default defineEventHandler(async (event) => {
     const getBufferObject = await convertFileTOBase64(getConverted.image_file);
     console.log("Advertise getConverted========", getConverted);
 
-    const getItem = await event.context.prisma.advertise.create({
+    await event.context.prisma.advertise.create({
       data: {
         name: getConverted.name,
         source: {
@@ -47,8 +47,8 @@ export default defineEventHandler(async (event) => {
       statusCode: 200,
       statusMessage: "Success",
       table: "advertise",
-      method: "create",
-      objectResult: getItem,
+      // method: "create",
+      // objectResult: getItem,
     };
   } catch (error) {
     console.log(error);

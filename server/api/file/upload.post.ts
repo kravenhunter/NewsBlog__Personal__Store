@@ -39,7 +39,7 @@ export default defineEventHandler(async (event) => {
         if (getConverted.type.includes("image")) {
           const getBufferObject = await convertFileTOBase64(getConverted.image_file);
 
-          const getItem = await event.context.prisma.file.create({
+          await event.context.prisma.file.create({
             data: {
               title: getConverted.title,
               file_type: "Image",
@@ -67,14 +67,14 @@ export default defineEventHandler(async (event) => {
             statusCode: 200,
             statusMessage: "Success",
             table: "file",
-            method: "create",
+            // method: "create",
             //  objectResult: { ...getItem, category: getItem.tag },
           };
         } else if (getConverted.type?.includes("audio") && getConverted.audio_file) {
           const getBufferObject = await convertFileTOBase64(getConverted.image_file);
           const getFullNameAudioFile = await write_To_File(getConverted.audio_file);
 
-          const getItem = await event.context.prisma.file.create({
+          await event.context.prisma.file.create({
             data: {
               title: getConverted.title,
               file_type: "Audio",
