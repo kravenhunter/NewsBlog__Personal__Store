@@ -22,13 +22,13 @@ export default defineNuxtConfig({
   routeRules: {
     "https://media.cnn.com/api/v1/**": {
       cors: true,
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "*",
-        "Access-Control-Allow-methods": "GET,HEAD",
-        //  'access-Control-Allow-origin': 'http://localhost:3000',
-        //  'access-control-allow-credentials': 'true'
-      },
+      // headers: {
+      //   "Access-Control-Allow-Origin": "*",
+      //   "Access-Control-Allow-Headers": "*",
+      //   "Access-Control-Allow-Methods": "GET,HEAD",
+      //   //  'access-Control-Allow-origin': 'http://localhost:3000',
+      //   //  'access-control-allow-credentials': 'true'
+      // },
     },
   },
   auth: {

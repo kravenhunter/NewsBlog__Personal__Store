@@ -36,9 +36,9 @@ async function submitForm() {
         placeholder="Please input password"
         type="password" />
 
-      <UiElementsAddButton title="Log In" font-size="16px" color-bg="light"
-        >Log In</UiElementsAddButton
-      >
+      <UiElementsAddButton title="Log In" font-size="16px" color-bg="light">
+        Load Posts
+      </UiElementsAddButton>
     </form>
   </div>
 </template>
