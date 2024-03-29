@@ -52,11 +52,7 @@ async function handleClick() {
           type="text"
           placeholder="Name *"
           v-model="newComment.anonumousName" />
-        <input
-          class="user_email input"
-          type="text"
-          placeholder="Email *"
-          v-model="newComment.userId" />
+        <input class="user_email input" type="text" placeholder="Email *" />
         <input class="user_phone input" type="text" placeholder="Phone" />
       </div>
     </div>
