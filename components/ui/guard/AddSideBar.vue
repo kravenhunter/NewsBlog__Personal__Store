@@ -173,16 +173,6 @@ const logOutHandler = async () => {
           </span>
           <span class="menu_text">Log Out</span>
         </UiElementsAddButton>
-        <!--  <UiElementsAddLink class="button log_out" to-path="/">
-          <span class="material_icon">
-            <UiElementsAddIcon
-              icon-name="tabler:logout"
-              color-icon="white"
-              size-width="40"
-              size-heigth="40" />
-          </span>
-          <span class="menu_text">Log Out</span>
-        </UiElementsAddLink> -->
       </div>
     </div>
   </aside>

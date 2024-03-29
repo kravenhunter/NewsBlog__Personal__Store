@@ -12,25 +12,6 @@ withDefaults(defineProps<IProps>(), {
   gridDirection: "1fr",
 });
 
-// defineProps({
-//   post: {
-//     type: Object as PropType<IPost>,
-//     default: () => {},
-//   },
-//   gridDirection: {
-//     type: String,
-//     default: "1fr",
-//   },
-//   isShowBody: {
-//     type: Boolean,
-//     default: false,
-//   },
-//   isShowShort: {
-//     type: Boolean,
-//     default: false,
-//   },
-// });
-
 const { deleteDataById, isPostExist } = useUnionStore();
 
 const goNext = (routeName: string, id: string | undefined) => {
@@ -40,9 +21,13 @@ const goNext = (routeName: string, id: string | undefined) => {
 
 <template>
   <div class="postListPreview" v-if="post?.id">
-    <NuxtImg
+    <!--     <NuxtImg
       v-if="post.imagePrev?.file_binary"
       :src="`data:image/webp;base64,${post.imagePrev.file_binary}`"
+      :alt="post.title" /> -->
+    <NuxtImg
+      v-if="post.imagePrev?.file_binary"
+      :src="post.imagePrev.file_binary"
       :alt="post.title" />
     <div class="description">
       <h2 class="title" @click="goNext('post', post.id)">{{ post.title }}</h2>

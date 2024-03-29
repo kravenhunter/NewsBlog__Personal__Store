@@ -30,7 +30,7 @@ export async function compressToBestSize(
 
   const promise = await new Promise((resolve, reject) => {
     const compress = new Compressor(fileImage, {
-      quality: 0.8,
+      quality: 0.4,
       // quality: 0.6,
       width: imaageWidth,
       height: currentHeight,

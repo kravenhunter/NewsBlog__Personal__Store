@@ -1,12 +1,13 @@
 import { getServerSession } from "#auth";
-import type { H3Error } from "h3";
+import type { H3Error, MultiPartData } from "h3";
+import { write_To_File } from "~/server/utils/saving_file_helper";
 
 //import { extractFormData } from "~/server/utils";
 
 interface IAdvertise {
   name: string;
   description: string;
-  image_file: File;
+  image_file: MultiPartData;
 }
 export default defineEventHandler(async (event) => {
   try {
@@ -18,37 +19,41 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    const formData = await readFormData(event);
-    // const title = formData.get("name");
-    // const description = formData.get("description");
-    // const file = formData.get("file");
-    const getConverted = extractFormData<IAdvertise>(formData);
+    const formData = await readMultipartFormData(event);
 
-    const getBufferObject = await convertFileTOBase64(getConverted.image_file);
-    console.log("Advertise getConverted========", getConverted);
+    if (formData?.length) {
+      const getConverted = extractMultipartData<IAdvertise>(formData);
 
-    await event.context.prisma.advertise.create({
-      data: {
-        name: getConverted.name,
-        source: {
-          create: {
-            title: getConverted.name,
-            description: getConverted.description,
-            file_type: "Image",
-            file_binary: getBufferObject,
+      //  const getBufferObject = await convertFileTOBase64(getConverted.image_file);
+
+      const getFullNameImageFile = await write_To_File(getConverted.image_file);
+      await event.context.prisma.advertise.create({
+        data: {
+          name: getConverted.name,
+          source: {
+            create: {
+              title: getConverted.name,
+              description: getConverted.description,
+              file_type: "Image",
+              file_binary: `/images/upload/${getFullNameImageFile}`,
+            },
           },
         },
-      },
-      select: {
-        source: true,
-      },
-    });
+        select: {
+          source: true,
+        },
+      });
+      return {
+        statusCode: 200,
+        statusMessage: "Success",
+        table: "advertise",
+        // method: "create",
+        // objectResult: getItem,
+      };
+    }
     return {
-      statusCode: 200,
-      statusMessage: "Success",
-      table: "advertise",
-      // method: "create",
-      // objectResult: getItem,
+      statusCode: 400,
+      statusMessage: "Form Data is empty",
     };
   } catch (error) {
     console.log(error);

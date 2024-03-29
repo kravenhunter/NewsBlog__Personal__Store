@@ -42,7 +42,8 @@ const remove = () => {
 
 <template>
   <div class="image" v-if="image">
-    <NuxtImg :src="`data:image/webp;base64,${image.file_binary}`" :alt="image.title" />
+    <!--   <NuxtImg :src="`data:image/webp;base64,${image.file_binary}`" :alt="image.title" /> -->
+    <NuxtImg :src="image.file_binary" :alt="image.title" :id="image.id" />
     <div class="intro">
       <h1>{{ title ?? image.title }}</h1>
       <p>{{ image.description }}</p>

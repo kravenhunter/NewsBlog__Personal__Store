@@ -27,9 +27,7 @@ const culture = postlist.value.filter((item) => {
 const styleList = postlist.value.filter((item) => {
   return item.tags?.some((el) => el.title?.includes("Style"));
 });
-const scienceList = postlist.value.filter((item) => {
-  return item.tags?.some((el) => el.title?.includes("Science"));
-});
+
 const favoriteList = postlist.value.filter((item) => {
   return item.tags?.some((el) => el.title?.includes("Favorite"));
 });
@@ -89,7 +87,7 @@ useSeoMeta({
           <LazyUiElementsAdvertise
             v-if="advertiseList"
             label="Advertisement"
-            :link="advertiseList[0]" />
+            :link="advertiseList[1]" />
         </div>
       </section>
 

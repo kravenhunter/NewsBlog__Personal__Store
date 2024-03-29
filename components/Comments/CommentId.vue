@@ -17,9 +17,7 @@ defineProps<IProps>();
         size-heigth="80" />
     </div>
     <div v-else class="avatar">
-      <NuxtImg
-        :src="`data:image/webp;base64,${comment.Author.avatarField.file_binary}`"
-        :alt="comment.Author.userNameField" />
+      <NuxtImg :src="comment.Author.avatarField.file_binary" :alt="comment.Author.userNameField" />
     </div>
     <div class="description">
       <div class="description__credentials">

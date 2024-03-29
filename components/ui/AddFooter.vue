@@ -4,7 +4,7 @@ import type { ICategory, IContacts, INavigation, IPost } from "~/types";
 interface IProps {
   categories?: ICategory[] | null;
   contacts?: IContacts[] | null;
-  aboutUsLinks?: INavigation[] | null;
+  aboutUsLinks?: INavigation[];
   favorites?: IPost[] | null;
 }
 defineProps<IProps>();

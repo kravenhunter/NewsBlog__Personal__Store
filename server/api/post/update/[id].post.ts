@@ -1,5 +1,6 @@
 import { getServerSession } from "#auth";
 import type { H3Error, MultiPartData } from "h3";
+import { write_To_File } from "~/server/utils/saving_file_helper";
 
 interface IProps {
   title: string;
@@ -22,7 +23,6 @@ export default defineEventHandler(async (event) => {
     }
 
     const formData = await readMultipartFormData(event);
-    console.log("Post ID=========", event?.context?.params?.id);
 
     if (formData?.length) {
       const getConverted = extractMultipartData<IProps>(formData);
@@ -34,9 +34,11 @@ export default defineEventHandler(async (event) => {
       });
 
       if (getConverted.imageBg && getConverted.imagePrev) {
-        const getImageBgBufferObject = await convertFileTOBase64(getConverted.imageBg);
-        const getImagePrevBufferObject = await convertFileTOBase64(getConverted.imagePrev);
-        const getPostTag = await event.context.prisma.post.findFirst({
+        // const getImageBgBufferObject = await convertFileTOBase64(getConverted.imageBg);
+        // const getImagePrevBufferObject = await convertFileTOBase64(getConverted.imagePrev);
+        const getFullNameImageFile = await write_To_File(getConverted.imageBg);
+
+        await event.context.prisma.post.findFirst({
           where: { id: event?.context?.params?.id },
           select: {
             title: true,
@@ -61,14 +63,14 @@ export default defineEventHandler(async (event) => {
               create: {
                 title: getConverted.imageBg.filename ?? getConverted.title,
                 file_type: "Image",
-                file_binary: getImageBgBufferObject,
+                file_binary: `/images/upload/${getFullNameImageFile}`,
               },
             },
             imagePrev: {
               create: {
                 title: getConverted.imagePrev.filename ?? getConverted.title,
                 file_type: "Image",
-                file_binary: getImagePrevBufferObject,
+                file_binary: `/images/upload/${getFullNameImageFile}`,
               },
             },
           },
@@ -91,99 +93,6 @@ export default defineEventHandler(async (event) => {
           method: "update",
           objectResult: getItem,
         };
-        // if(getPostTag && getPostTag.tags.some(el => el.title.includes(getConverted.title))){
-        //   const getItem = await event.context.prisma.post.update({
-        //     where: { id: event?.context?.params?.id },
-        //     data: {
-        //       title: getConverted.title,
-        //       body: getConverted.body,
-        //       shortBody: getConverted.shortBody,
-        //       author: getConverted.author,
-        //       imageBg: {
-        //         create: {
-        //           title: getConverted.imageBg.filename ?? getConverted.title,
-        //           file_type: "Image",
-        //           file_binary: getImageBgBufferObject,
-        //         },
-        //       },
-        //       imagePrev: {
-        //         create: {
-        //           title: getConverted.imagePrev.filename ?? getConverted.title,
-        //           file_type: "Image",
-        //           file_binary: getImagePrevBufferObject,
-        //         },
-        //       },
-        //     },
-        //     select: {
-        //       id: true,
-        //       title: true,
-        //       author: true,
-        //       body: true,
-        //       shortBody: true,
-        //       imageBg: true,
-        //       imagePrev: true,
-        //       tags: true,
-        //       Comment: true,
-        //     },
-        //   });
-        //   return {
-        //     statusCode: 200,
-        //     statusMessage: "Success",
-        //     table: "post",
-        //     method: "update",
-        //     objectResult: getItem,
-        //   };
-        // }else{
-
-        //   const getItem = await event.context.prisma.post.update({
-        //     where: { id: event?.context?.params?.id },
-        //     data: {
-        //       title: getConverted.title,
-        //       body: getConverted.body,
-        //       shortBody: getConverted.shortBody,
-        //       author: getConverted.author,
-
-        //       tags: {
-        //         connect: {
-        //           id: categoryList?.id,
-        //           title: categoryList?.title,
-        //         },
-        //       },
-        //       imageBg: {
-        //         create: {
-        //           title: getConverted.imageBg.filename ?? getConverted.title,
-        //           file_type: "Image",
-        //           file_binary: getImageBgBufferObject,
-        //         },
-        //       },
-        //       imagePrev: {
-        //         create: {
-        //           title: getConverted.imagePrev.filename ?? getConverted.title,
-        //           file_type: "Image",
-        //           file_binary: getImagePrevBufferObject,
-        //         },
-        //       },
-        //     },
-        //     select: {
-        //       id: true,
-        //       title: true,
-        //       author: true,
-        //       body: true,
-        //       shortBody: true,
-        //       imageBg: true,
-        //       imagePrev: true,
-        //       tags: true,
-        //       Comment: true,
-        //     },
-        //   });
-        //   return {
-        //     statusCode: 200,
-        //     statusMessage: "Success",
-        //     table: "post",
-        //     method: "update",
-        //     objectResult: getItem,
-        //   };
-        // }
       } else {
         const getItem = await event.context.prisma.post.update({
           where: { id: event?.context?.params?.id },

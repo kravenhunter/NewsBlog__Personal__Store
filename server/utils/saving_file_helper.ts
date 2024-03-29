@@ -24,7 +24,7 @@ export const write_To_File = async (file: MultiPartData): Promise<string> => {
       // Для Windows достаточно рутовой дирректории "./" audio
       const publicPath = _mime.includes("audio")
         ? `./public/audio/upload/${fileName}`
-        : `./public/image/upload/${fileName}`;
+        : `./public/images/upload/${fileName}`;
 
       const array = Buffer.from(file.data.buffer);
 

@@ -1,5 +1,6 @@
 import { getServerSession } from "#auth";
 import type { H3Error, MultiPartData } from "h3";
+import { write_To_File } from "~/server/utils/saving_file_helper";
 
 // import type { ICategory } from "~/types";
 
@@ -32,9 +33,9 @@ export default defineEventHandler(async (event) => {
           title: getConverted.tags,
         },
       });
-
-      const getImageBgBufferObject = await convertFileTOBase64(getConverted.imageBg);
-      const getImagePrevBufferObject = await convertFileTOBase64(getConverted.imagePrev);
+      const getFullNameImageFile = await write_To_File(getConverted.imageBg);
+      // const getImageBgBufferObject = await convertFileTOBase64(getConverted.imageBg);
+      // const getImagePrevBufferObject = await convertFileTOBase64(getConverted.imagePrev);
 
       // const getTags = converArrayToTags(getConverted.tags, categoryList);
 
@@ -56,14 +57,14 @@ export default defineEventHandler(async (event) => {
             create: {
               title: getConverted.imageBg.filename ?? getConverted.title,
               file_type: "Image",
-              file_binary: getImageBgBufferObject,
+              file_binary: `/images/upload/${getFullNameImageFile}`,
             },
           },
           imagePrev: {
             create: {
               title: getConverted.imagePrev.filename ?? getConverted.title,
               file_type: "Image",
-              file_binary: getImagePrevBufferObject,
+              file_binary: `/images/upload/${getFullNameImageFile}`,
             },
           },
         },

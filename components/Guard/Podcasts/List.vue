@@ -25,7 +25,7 @@ const deleteHandler = async (audioId?: string) => {
   <div class="podcast_block" v-if="list">
     <div class="postListPreview" v-for="el in list" :key="el.id">
       <div class="img_block">
-        <NuxtImg :src="`data:image/webp;base64,${el.file_binary}`" :alt="el.title" />
+        <NuxtImg :src="el.file_binary" :alt="el.title" />
       </div>
 
       <div class="description">
@@ -41,12 +41,6 @@ const deleteHandler = async (audioId?: string) => {
         </p>
       </div>
       <div class="edit_block">
-        <!-- <UiElementsAddIcon
-          icon-name="bx:edit"
-          color-icon="black"
-          size-width="24"
-          size-heigth="24" /> -->
-
         <button class="delete" @click="deleteHandler(el.id)">&times;</button>
       </div>
     </div>

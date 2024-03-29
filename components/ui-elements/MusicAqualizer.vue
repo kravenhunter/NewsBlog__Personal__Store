@@ -165,7 +165,7 @@ onMounted(async () => await loadData());
       <div class="album_block">
         <NuxtImg
           :class="{ spin_next: isSpinNext, spin_back: isSpinBack }"
-          :src="`data:image/webp;base64,${currentSongObject.file_binary}`"
+          :src="currentSongObject.file_binary"
           :alt="currentSongObject.title" />
         <span></span>
       </div>

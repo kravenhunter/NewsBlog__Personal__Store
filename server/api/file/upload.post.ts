@@ -1,7 +1,6 @@
 import { getServerSession } from "#auth";
 
 import type { H3Error, MultiPartData } from "h3";
-import { convertFileTOBase64 } from "~/server/utils/convertFileTOBase64";
 import { extractMultipartData } from "~/server/utils/extractFormData";
 import { write_To_File } from "~/server/utils/saving_file_helper";
 
@@ -36,14 +35,14 @@ export default defineEventHandler(async (event) => {
       });
 
       if (category && getConverted.image_file) {
-        if (getConverted.type.includes("image")) {
-          const getBufferObject = await convertFileTOBase64(getConverted.image_file);
-
+        if (getConverted.type.includes("image") && getConverted.image_file) {
+          //  const getBufferObject = await convertFileTOBase64(getConverted.image_file);
+          const getFullNameImageFile = await write_To_File(getConverted.image_file);
           await event.context.prisma.file.create({
             data: {
               title: getConverted.title,
               file_type: "Image",
-              file_binary: getBufferObject,
+              file_binary: `/images/upload/${getFullNameImageFile}`,
               description: getConverted.description,
               tag: {
                 connect: { ...category },
@@ -71,14 +70,15 @@ export default defineEventHandler(async (event) => {
             //  objectResult: { ...getItem, category: getItem.tag },
           };
         } else if (getConverted.type?.includes("audio") && getConverted.audio_file) {
-          const getBufferObject = await convertFileTOBase64(getConverted.image_file);
+          // const getBufferObject = await convertFileTOBase64(getConverted.image_file);
+          const getFullNameImageFile = await write_To_File(getConverted.image_file);
           const getFullNameAudioFile = await write_To_File(getConverted.audio_file);
 
           await event.context.prisma.file.create({
             data: {
               title: getConverted.title,
               file_type: "Audio",
-              file_binary: getBufferObject,
+              file_binary: `/images/upload/${getFullNameImageFile}`,
               adition_binary: `/audio/upload/${getFullNameAudioFile}`,
               description: getConverted.description,
               tag: {
@@ -126,6 +126,10 @@ export default defineEventHandler(async (event) => {
         };
       }
     }
+    return {
+      statusCode: 400,
+      statusMessage: "Form Data is empty",
+    };
   } catch (error) {
     const getError = error as H3Error;
     throw createError({

@@ -213,7 +213,7 @@ const submitForm = async () => {
 .add_post .post_form {
   display: grid;
   row-gap: 50px;
-  margin-bottom: 50px;
+  margin-bottom: 6rem;
 }
 .btn_block {
   display: flex;

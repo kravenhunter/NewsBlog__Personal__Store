@@ -34,12 +34,15 @@ withDefaults(defineProps<IProps>(), {
     </div>
 
     <div class="preview_image" v-if="showImage">
-      <!-- <img class="image" :src="singlePost?.image" alt="postPriview" /> -->
-
-      <NuxtImg
+      <!-- <NuxtImg
         v-if="singlePost?.imagePrev"
         class="image"
         :src="`data:image/webp;base64,${singlePost.imageBg.file_binary}`"
+        alt="Image" /> -->
+      <NuxtImg
+        v-if="singlePost?.imagePrev"
+        class="image"
+        :src="singlePost.imageBg.file_binary"
         alt="Image" />
     </div>
 
