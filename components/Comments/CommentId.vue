@@ -22,12 +22,12 @@ defineProps<IProps>();
         :alt="comment.Author.userNameField" />
     </div>
     <div class="description">
-      <div class="credentials">
-        <h4>{{ comment.Author?.userNameField }}</h4>
+      <div class="description__credentials">
+        <h4>{{ comment.Author?.userNameField ?? comment.anonumousName }}</h4>
         <h5>{{ comment.date && formatDate(comment.date) }}</h5>
       </div>
-      <div class="admin_message"><p>Your comment is awaiting moderation</p></div>
-      <div class="text">
+
+      <div class="description__text">
         <p>
           {{ comment.body }}
         </p>
@@ -36,14 +36,17 @@ defineProps<IProps>();
   </div>
 </template>
 
-<style scoped>
-.description .credentials {
-  display: flex;
-  column-gap: 10px;
-}
+<style scoped lang="scss">
 .description {
   display: grid;
   row-gap: 10px;
+  &__credentials {
+    display: flex;
+    column-gap: 10px;
+  }
+  &__text p {
+    font-size: 1.2rem;
+  }
 }
 .user_comment_block {
   display: grid;

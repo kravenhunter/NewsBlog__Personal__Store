@@ -13,12 +13,12 @@ definePageMeta({
       <LazyGuardPostsBlock v-if="route.params.id === 'posts'" />
       <LazyGuardPostsAddPost v-if="route.params.id === 'createpost'" />
     </div>
-    <LazyGuardPodcastsPodcastBlock v-if="route.params.id === 'podcasts'" />
+    <LazyGuardPodcastsItem v-if="route.params.id === 'podcasts'" />
     <LazyGuardPodcastsCreateAudioRecord v-if="route.params.id === 'createpodcasts'" />
     <LazyGuardGalaryBlock v-if="route.params.id === 'galary'" />
     <LazyGuardCategoryBlock v-if="route.params.id === 'category'" />
     <LazyGuardAdvertiseBlock v-if="route.params.id === 'advertise'" />
-    <LazyGuardAboutusAboutUsBlock v-if="route.params.id === 'aboutus'" />
+    <LazyGuardAboutusItem v-if="route.params.id === 'aboutus'" />
     <LazyGuardNavigationBlock v-if="route.params.id === 'navigation'" />
     <LazyGuardContactsBlock v-if="route.params.id === 'contacts'" />
     <LazyGuardUsersProfilesBlock v-if="route.params.id === 'users'" />

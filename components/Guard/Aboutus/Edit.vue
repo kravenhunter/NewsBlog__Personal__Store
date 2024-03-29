@@ -2,38 +2,27 @@
 import { storeToRefs } from "pinia";
 import type { IAbout } from "~/types";
 
+interface IProps {
+  about?: IAbout;
+}
+const props = defineProps<IProps>();
+
 const { aboutUs } = storeToRefs(useUnionStore());
 
-// const state = reactive({
-//   title: aboutUs.value?.length ? aboutUs.value[0].title : "",
-//   description: aboutUs.value?.length ? aboutUs.value[0].description : "",
-// });
 const state = reactive({
-  title: aboutUs.value[0]?.title ?? "",
-  description: aboutUs.value[0]?.description ?? "",
+  title: props.about?.title ?? "",
+  description: props.about?.description ?? "",
 });
-// const { updateAboutUs, addAbout } = useAboutUsStore();
+
 const { createOrUpdateData } = useUnionStore();
 const submitForm = async () => {
-  aboutUs.value[0]?.id &&
-    (await createOrUpdateData<IAbout>(`about/update/${aboutUs.value[0].id}`, state));
-  !aboutUs.value[0]?.id && (await createOrUpdateData<IAbout>("about/create", state));
+  props.about?.id && (await createOrUpdateData<IAbout>(`about/update/${props.about.id}`, state));
+  !props.about?.id && (await createOrUpdateData<IAbout>("about/create", state));
 };
-
-// const fillState = () => {
-//   aboutUs?.value?.id && (state.id = aboutUs?.value?.id);
-//   aboutUs?.value?.title && (state.title = aboutUs?.value?.title);
-//   aboutUs?.value?.aboutContent && (state.aboutContent = aboutUs?.value?.aboutContent);
-// };
-
-// onMounted(() => {
-//   fillState();
-// });
 </script>
 
 <template>
   <div class="edit_block">
-    <!-- <input type="hidden"  :id="aboutUs.id" /> -->
     <LazyUiElementsAddPostInput
       label="Title"
       width-form="100%"

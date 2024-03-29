@@ -7,6 +7,14 @@ export default defineEventHandler(async (event) => {
       where: {
         postId: event?.context?.params?.id,
       },
+      select: {
+        id: true,
+        body: true,
+        anonumousName: true,
+        date: true,
+        Posts: true,
+        Author: true,
+      },
     });
 
     if (!getItemList.length) {

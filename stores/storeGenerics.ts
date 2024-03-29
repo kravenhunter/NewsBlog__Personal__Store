@@ -14,8 +14,6 @@ import type {
   IUserCredentials,
 } from "~/types";
 
-// import { compressToBestSize } from "~/composables/compressFile";
-
 //import { uuid } from "vue-uuid";
 
 type TypeTables =
@@ -33,7 +31,6 @@ type TypeTables =
 
 const apiUrl = "/api";
 export const useUnionStore = defineStore("union-store", () => {
-  //const { data: response, error, refresh } = await useFetch<IResponse>(`/api/advertise/create`);
   const postlist = ref<IPost[]>([]);
   const aboutUs = ref<IAbout[]>([]);
   const advertiseList = ref<IAdvertisment[]>([]);
@@ -85,6 +82,28 @@ export const useUnionStore = defineStore("union-store", () => {
         action === "delete" &&
           (postlist.value = postlist.value.filter((el) => el.id !== (data as IPost).id));
         !action && (postlist.value = data as IPost[]);
+
+        break;
+      case "comment":
+        if (action === "create") {
+          const newComment = data as IComment;
+
+          const getPost = postlist.value.find((post) => post.id === newComment.postId);
+
+          getPost && getPost.Comment?.push(newComment);
+        }
+
+        // action === "update" &&
+        //   (commentListByCurrentPost.value = commentListByCurrentPost.value.map((el) => {
+        //     if (el.id === (data as IComment).id) {
+        //       return data as IComment;
+        //     }
+        //     return el;
+        //   }));
+        action === "delete" &&
+          (commentListByCurrentPost.value = commentListByCurrentPost.value.filter(
+            (el) => el.id !== (data as IComment).id,
+          ));
 
         break;
       case "images":
@@ -217,6 +236,7 @@ export const useUnionStore = defineStore("union-store", () => {
           ));
         !action && (footerLinks.value = data as INavigation[]);
         break;
+
       case "user-credential":
         action === "create" && userCredentials.value.push(data as IUserCredentials);
         action === "update" &&

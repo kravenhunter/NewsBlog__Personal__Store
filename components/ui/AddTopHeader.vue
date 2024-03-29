@@ -14,10 +14,7 @@ defineEmits<{
   searchInput: [value: string];
 }>();
 
-const { data, signIn, signOut, status } = useAuth();
-
-console.log("Header->user", data.value?.user?.name);
-console.log("Header->auth status", status.value);
+const { data, signOut, status } = useAuth();
 
 const convertPath = (title: string | undefined) => title && `/${title?.toLocaleLowerCase()}/list`;
 
@@ -29,9 +26,6 @@ const isBurgerOpen = ref(false);
 const openLogIn = ref(false);
 const opnenSignIn = ref(false);
 const opemProfile = ref(false);
-
-// const { signOutUser } = useAuthStore();
-// const { statAuth } = storeToRefs(useAuthStore());
 
 const toggleHandler = (event: boolean) => (isShow.value = !event);
 
@@ -48,7 +42,7 @@ const logOutHandler = async () => {
     const result = await signOut({
       redirect: false,
     });
-    console.log(result); //  { url: 'http://localhost:3001/index' }
+    // console.log(result); //  { url: 'http://localhost:3001/index' }
   } catch (error) {
     console.log(error);
   }

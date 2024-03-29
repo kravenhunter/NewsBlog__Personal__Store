@@ -38,7 +38,6 @@ model User {
   updateddAt       DateTime          @default(now())
   Account          Account?
   Session          Session?
-  Comment          Comment?
   User_Credentials User_Credentials?
 }
 
@@ -57,6 +56,7 @@ model User_Credentials {
   genderField    Gender
   userId         String    @unique
   User           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Comment        Comment[]
 }
 
 enum Gender {
@@ -103,14 +103,14 @@ model Post {
   date      DateTime @default(now())
   title     String
   author    String
-  body      String  @db.Text
+  body      String   @db.Text
   imageBg   File?    @relation(name: "imageBg")
   imagePrev File?    @relation(name: "imagePrev")
-  shortBody String    @db.Text
+  shortBody String   @db.Text
   tags      Tag[]
 
   Comment   Comment[]
-  CommentId String?
+
 }
 
 model Tag {
@@ -122,21 +122,21 @@ model Tag {
 }
 
 model Comment {
-  id            String   @id @default(cuid())
-  date          DateTime @default(now())
+  id            String            @id @default(cuid())
+  date          DateTime          @default(now())
   body          String
-  postId        String   @unique
-  Posts         Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
-  userId        String?  @unique
-  Author        User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  anonumousName String?  @unique
+  postId        String           
+  Posts         Post              @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId        String?           
+  Author        User_Credentials? @relation(fields: [userId], references: [id], onDelete: Cascade)
+  anonumousName String?           @unique
 }
 
 model About {
   id          String   @id @default(cuid())
   date        DateTime @default(now())
   title       String
-  description String  @db.Text
+  description String   @db.Text
 }
 
 model Advertise {

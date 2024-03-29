@@ -3,7 +3,7 @@ import type { IPost } from "~/types";
 
 interface IProps {
   post?: IPost | null;
-  gridDirection: string;
+  gridDirection?: string | null;
   isShowBody?: boolean | null;
   isShowShort?: boolean | null;
 }
@@ -48,10 +48,10 @@ const goNext = (routeName: string, id: string | undefined) => {
       <h2 class="title" @click="goNext('post', post.id)">{{ post.title }}</h2>
 
       <p class="created">{{ post.date && formatDate(post.date) }}</p>
-      <p class="post_body" v-if="isShowShort">
+      <p class="post_body" v-if="isShowShort && post.shortBody">
         {{ post.shortBody }}
       </p>
-      <p class="post_body" v-if="isShowBody">
+      <p class="post_body" v-if="isShowBody && post.body">
         {{ post.body }}
       </p>
     </div>

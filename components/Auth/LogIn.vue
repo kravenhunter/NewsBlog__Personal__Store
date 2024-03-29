@@ -30,15 +30,6 @@ async function submitForm() {
         isLoading.value = false;
       }, 1000);
     }
-    // // console.log('password', v$.value.passwordField.$model);
-    // const reseulAuth = await logInInUser(v$.value.emailField.$model, v$.value.passwordField.$model);
-    // if (reseulAuth.statusCode === 200) {
-    //   // userState.value = true;
-
-    //   closeHandler();
-    // }
-
-    // reseulAuth.statusCode === 405 && console.log("submit! isAutState", reseulAuth.statusCode);
   } else {
     // console.log(v$.value.$errors[0]);
     console.log("password", v$.value.passwordField.$model);
@@ -102,6 +93,7 @@ function closeHandler() {
 
 <style lang="scss" scoped>
 .btn_close {
+  font-size: 2.5rem;
   position: absolute;
   top: 10px;
   right: 20px;

@@ -1,6 +1,6 @@
-import type { ICategory, IFileData } from "~/types";
+import type { ICategory, IComment, IFileData } from "~/types";
 
-export default interface Post {
+export default interface IPost {
   id?: string;
   date: number;
   title: string;
@@ -10,5 +10,5 @@ export default interface Post {
   imagePrev: IFileData;
   shortBody: string;
   tags: ICategory[];
-  // Comment  : string;
+  Comment?: IComment[];
 }

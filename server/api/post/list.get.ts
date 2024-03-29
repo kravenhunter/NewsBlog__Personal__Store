@@ -19,10 +19,18 @@ export default defineEventHandler(async (event) => {
         imageBg: true,
         imagePrev: true,
         tags: true,
-        Comment: true,
+        Comment: {
+          select: {
+            id: true,
+            date: true,
+            body: true,
+            postId: true,
+            Author: true,
+            anonumousName: true,
+          },
+        },
       },
     });
-    console.log(getItemList);
 
     if (!getItemList.length) {
       console.log("Empty array Posts ===============");

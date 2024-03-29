@@ -19,6 +19,18 @@ export default defineNuxtConfig({
     "@nuxt/image",
     "@sidebase/nuxt-auth",
   ],
+  routeRules: {
+    "https://media.cnn.com/api/v1/**": {
+      cors: true,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "*",
+        "Access-Control-Allow-methods": "GET,HEAD",
+        //  'access-Control-Allow-origin': 'http://localhost:3000',
+        //  'access-control-allow-credentials': 'true'
+      },
+    },
+  },
   auth: {
     baseURL: process.env.AUTH_ORIGIN,
     provider: {
@@ -37,7 +49,9 @@ export default defineNuxtConfig({
       "postcss-import": true,
       "postcss-url": {},
       // to edit target browsers: use "browserslist" field in package.json
-      autoprefixer: {},
+      autoprefixer: {
+        overrideBrowserslist: ["cover 99.5%", "not IE < 9"],
+      },
     },
   },
   // register directory for auto-imports
@@ -66,7 +80,19 @@ export default defineNuxtConfig({
         { charset: "utf-8" },
         { name: "viewport", content: "width=device-width, initial-scale=1" },
         //  { hid: "description", name: "description", content: "the whole world daily news" },
+        { name: "description", content: "WORLD IMPULSE - the news blog" },
+        {
+          name: "keywords",
+          content: "world impulse, news,blog, world news",
+        },
+        { name: "ogTitle", content: "WORLD IMPULSE - the news blog" },
+        { name: "ogDescription", content: "WORLD IMPULSE - a blog of n world news" },
+        // Запрет активации  телефона поссылке
         { name: "format-detection", content: "telephone=no" },
+        //Запрет индексации  картинок и ссылок, текст контента доступен
+        { name: "robots", content: "noimageindex, nofollow" },
+        { name: "author", content: "Sergio Below" },
+        { name: "copyright", content: "Sergio Below" },
       ],
     },
   },

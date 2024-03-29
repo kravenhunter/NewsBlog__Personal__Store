@@ -14,6 +14,11 @@ const newComment = reactive({
   anonumousName: "",
 });
 
+const resetForm = () => {
+  newComment.body = "";
+  newComment.anonumousName = "";
+};
+
 async function handleClick() {
   if (newComment.postId && newComment.body) {
     if (status.value === "authenticated" && data.value?.user?.name) {
@@ -21,16 +26,8 @@ async function handleClick() {
       getUser?.id && (newComment.userId = getUser.id);
     }
 
-    try {
-      const result = await createOrUpdateData("comment/create", newComment);
-    } catch (error) {
-      console.log(error);
-    }
-
-    // const statusData = await addComment(newComment.value);
-    // status.statusCode === 200
-    //   ? (newComment.value = {})
-    //   : console.log(`Error ${status.statusCode} ${status.message}`);
+    const result = await createOrUpdateData("comment/create", { ...newComment });
+    result.statusCode === 200 ? resetForm() : console.log(`Error`, result);
   } else {
     console.log(`Form is empty`);
   }

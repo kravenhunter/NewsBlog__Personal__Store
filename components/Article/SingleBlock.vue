@@ -1,34 +1,30 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
-import type { IPost } from "~/types";
+import type { IComment, IPost } from "~/types";
 
 const route = useRoute();
 const article = ref<IPost>();
+const comments = ref<IComment[]>();
 
 const prevPage = ref<IPost>();
 const nextPage = ref<IPost>();
 
 //Gets  Comments list and functions
 
-const { commentListByCurrentPost, postlist, advertiseList } = storeToRefs(useUnionStore());
+const { postlist, advertiseList } = storeToRefs(useUnionStore());
 
-const { getPostByCategory, getCommentsByPostId } = useUnionStore();
+const { getPostByCategory } = useUnionStore();
 
 function getNavigations(currentPostId: string) {
+  article.value = postlist.value.find((el) => el.id === String(route.params.id));
   const categoryList = getPostByCategory(String(route.params.slug));
 
   const index = categoryList.findIndex((el) => el.id === currentPostId);
   prevPage.value = categoryList[index - 1];
   nextPage.value = categoryList[index + 1];
 }
-const loadStores = async () => {
-  article.value = postlist.value.find((el) => el.id === String(route.params.id));
-  article.value?.id && (await getCommentsByPostId(article.value.id));
-  getNavigations(String(route.params.id));
-};
-loadStores();
 
-// onMounted(() => console.log(commentsState.value.commentlist));
+getNavigations(String(route.params.id));
 
 useSeoMeta({
   title: article.value && `${article.value?.title}`,
@@ -85,11 +81,8 @@ useSeoMeta({
           </div>
           <div class="comments grid_block">
             <LazyCommentsLeaveComments :post-id="article.id" />
-            <div class="comment_block grid_block" v-if="commentListByCurrentPost?.length">
-              <LazyCommentsCommentId
-                v-for="com in commentListByCurrentPost"
-                :key="com.id"
-                :comment="com" />
+            <div class="comment_block grid_block" v-if="article.Comment?.length">
+              <LazyCommentsCommentId v-for="com in article.Comment" :key="com.id" :comment="com" />
             </div>
           </div>
         </article>

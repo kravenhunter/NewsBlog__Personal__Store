@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 
-const isEdit = ref(false);
-
 const { aboutUs } = storeToRefs(useUnionStore());
+const isEdit = ref(false);
 </script>
 
 <template>
@@ -15,7 +14,7 @@ const { aboutUs } = storeToRefs(useUnionStore());
       >
     </div>
 
-    <LazyGuardAboutusEditAbout v-if="isEdit" />
+    <LazyGuardAboutusEdit v-if="isEdit" :about="aboutUs[0]" />
 
     <div class="about_content" v-if="!isEdit && aboutUs.length">
       <div class="about_title">

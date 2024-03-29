@@ -99,18 +99,6 @@ withDefaults(defineProps<IProps>(), {
   & .description_block {
     display: grid;
     row-gap: 20px;
-    /*     & .pre {
-      font-family: var(--font-standart);
-      line-height: 1.6;
-      white-space: pre-line;
-      padding-left: 15px;
-
-      @media (max-width: 600px) {
-        & p {
-          font-size: 20px;
-        }
-      }
-    } */
   }
   & h5 {
     font-family: var(--font-italic);

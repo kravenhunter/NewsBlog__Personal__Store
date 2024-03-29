@@ -5,7 +5,7 @@ interface IProps {
   list?: IPost[] | null;
   singlePost?: IPost | null;
   label?: string | null;
-  directionCard?: string;
+  directionCard?: string | null;
   directionContainer?: string | null;
   row?: string | null;
   showBody?: boolean | null;
@@ -60,8 +60,8 @@ withDefaults(defineProps<IProps>(), {
     <div class="post_list" v-if="list">
       <LazyGuardPreviewForList
         :grid-direction="directionCard"
-        v-for="(post, i) in list"
-        :key="i"
+        v-for="post in list"
+        :key="post.id"
         :post="post"
         :is-show-body="showBody"
         :is-show-short="showShort" />
