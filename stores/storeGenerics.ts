@@ -299,10 +299,17 @@ export const useUnionStore = defineStore("union-store", () => {
     }
   };
 
+  /**
+   * async Function Pass Data to Create  in Data base and  Returns IResponse
+   * @param {string} apiPath   apiPath
+   * @param {T} formData   form data type T
+   * @return {Promise<IResponse>}  Promise IResponse {statusCode , statusMessage}
+   *
+   **/
   const createOrUpdateData = async <T extends Record<string, any>>(
     apiPath: string,
     formData: T,
-  ) => {
+  ): Promise<IResponse> => {
     try {
       const {
         data: response,

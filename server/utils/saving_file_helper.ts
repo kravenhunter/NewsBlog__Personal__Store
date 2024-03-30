@@ -5,7 +5,23 @@ import * as fs from "node:fs";
 import path from "node:path";
 
 const FILES_KEYS = ["name", "filename", "type", "data"];
+const getPathObject = (file_name: string, file_type: string) => {
+  const [_mime, ext] = String(file_type).split("/");
+  const [name, extension] = String(file_name).split(".");
+  const fileName = `${randomUUID()}_${name}.${extension}`;
+  // Формирование пути для  Linux
+  const currentPath = path.resolve(path.dirname("./"), "public");
+  // const currentPath = path.resolve(path.dirname('./'), 'public', files.file.originalFilename);
 
+  // Для Windows достаточно рутовой дирректории "./" audio
+  const publicPath = _mime.includes("audio")
+    ? `./public/audio/upload/${fileName}`
+    : `./public/images/upload/${fileName}`;
+  return {
+    fileName,
+    publicPath,
+  };
+};
 // Проверяем содержит ли  объект все ключи FILES_KEYS
 export const isFile = (data: MultiPartData) => {
   return Object.keys(data).filter((key) => FILES_KEYS.includes(key)).length === FILES_KEYS.length;
@@ -14,17 +30,7 @@ export const isFile = (data: MultiPartData) => {
 export const write_To_File = async (file: MultiPartData): Promise<string> => {
   return await new Promise<string>((resolve, reject) => {
     if (isFile(file)) {
-      const [_mime, ext] = String(file.type).split("/");
-      const [name, extension] = String(file.filename).split(".");
-      const fileName = `${randomUUID()}_${name}.${extension}`;
-      // Формирование пути для  Linux
-      const currentPath = path.resolve(path.dirname("./"), "public");
-      // const currentPath = path.resolve(path.dirname('./'), 'public', files.file.originalFilename);
-
-      // Для Windows достаточно рутовой дирректории "./" audio
-      const publicPath = _mime.includes("audio")
-        ? `./public/audio/upload/${fileName}`
-        : `./public/images/upload/${fileName}`;
+      const { fileName, publicPath } = getPathObject(file.filename!, file.type!);
 
       const array = Buffer.from(file.data.buffer);
 
