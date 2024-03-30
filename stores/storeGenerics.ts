@@ -44,30 +44,49 @@ export const useUnionStore = defineStore("union-store", () => {
   const userCredentials = ref<IUserCredentials[]>([]);
 
   const pendingData = ref<boolean>(false);
+
+  /**
+   * async Function Returns boolean
+   * @param {string} idItem   apiPath
+   * @param {TypeTables} table   table name
+   * @return {boolean}  boolean
+   *
+   **/
   const isItemExist = (idItem: string, table: TypeTables) => {
     switch (table) {
       case "post":
-        return postlist.value.some((el) => el.id === idItem);
+        return postlist.value.some((el) => el.id === idItem) ?? false;
       case "images":
-        return imageList.value.some((el) => el.id === idItem);
+        return imageList.value.some((el) => el.id === idItem) ?? false;
       case "podcasts":
-        return podCastList.value.some((el) => el.id === idItem);
+        return podCastList.value.some((el) => el.id === idItem) ?? false;
       case "about":
-        return aboutUs.value.some((el) => el.id === idItem);
+        return aboutUs.value.some((el) => el.id === idItem) ?? false;
       case "advertise":
-        return advertiseList.value.some((el) => el.id === idItem);
+        return advertiseList.value.some((el) => el.id === idItem) ?? false;
       case "contacts":
-        return contactList.value.some((el) => el.id === idItem);
+        return contactList.value.some((el) => el.id === idItem) ?? false;
       case "tag":
-        return categoryList.value.some((el) => el.id === idItem);
+        return categoryList.value.some((el) => el.id === idItem) ?? false;
       case "nav-link":
-        return navLiks.value.some((el) => el.id === idItem);
+        return navLiks.value.some((el) => el.id === idItem) ?? false;
       case "footer-link":
-        return footerLinks.value.some((el) => el.id === idItem);
+        return footerLinks.value.some((el) => el.id === idItem) ?? false;
       case "user-credential":
-        return userCredentials.value.some((el) => el.id === idItem);
+        return userCredentials.value.some((el) => el.id === idItem) ?? false;
+      default:
+        return false;
     }
   };
+
+  /**
+   * async Function Returns void
+   * @param {string} table   table
+   * @param {T} data   data
+   * @param {string?} action   action
+   * @return {void}  void.
+   *
+   **/
   const fillStoreData = <T>(table: string, data: T, action?: string) => {
     switch (table) {
       case "post":
@@ -260,11 +279,11 @@ export const useUnionStore = defineStore("union-store", () => {
 
     // console.log(categoryList.value);
   };
+
   /**
-   * async Function Returns void
+   * async Function Returns  Promise IResponse
    * @param {string} apiPath   apiPath
-   * @param {TypeTables} table   table
-   * @return {Promise<void>}  Promise void.
+   * @return {Promise<IResponse>}  Promise IResponse { statusCode , statusMessage}.
    *
    **/
   const loadDataList = async (apiPath: string) => {
@@ -348,9 +367,9 @@ export const useUnionStore = defineStore("union-store", () => {
   };
 
   /**
-   * async Function Returns  void
+   * async Function Promise IResponse
    * @param {string} apiPath   apiPath
-   * @return { Promise<void>}  Promise void
+   * @return {Promise<IResponse>}  Promise IResponse {statusCode , statusMessage}
    *
    **/
   const deleteDataById = async (apiPath: string) => {
@@ -360,28 +379,40 @@ export const useUnionStore = defineStore("union-store", () => {
       if (error.value) {
         throw error.value;
       }
+      if (!response.value) {
+        return {
+          statusCode: 400,
+          statusMessage: "Response object is null",
+        };
+      }
 
       response.value?.table &&
         response.value.statusCode === 200 &&
         fillStoreData(response.value.table, response.value.objectResult, "delete");
+      return {
+        statusCode: response.value.statusCode,
+        statusMessage: response.value.statusMessage,
+      };
     } catch (error) {
-      console.log(error);
+      const getError = error as H3Error;
+      return {
+        statusCode: getError.statusCode,
+        statusMessage: getError.message,
+      };
     }
   };
 
   /**
-   * async Function Returns voidt
+   * async Function Returns Promise void.
    * @param {string} postId   postId
    * @return {Promise<void>}  Promise void.
    *
    **/
   const getCommentsByPostId = async (postId: string) => {
     try {
-      const {
-        data,
-        error,
-        refresh: refreshPost,
-      } = await useFetch<IComment[]>(`${apiUrl}/comment/list-by-post-id/list/${postId}`);
+      const { data, error } = await useFetch<IComment[]>(
+        `${apiUrl}/comment/list-by-post-id/list/${postId}`,
+      );
       if (error.value) {
         throw error.value;
       }
@@ -394,7 +425,7 @@ export const useUnionStore = defineStore("union-store", () => {
   /**
    * async Function Returns   IPost array
    * @param {string} category   category
-   * @return {Promise<IPost[]>}  Promise Post[].
+   * @return {Post[]}  Post[].
    *
    **/
   const getPostByCategory = (category: string) => {
@@ -406,39 +437,32 @@ export const useUnionStore = defineStore("union-store", () => {
   /**
    * async Function Returns  IPost array
    * @param {string} search   search
-   * @return {Promise<IPost[]>}  Promise Post[].
+   * @return {IPost[]}  Promise Post[].
    *
    **/
-  const getPostByName = (search: string) => postlist.value.filter((el) => el.title.match(search));
+  const getPostByName = (search: string): IPost[] =>
+    postlist.value.filter((el) => el.title.match(search));
 
   /**
    * async Function Returns  IPost object
-   * @param {string} search   search
-   * @return {Promise<IPost>}  Promise Post.
+   * @param {string} postId   postId
+   * @return {IPost | null}   Post | null.
    *
    **/
-  const getPostById = (postId: string) => postlist.value.find((el) => el.id === postId);
-
-  /**
-   * async Function Returns  IResponse object | null
-   * @param {string} apiPath   apiPath
-   * @param {T} formData   formData
-   * @return {Promise<IResponse | null>}  Promise IResponse | null.
-   *
-   **/
+  const getPostById = (postId: string) => postlist.value.find((el) => el.id === postId) ?? null;
 
   /**
    * async Function Returns IUserCredentials | undefined
-   * @param {string} name   apiPath
-   * @return { IUserCredentials | undefined}  IUserCredentials | undefined
+   * @param {string} name   name
+   * @return { IUserCredentials | null}  IUserCredentials | null
    *
    **/
   const getAuthUserByName = (name?: string) =>
-    userCredentials.value?.find((u) => u.userNameField === name);
+    userCredentials.value?.find((u) => u.userNameField === name) ?? null;
 
   /**
    * async Function Returns boolean
-   * @param {string} id   apiPath
+   * @param {string} id   id
    * @return {boolean}  boolean
    *
    **/
